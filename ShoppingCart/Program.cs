@@ -1,0 +1,27 @@
+using Models;
+using ShoppingCart;
+using ShoppingCart.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
+builder.Services.AddControllers();
+
+builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
+builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
+builder.Services.AddScoped<DataContext>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseCors(a => a.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseHttpsRedirection();
+app.MapControllers();
+app.Run();
