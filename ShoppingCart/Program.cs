@@ -1,12 +1,15 @@
 using Models;
 using ShoppingCart;
 using ShoppingCart.Services;
+using ShoppingCart.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddControllers();
+
+builder.Services.Configure<GrpcSettings>(builder.Configuration.GetSection("Grpc:Products"));
 
 builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
