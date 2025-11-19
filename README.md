@@ -1,2 +1,2 @@
 # MarketPlace
-Asp.net core project with microservise architecture
+Asp.net core project with microservice architecture
