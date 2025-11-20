@@ -12,7 +12,6 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
         if (order != null)
         {
             order.Quantity = quantity;
-            CreateEvent(CartEventType.OrderChanged, order);
         }
         else
         {
@@ -26,7 +25,6 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
                     Quantity = quantity
                 };
                 dataContext.Orders.Add(order);
-                CreateEvent(CartEventType.OrderAdded, order);
             }
         }
 
@@ -39,23 +37,8 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
         if (order != null)
         {
             dataContext.Orders.Remove(order);
-            CreateEvent(CartEventType.OrderRemoved, order);
         }
 
         return Get();
-    }
-
-    public IEnumerable<CartEvent> GetCartEvents(long timestamp)
-        => dataContext.CartEvents.Where(e => e.TimeStamp > timestamp);
-
-    private void CreateEvent(CartEventType cartEventType, Order order)
-    {
-        dataContext.CartEvents.Add(new CartEvent()
-        {
-            Order = order,
-            Type = cartEventType,
-            TimeStamp = DateTime.Now.Ticks,
-            Time = DateTime.Now
-        });
     }
 }

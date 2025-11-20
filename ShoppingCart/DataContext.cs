@@ -4,14 +4,12 @@ namespace ShoppingCart;
 
 public class DataContext
 {
-    private readonly StaticData _staticData = new();
-
-    public List<Cart> ShoppingCarts { get; set; } = new List<Cart>();
+    public List<Cart> ShoppingCarts { get => StaticData.ShoppingCarts; set => StaticData.ShoppingCarts = value; }
     public List<Order> Orders { get => StaticData.Orders; set => StaticData.Orders = value; }
-    public List<CartEvent> CartEvents { get; set; } = new List<CartEvent>();
 }
 
-public class StaticData
+internal class StaticData
 {
     public static List<Order> Orders { get; set; } = [];
+    public static List<Cart> ShoppingCarts { get; set; } = [];
 }
