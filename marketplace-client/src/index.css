@@ -1,0 +1,55 @@
+:root {
+  font-family: "HelveticaNeue-Light", "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 400;
+
+  white-space: nowrap;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+p{
+  text-wrap: wrap;
+}
+
+button {
+  border-radius: 30px;
+  border: 1px solid #DEDCD9;
+  padding: 0.4em 1.2em;
+  font-size: 1em;
+  font-family: inherit;
+  background-color: white;
+  cursor: pointer;
+  transition: background-color 0.5s;
+}
+button:hover {
+  border-color: #1a1a1a;
+}
+.active {
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 1px solid #1a1a1a;
+}
+.fs36{ font-size: 36px;}
+.fs32{ font-size: 32px;}
+.fs24{ font-size: 24px;}
+.fs21{ font-size: 21px;}
+.fs18{ font-size: 18px;}
+.color-gray{ color: #9B9B9B;}

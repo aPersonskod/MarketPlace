@@ -10,7 +10,7 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     [HttpGet]
     public async Task<Cart> Get() => await shoppingCart.Get();
     
-    [HttpPut]
+    [HttpPost]
     public async Task<Cart> AddOrder(Guid productId, int quantity) => await shoppingCart.AddOrder(productId, quantity);
     
     [HttpDelete]
