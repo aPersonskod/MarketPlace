@@ -18,13 +18,21 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
             var product = await productCatalog.Get(productId);
             if (product != null)
             {
-                order = new Order()
+                var existingOrder = dataContext.Orders.FirstOrDefault(o => o.OrderedProduct?.Id == productId);
+                if (existingOrder != null)
                 {
-                    Id = Guid.NewGuid(),
-                    OrderedProduct = product,
-                    Quantity = quantity
-                };
-                dataContext.Orders.Add(order);
+                    existingOrder.Quantity += quantity;
+                }
+                else
+                {
+                    order = new Order()
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderedProduct = product,
+                        Quantity = quantity
+                    };
+                    dataContext.Orders.Add(order);
+                }
             }
         }
 

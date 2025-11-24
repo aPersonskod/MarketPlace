@@ -13,7 +13,7 @@ builder.Services.Configure<GrpcSettings>(builder.Configuration.GetSection("Grpc:
 
 builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
-builder.Services.AddScoped<DataContext>();
+builder.Services.AddSingleton<DataContext>();
 
 var app = builder.Build();
 
