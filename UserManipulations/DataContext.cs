@@ -15,14 +15,14 @@ public class StaticData
         {
             Id = Guid.NewGuid(),
             Name = "Петя Пяточкин",
-            Nick = "patochin228",
+            Email = "patochin228@gmail.com",
             Password = "12345"
         },
         new User()
         {
             Id = Guid.NewGuid(),
             Name = "Андрей Викторович",
-            Nick = "the_king",
+            Email = "the_king@gmail.com",
             Password = "password"
         }
     ];

@@ -8,13 +8,18 @@ public class UserManipulationsService(DataContext dataContext) : IUserManipulati
 
     public Task<User?> Get(Guid userId) => Task.FromResult(dataContext.Users.FirstOrDefault(x => x.Id == userId));
 
+    public Task<User?> Authorize(string email, string password) 
+        => Task.FromResult(dataContext.Users.FirstOrDefault(x => x.Email == email && x.Password == password));
+
     public Task<User> Add(User user)
     {
+        if(dataContext.Users.Any(x => x.Email == user.Email))
+            throw new Exception("User already exists");
         var newUser = new User()
         {
             Id = Guid.NewGuid(),
             Name = user.Name,
-            Nick = user.Nick,
+            Email = user.Email,
             Password = user.Password,
         };
         dataContext.Users.Add(newUser);
@@ -26,7 +31,7 @@ public class UserManipulationsService(DataContext dataContext) : IUserManipulati
         var foundUser = dataContext.Users.FirstOrDefault(x => x.Id == user.Id);
         if (foundUser == null) throw new ArgumentNullException("User not found");
         foundUser.Name = user.Name;
-        foundUser.Nick = user.Nick;
+        foundUser.Email = user.Email;
         foundUser.Password = user.Password;
         return Task.FromResult<User?>(foundUser);
 

@@ -11,6 +11,9 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     public async Task<IEnumerable<User>> Get() => await userManipulationsService.Get();
     [HttpGet("{userId:guid}")]
     public async Task<User?> Get(Guid userId) => await userManipulationsService.Get(userId);
+    [HttpGet("[action]")]
+    public async Task<User?> Authorize(string email, string password) =>
+        await userManipulationsService.Authorize(email, password);
     [HttpPut]
     public async Task<User> AddUser(User user) => await userManipulationsService.Add(user);
     [HttpPatch]

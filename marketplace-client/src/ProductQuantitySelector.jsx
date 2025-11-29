@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-const ProductQuantitySelector = ({ productName, productId, initialQuantity = 0, minQuantity = 0, maxQuantity = 99 }) => {
+const ProductQuantitySelector = ({ productName, userId, productId, placeId, initialQuantity = 0, minQuantity = 0, maxQuantity = 99 }) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -74,7 +74,7 @@ const ProductQuantitySelector = ({ productName, productId, initialQuantity = 0, 
         if (quantity >= 1) {
             try {
                 //let id = `${productId}`;
-                let query = `https://localhost:7002/ShoppingCart?productId=${productId}&quantity=${quantity}`;
+                let query = `https://localhost:7002/ShoppingCart?userId=${userId}&productId=${productId}&placeId=${placeId}&quantity=${quantity}`;
                 const response = await fetch(query, {
                     method: 'POST',
                     headers: {
