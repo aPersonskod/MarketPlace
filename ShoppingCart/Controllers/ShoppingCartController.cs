@@ -7,12 +7,19 @@ namespace ShoppingCart.Controllers;
 [Route("[controller]")]
 public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
 {
+    [HttpGet("Places")]
+    public async Task<IEnumerable<Place>> Get() => await shoppingCart.GetPlaces();
     [HttpGet]
-    public async Task<Cart> Get() => await shoppingCart.Get();
+    public async Task<Cart> Get(Guid userId) => await shoppingCart.Get(userId);
     
     [HttpPost]
-    public async Task<Cart> AddOrder(Guid productId, int quantity) => await shoppingCart.AddOrder(productId, quantity);
+    public async Task<Cart> AddOrder(Guid userId, Guid productId, Guid placeId, int quantity) =>
+        await shoppingCart.AddOrder(userId, productId, placeId, quantity);
     
     [HttpDelete]
-    public async Task<Cart> DeleteOrder(Guid productId) => await shoppingCart.DeleteOrder(productId);
+    public async Task<IActionResult> DeleteOrder(Guid userId, Guid productId)
+    {
+        await shoppingCart.DeleteOrder(userId, productId);
+        return Ok();
+    }
 }

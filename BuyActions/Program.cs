@@ -1,6 +1,6 @@
+using BuyActions;
+using BuyActions.Services;
 using Models;
-using ProductCatalog;
-using ProductCatalog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors();
 builder.Services.AddControllers();
-builder.Services.AddGrpc();
+builder.Services.AddCors();
 
-builder.Services.AddTransient<IProductCatalog, ProductCatalogService>();
+builder.Services.AddTransient<IBuyService, BuyService>();
 builder.Services.AddSingleton<DataContext>();
 
 var app = builder.Build();
@@ -23,8 +22,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.MapGrpcService<ProductMessengerService>();
 
 app.UseCors(a => a.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();

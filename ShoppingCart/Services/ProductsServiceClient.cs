@@ -26,7 +26,8 @@ public class ProductsServiceClient : IProductCatalog
             return await Task.FromResult(reply.Products.Select(x => new Product()
             {
                 Id = Guid.Parse(x.Id),
-                Name = x.Name
+                Name = x.Name,
+                Cost = x.Cost
             }));
         }
         catch (RpcException e)
@@ -43,7 +44,8 @@ public class ProductsServiceClient : IProductCatalog
             return await Task.FromResult(new Product()
             {
                 Id = Guid.Parse(reply.Id),
-                Name = reply.Name
+                Name = reply.Name,
+                Cost = reply.Cost
             });
         }
         catch (RpcException e)

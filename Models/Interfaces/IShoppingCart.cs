@@ -2,7 +2,9 @@ namespace Models;
 
 public interface IShoppingCart
 {
-    Task<Cart> Get();
-    Task<Cart> AddOrder(Guid productId, int quantity);
-    Task<Cart> DeleteOrder(Guid productId);
+    Task<IEnumerable<Cart>> Get();
+    Task<IEnumerable<Place>> GetPlaces();
+    Task<Cart> Get(Guid userId);
+    Task<Cart> AddOrder(Guid userId, Guid productId, Guid placeId, int quantity);
+    Task DeleteOrder(Guid userId, Guid productId);
 }

@@ -11,7 +11,8 @@ public class ProductMessengerService(DataContext dataContext) : ProductService.P
         var products = dataContext.Products.Select(x => new ProductReply()
         {
             Id = x.Id.ToString(),
-            Name = x.Name
+            Name = x.Name,
+            Cost = x.Cost,
         });
         var productsReply = new ListProductsReply();
         productsReply.Products.AddRange(products);
@@ -29,7 +30,8 @@ public class ProductMessengerService(DataContext dataContext) : ProductService.P
         return Task.FromResult(new ProductReply()
         {
             Id = foundProduct.Id.ToString(),
-            Name = foundProduct.Name
+            Name = foundProduct.Name,
+            Cost = foundProduct.Cost,
         });
     }
 }

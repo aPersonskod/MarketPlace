@@ -1,6 +1,6 @@
 using Models;
-using ProductCatalog;
-using ProductCatalog.Services;
+using UserManipulations;
+using UserManipulations.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +10,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddControllers();
-builder.Services.AddGrpc();
 
-builder.Services.AddTransient<IProductCatalog, ProductCatalogService>();
+builder.Services.AddTransient<IUserManipulations, UserManipulationsService>();
 builder.Services.AddSingleton<DataContext>();
 
 var app = builder.Build();
@@ -23,8 +22,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.MapGrpcService<ProductMessengerService>();
 
 app.UseCors(a => a.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();
