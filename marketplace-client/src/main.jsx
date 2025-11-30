@@ -8,8 +8,8 @@ import Registration from "./Registration.jsx";
 import Purchases from "./Purchases.jsx";
 
 const router = createBrowserRouter([
-    { path: '/', Component: App },
-    { path: '/authorize', Component: Authorization },
+    { path: '/', Component: Authorization },
+    { path: '/main', Component: App },
     { path: '/registration', Component: Registration },
     { path: '/purchases', Component: Purchases }
 ]);

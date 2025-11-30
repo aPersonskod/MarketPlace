@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import { useNavigate } from 'react-router';
 import './Authorization.css';
 
@@ -18,6 +18,15 @@ const Authorization = ({
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     //const { login } = useAuth();
+    
+    useEffect(() => {
+        navigateNext();
+    }, [])
+    const navigateNext = () => {
+        if (localStorage.getItem('marketplace-user-id') !== null) {
+            navigate('/main');
+        }
+    };
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -63,13 +72,11 @@ const Authorization = ({
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
-            localStorage.setItem('marketplace-user', JSON.stringify(result));
+            localStorage.setItem('marketplace-user-id', result.id);
         } catch (err) {
             setError(err);
         }
-        if (localStorage.getItem('marketplace-user') !== null) {
-            navigate('/');
-        }
+        navigateNext();
     }
     const handleSubmit = async (e) => {
         e.preventDefault();

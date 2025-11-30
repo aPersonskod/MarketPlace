@@ -48,7 +48,7 @@ public class UserManipulationsService(DataContext dataContext) : IUserManipulati
     {
         var foundUser = dataContext.Users.FirstOrDefault(x => x.Id == userId);
         if (foundUser == null) throw new ArgumentNullException("User not found");
-        foundUser.Wallet = money;
+        foundUser.Wallet += money;
         return Task.FromResult(foundUser);
     }
 
