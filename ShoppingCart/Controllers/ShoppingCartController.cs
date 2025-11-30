@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Interfaces;
 
 namespace ShoppingCart.Controllers;
 
@@ -7,19 +8,57 @@ namespace ShoppingCart.Controllers;
 [Route("[controller]")]
 public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
 {
-    [HttpGet("Places")]
-    public async Task<IEnumerable<Place>> Get() => await shoppingCart.GetPlaces();
-    [HttpGet]
-    public async Task<Cart> Get(Guid userId) => await shoppingCart.Get(userId);
-    
-    [HttpPost]
-    public async Task<Cart> AddOrder(Guid userId, Guid productId, Guid placeId, int quantity) =>
-        await shoppingCart.AddOrder(userId, productId, placeId, quantity);
-    
-    [HttpDelete]
+    [HttpGet("[action]")]
+    public async Task<IEnumerable<Place>> GetPlaces() => await shoppingCart.GetPlaces();
+    [HttpGet("{userId:guid}")]
+    public async Task<IActionResult> Get(Guid userId)
+    {
+        try
+        {
+            return Ok(await shoppingCart.Get(userId));
+        }
+        catch (Exception e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> AddOrder(Guid userId, Guid productId,int quantity)
+    {
+        try
+        {
+            return Ok(await shoppingCart.AddOrder(userId, productId, quantity));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> ConfirmCart(Guid userId, Guid productId)
+    {
+        try
+        {
+            return Ok(await shoppingCart.ConfirmCart(userId, productId));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpDelete("[action]")]
     public async Task<IActionResult> DeleteOrder(Guid userId, Guid productId)
     {
-        await shoppingCart.DeleteOrder(userId, productId);
-        return Ok();
+        try
+        {
+            return Ok(await shoppingCart.DeleteOrder(userId, productId));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

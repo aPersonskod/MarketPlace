@@ -16,9 +16,26 @@ function Header() {
     const isLoggedIn = localStorage.getItem('marketplace-user-id') !== null;
     const [user, setUser] = useState({});
     const navigate = useNavigate();
+    const [screenSize, setScreenSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
     
     useEffect(() => {
-        getUserData();
+        const handleResize = () => {
+            setScreenSize({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup the event listener when the component unmounts
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            getUserData();
+        };
     },[]);
     const logOutHandler = () => {
         localStorage.removeItem('marketplace-user-id');
@@ -94,6 +111,7 @@ function Header() {
                                 <Nav.Link href="/purchases">History</Nav.Link>
                             </Nav>
                             <NavDropdown
+                                drop={screenSize.width < 768 ? 'down-centered' : 'start'}
                                 title={isLoggedIn ? <LoggedLogo/> : <NotLoggedLogo/>}
                                 id={`offcanvasNavbarDropdown-expand-${expand}`}
                             >

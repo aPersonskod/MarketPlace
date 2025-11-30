@@ -1,6 +1,7 @@
 using BuyActions;
 using BuyActions.Services;
 using Models;
+using Models.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

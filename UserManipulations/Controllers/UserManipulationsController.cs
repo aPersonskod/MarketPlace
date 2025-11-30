@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Interfaces;
 
 namespace UserManipulations.Controllers;
 
@@ -10,14 +11,57 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     [HttpGet]
     public async Task<IEnumerable<User>> Get() => await userManipulationsService.Get();
     [HttpGet("{userId:guid}")]
-    public async Task<User?> Get(Guid userId) => await userManipulationsService.Get(userId);
+    public async Task<IActionResult> Get(Guid userId)
+    {
+        try
+        {
+            return Ok(await userManipulationsService.Get(userId));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpGet("[action]")]
-    public async Task<User?> Authorize(string email, string password) =>
-        await userManipulationsService.Authorize(email, password);
+    public async Task<IActionResult> Authorize(string email, string password)
+    {
+        try
+        {
+            return Ok(await userManipulationsService.Authorize(email, password));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpPut]
-    public async Task<User> AddUser(User user) => await userManipulationsService.Add(user);
+    public async Task<IActionResult> AddUser(User user)
+    {
+        try
+        {
+            return Ok(await userManipulationsService.Add(user));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpPatch]
-    public async Task<User?> UpdateUser(User user) => await userManipulationsService.Update(user);
+    public async Task<IActionResult> UpdateUser(User user)
+    {
+        try
+        {
+            return Ok(await userManipulationsService.Update(user));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpDelete]
     public async Task<IActionResult> DeleteUser(Guid userId)
     {
@@ -25,9 +69,28 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         return Ok();
     }
     [HttpPost("[action]")]
-    public async Task<User> WalletReplenishment(Guid userId, int money) 
-        => await userManipulationsService.WalletReplenishment(userId, money);
+    public async Task<IActionResult> WalletReplenishment(Guid userId, int money)
+    {
+        try
+        {
+            return Ok(await userManipulationsService.WalletReplenishment(userId, money));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpPost("[action]")]
-    public async Task<User> SpendMoney(Guid userId, int money) 
-        => await userManipulationsService.SpendMoney(userId, money);
+    public async Task<IActionResult> SpendMoney(Guid userId, int money)
+    {
+        try
+        {
+            return Ok(await userManipulationsService.SpendMoney(userId, money));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

@@ -9,7 +9,9 @@ public class Cart
     [JsonPropertyName("orders")]
     public List<Order> Orders { get; set; } = new List<Order>();
     [JsonPropertyName("user")]
-    public User? User { get; set; }
+    public User User { get; set; }
     [JsonPropertyName("place")]
-    public Place? Place { get; set; }
+    public Place Place { get; set; }
+    [JsonPropertyName("is_confirmed")]
+    public bool IsConfirmed { get; set; }
 }

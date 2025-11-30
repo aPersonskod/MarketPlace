@@ -46,7 +46,7 @@
 
 @media (width <= 991px) {
   .mdDivStyle{
-    height: 40vh !important;
+    height: 35vh !important;
     overflow-y: auto;
     border-radius: 21px;
     background-color: #ececec;
@@ -56,7 +56,7 @@
 @media (width <= 575px) {
   
   .xsDivStyle{
-    height: 40vh !important;
+    height: 35vh !important;
     overflow-y: auto;
     border-radius: 21px;
     background-color: #ececec;

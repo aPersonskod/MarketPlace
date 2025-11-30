@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-const OrderedProduct = ({ productName, orderId, quantity}) => {
+const OrderedProduct = ({ productId, productName, quantity}) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -60,8 +60,8 @@ const OrderedProduct = ({ productName, orderId, quantity}) => {
         setError(null);
         setSuccess(false);
         try {
-            //let id = `${productId}`;
-            let query = `https://localhost:7002/ShoppingCart?productId=${orderId}`;
+            let userId = localStorage.getItem('marketplace-user-id');
+            let query = `https://localhost:7002/ShoppingCart/DeleteOrder?userId=${userId}&productId=${productId}`;
             const response = await fetch(query, {
                 method: 'DELETE',
                 headers: {

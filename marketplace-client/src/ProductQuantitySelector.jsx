@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-const ProductQuantitySelector = ({ productName, userId, productId, placeId, initialQuantity = 0, minQuantity = 0, maxQuantity = 99 }) => {
+const ProductQuantitySelector = ({ productName, productCost, productId, initialQuantity = 0, minQuantity = 0, maxQuantity = 99 }) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -73,8 +73,8 @@ const ProductQuantitySelector = ({ productName, userId, productId, placeId, init
         setSuccess(false);
         if (quantity >= 1) {
             try {
-                //let id = `${productId}`;
-                let query = `https://localhost:7002/ShoppingCart?userId=${userId}&productId=${productId}&placeId=${placeId}&quantity=${quantity}`;
+                let userId = localStorage.getItem('marketplace-user-id');
+                let query = `https://localhost:7002/ShoppingCart/AddOrder?userId=${userId}&productId=${productId}&quantity=${quantity}`;
                 const response = await fetch(query, {
                     method: 'POST',
                     headers: {
@@ -134,6 +134,7 @@ const ProductQuantitySelector = ({ productName, userId, productId, placeId, init
                 </button>
             </div>
             <br/>
+            <p className='fs21'>Цена: {productCost}</p>
             <button onClick={putToShoppingCart}>Добавить в корзину</button>
         </div>
     );

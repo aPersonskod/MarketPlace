@@ -1,4 +1,5 @@
 using Models;
+using Models.Interfaces;
 using ShoppingCart;
 using ShoppingCart.Services;
 using ShoppingCart.Settings;

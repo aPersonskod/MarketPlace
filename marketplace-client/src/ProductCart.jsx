@@ -10,7 +10,8 @@ function ProductCart() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('https://localhost:7002/ShoppingCart');
+                let userId = localStorage.getItem('marketplace-user-id');
+                const response = await fetch(`https://localhost:7002/ShoppingCart/${userId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -33,10 +34,9 @@ function ProductCart() {
         <>
             <div className='d-flex'>
                 <div style={{margin: '5px', overflowY: 'auto'}}>
-                    <p className='fs24'>Корзина:</p>
                     <div className='d-flex flex-wrap'>
                         {data.orders.map((item, index) => (
-                            <OrderedProduct key={index} orderId={item.id} productName={item.orderedProduct.name}
+                            <OrderedProduct key={index} productId={item.orderedProduct.id} productName={item.orderedProduct.name}
                                             quantity={item.quantity}/>
                         ))}
                     </div>

@@ -3,6 +3,7 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
 using Models;
+using Models.Interfaces;
 using productServiceClient;
 using ShoppingCart.Settings;
 

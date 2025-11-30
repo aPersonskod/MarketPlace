@@ -32,11 +32,9 @@ function Products() {
         <>
             <div className='d-flex'>
                 <div style={{margin:'5px'}}>
-                    <p className='fs24'>Продукты:</p>
-                    <br/>
                     <div className='d-flex flex-wrap'>
                         {data.map((item, index) => (
-                            <ProductQuantitySelector productName={item.name} productId={item.id} key={index} />
+                            <ProductQuantitySelector productId={item.id} productName={item.name} productCost={item.cost}  key={index} />
                         ))}
                     </div>
                 </div>

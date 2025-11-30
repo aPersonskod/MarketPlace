@@ -1,4 +1,5 @@
 using Models;
+using Models.Interfaces;
 
 namespace ShoppingCart.Services;
 
@@ -9,23 +10,24 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
 
     public async Task<Cart> Get(Guid userId)
     {
-        var carts = await Get();
-        var cart = carts.FirstOrDefault(c => c.User?.Id == userId);
+        var carts = dataContext.ShoppingCarts;
+        var cart = carts.FirstOrDefault(c => c.User.Id == userId && !c.IsConfirmed);
         if (cart != null) return await Task.FromResult(cart);
         var userService = new UserClientService();
         var foundUser = await userService.GetUser(userId);
-        return await Task.FromResult(new Cart() { Id = Guid.NewGuid(), User = foundUser!});
+        if (foundUser == null) throw new NullReferenceException("User not found");
+        var newCart = new Cart() { Id = Guid.NewGuid(), User = foundUser };
+        dataContext.ShoppingCarts.Add(newCart);
+        return await Task.FromResult(newCart);
     }
 
-    public async Task<Cart> AddOrder(Guid userId, Guid productId, Guid placeId, int quantity)
+    public async Task<Cart> AddOrder(Guid userId, Guid productId, int quantity)
     {
         var cart = await Get(userId);
-        cart.Place = dataContext.Places.FirstOrDefault(p => p.Id == placeId);
         var order = cart.Orders.FirstOrDefault(o => o.OrderedProduct?.Id == productId);
         if (order != null)
         {
             order.Quantity += quantity;
-            dataContext.ShoppingCarts.First(x => x.User?.Id == userId).Orders.Add(order);
         }
         else
         {
@@ -46,14 +48,22 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
         return await Get(userId);
     }
 
-    public async Task DeleteOrder(Guid userId, Guid productId)
+    public Task<Cart> ConfirmCart(Guid userId, Guid placeId)
     {
-        var cart = await Get(userId);
+        var cart = dataContext.ShoppingCarts.FirstOrDefault(c => c.Id == placeId);
+        cart!.Place = dataContext.Places.FirstOrDefault(p => p.Id == placeId)!;
+        cart.IsConfirmed = true;
+        return Task.FromResult(cart);
+    }
+
+    public async Task<Cart> DeleteOrder(Guid userId, Guid productId)
+    {
+        var cartId = (await Get(userId)).Id;
+        var cart = dataContext.ShoppingCarts.First(x => x.Id == cartId);
         var order = cart.Orders.FirstOrDefault(o => o.OrderedProduct?.Id == productId);
-        if (order != null)
-        {
-            dataContext.ShoppingCarts.First(x => x.User.Id == userId).Orders.Remove(order);
-        }
+        if (order == null) throw new Exception("Order not found");
+        cart.Orders.Remove(order);
+        return await Task.FromResult(cart);
     }
 }
 

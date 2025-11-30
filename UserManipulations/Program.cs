@@ -1,4 +1,5 @@
 using Models;
+using Models.Interfaces;
 using UserManipulations;
 using UserManipulations.Services;
 

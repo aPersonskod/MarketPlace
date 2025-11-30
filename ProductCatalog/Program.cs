@@ -1,4 +1,5 @@
 using Models;
+using Models.Interfaces;
 using ProductCatalog;
 using ProductCatalog.Services;
 
