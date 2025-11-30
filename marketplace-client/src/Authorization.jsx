@@ -23,7 +23,7 @@ const Authorization = ({
         navigateNext();
     }, [])
     const navigateNext = () => {
-        if (localStorage.getItem('marketplace-user-id') !== null) {
+        if (localStorage.getItem('marketplace-user-id')) {
             navigate('/main');
         }
     };
@@ -70,6 +70,10 @@ const Authorization = ({
             const response = await fetch(`https://localhost:7004/UserManipulations/Authorize?email=${formData.email}&password=${formData.password}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            if(response.status === 204){
+                alert(`login or password are wrong`);
+                return;
             }
             const result = await response.json();
             localStorage.setItem('marketplace-user-id', result.id);

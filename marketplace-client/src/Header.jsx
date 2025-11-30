@@ -40,7 +40,9 @@ function Header() {
                 //throw new Error(`HTTP error! status: ${response.status}`);
                 alert(`HTTP error! status: ${response.status}`);
             }
-            
+
+            const data = await response.json();
+            setUser(data);
         } catch (error) {
             console.error('Error updating user:', error);
         }
