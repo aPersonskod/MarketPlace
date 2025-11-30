@@ -37,11 +37,11 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> ConfirmCart(Guid userId, Guid productId)
+    public async Task<IActionResult> ConfirmCart(Guid userId, Guid placeId)
     {
         try
         {
-            return Ok(await shoppingCart.ConfirmCart(userId, productId));
+            return Ok(await shoppingCart.ConfirmCart(userId, placeId));
         }
         catch (Exception e)
         {

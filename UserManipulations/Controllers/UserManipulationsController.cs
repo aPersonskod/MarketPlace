@@ -65,8 +65,15 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     [HttpDelete]
     public async Task<IActionResult> DeleteUser(Guid userId)
     {
-        await userManipulationsService.Delete(userId);
-        return Ok();
+        try
+        {
+            await userManipulationsService.Delete(userId);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
     [HttpPost("[action]")]
     public async Task<IActionResult> WalletReplenishment(Guid userId, int money)

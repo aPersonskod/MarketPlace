@@ -30,11 +30,11 @@ function Header() {
         };
 
         window.addEventListener('resize', handleResize);
+        getUserData();
 
         // Cleanup the event listener when the component unmounts
         return () => {
             window.removeEventListener('resize', handleResize);
-            getUserData();
         };
     },[]);
     const logOutHandler = () => {
@@ -79,6 +79,8 @@ function Header() {
             if (!response.ok) {
                 //throw new Error(`HTTP error! status: ${response.status}`);
                 alert(`HTTP error! status: ${response.status}`);
+                localStorage.removeItem('marketplace-user-id');
+                navigate('/');
             }
 
             const data = await response.json();
@@ -107,8 +109,8 @@ function Header() {
                         </Offcanvas.Header>
                         <Offcanvas.Body>
                             <Nav className="justify-content-start flex-grow-1 pe-3">
-                                <Nav.Link href="/">Home</Nav.Link>
-                                <Nav.Link href="/purchases">History</Nav.Link>
+                                <Nav.Link href="/main">Home</Nav.Link>
+                                <Nav.Link href="/main/purchases">History</Nav.Link>
                             </Nav>
                             <NavDropdown
                                 drop={screenSize.width < 768 ? 'down-centered' : 'start'}

@@ -12,8 +12,12 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
     {
         var carts = dataContext.ShoppingCarts;
         var cart = carts.FirstOrDefault(c => c.User.Id == userId && !c.IsConfirmed);
-        if (cart != null) return await Task.FromResult(cart);
         var userService = new UserClientService();
+        if (cart != null)
+        {
+            cart.User = await userService.GetUser(userId) ?? cart.User;
+            return await Task.FromResult(cart);
+        }
         var foundUser = await userService.GetUser(userId);
         if (foundUser == null) throw new NullReferenceException("User not found");
         var newCart = new Cart() { Id = Guid.NewGuid(), User = foundUser };
@@ -40,8 +44,9 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
                     OrderedProduct = product,
                     Quantity = quantity
                 };
-                cart.Orders.Add(order);
-                dataContext.ShoppingCarts.Add(cart);
+                dataContext.ShoppingCarts.First(x => x.Id == cart.Id).Orders.Add(order);
+                //cart.Orders.Add(order);
+                //dataContext.ShoppingCarts.Add(cart);
             }
         }
 
@@ -50,7 +55,7 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
 
     public Task<Cart> ConfirmCart(Guid userId, Guid placeId)
     {
-        var cart = dataContext.ShoppingCarts.FirstOrDefault(c => c.Id == placeId);
+        var cart = dataContext.ShoppingCarts.FirstOrDefault(c => c.User.Id == userId && !c.IsConfirmed);
         cart!.Place = dataContext.Places.FirstOrDefault(p => p.Id == placeId)!;
         cart.IsConfirmed = true;
         return Task.FromResult(cart);

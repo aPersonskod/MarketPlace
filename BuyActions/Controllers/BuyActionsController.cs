@@ -23,17 +23,17 @@ public class BuyActionsController(IBuyService buyService) : ControllerBase
         }
     }
 
-    [HttpPost("BuyCart")]
-    public async Task BuyCart(Cart cart)
+    [HttpPost("[action]")]
+    public async Task<IActionResult> BuyCart(Cart cart)
     {
         try
         {
             await buyService.BuyCart(cart);
-            Ok();
+            return Ok();
         }
         catch (Exception e)
         {
-            BadRequest(e.Message);
+            return BadRequest(e.Message);
         }
     }
 }
