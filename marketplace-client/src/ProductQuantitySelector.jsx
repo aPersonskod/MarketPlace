@@ -1,4 +1,5 @@
 import {useState} from "react";
+import Button from "react-bootstrap/Button";
 
 const ProductQuantitySelector = ({ productName, productCost, productId, initialQuantity = 0, minQuantity = 0, maxQuantity = 99 }) => {
     // Basic inline styles for quick demonstration
@@ -135,7 +136,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, initialQ
             </div>
             <br/>
             <p className='fs21'>Цена: {productCost}</p>
-            <button onClick={putToShoppingCart}>Добавить в корзину</button>
+            <Button onClick={putToShoppingCart}>Добавить в корзину</Button>
         </div>
     );
 }
