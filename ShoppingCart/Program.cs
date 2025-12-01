@@ -10,10 +10,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddControllers();
 
-builder.Services.Configure<GrpcSettings>(builder.Configuration.GetSection("Grpc:Products"));
+builder.Services.Configure<GrpcProductSettings>(builder.Configuration.GetSection("Grpc:Products"));
+builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
 
 builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
+builder.Services.AddSingleton<UserClientService>();
 builder.Services.AddSingleton<DataContext>();
 
 var app = builder.Build();

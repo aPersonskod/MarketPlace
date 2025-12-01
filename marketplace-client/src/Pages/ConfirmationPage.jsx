@@ -57,6 +57,7 @@ const ConfirmationPage = () => {
             };
         } catch (err) {
             console.error('Error confirm cart!', err);
+            alert(err);
         }
     }
     
@@ -79,6 +80,7 @@ const ConfirmationPage = () => {
             alert("Заказ куплен !!!")
         } catch (err) {
             console.error('Error buy cart!', err);
+            alert(err);
         }
     }
 

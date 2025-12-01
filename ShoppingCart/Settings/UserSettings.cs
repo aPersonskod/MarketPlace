@@ -1,6 +1,6 @@
 namespace ShoppingCart.Settings;
 
-public class GrpcSettings
+public class UserSettings
 {
     public string Address { get; set; }
 }

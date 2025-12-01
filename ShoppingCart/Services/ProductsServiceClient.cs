@@ -13,7 +13,7 @@ public class ProductsServiceClient : IProductCatalog
 {
     private readonly ProductService.ProductServiceClient _client;
 
-    public ProductsServiceClient(IOptions<GrpcSettings> grpcOptions)
+    public ProductsServiceClient(IOptions<GrpcProductSettings> grpcOptions)
     {
         var channel = GrpcChannel.ForAddress(grpcOptions.Value.Address);
         _client = new ProductService.ProductServiceClient(channel);

@@ -1,5 +1,6 @@
 using BuyActions;
 using BuyActions.Services;
+using BuyActions.Settings;
 using Models;
 using Models.Interfaces;
 
@@ -12,6 +13,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddCors();
 
+builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
+builder.Services.Configure<ShoppingCartSettings>(builder.Configuration.GetSection("Grpc:ShoppingCarts"));
+
+builder.Services.AddSingleton<ShoppingCartClientService>();
+builder.Services.AddSingleton<UserClientService>();
 builder.Services.AddTransient<IBuyService, BuyService>();
 builder.Services.AddSingleton<DataContext>();
 
