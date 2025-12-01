@@ -19,7 +19,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -32,7 +32,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -45,7 +45,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -58,7 +58,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -72,7 +72,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
     [HttpPost("[action]")]
@@ -84,7 +84,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -97,7 +97,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 }

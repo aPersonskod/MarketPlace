@@ -5,7 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import Authorization from "./Authorization.jsx";
 import Registration from "./Registration.jsx";
-import Purchases from "./Pages/Purchases.jsx";
+import PurchasesPage from "./Pages/PurchasesPage.jsx";
 import ProductCatalogPage from "./Pages/ProductCatalogPage.jsx";
 import ConfirmationPage from "./Pages/ConfirmationPage.jsx";
 
@@ -15,7 +15,7 @@ const router = createBrowserRouter([
         { path: '', Component: ProductCatalogPage },
         { path: 'registration', Component: Registration },
         { path: 'confirmation', Component: ConfirmationPage },
-        { path: 'purchases', Component: Purchases }
+        { path: 'purchases', Component: PurchasesPage }
     ] }
 ]);
 

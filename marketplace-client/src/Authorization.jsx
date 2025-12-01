@@ -69,7 +69,8 @@ const Authorization = ({
         try {
             const response = await fetch(`https://localhost:7004/UserManipulations/Authorize?email=${formData.email}&password=${formData.password}`);
             if (!response.ok) {
-                alert(`login or password are wrong: ${response.status}`);
+                let localError = await response.json();
+                alert(localError.message);
                 return;
             }
             const result = await response.json();

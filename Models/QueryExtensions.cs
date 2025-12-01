@@ -13,6 +13,15 @@ public static class QueryExtensions
         if (response.IsSuccessStatusCode) return await response.Content.ReadFromJsonAsync<T>();
         throw new ArgumentNullException($"server error code {response.StatusCode}");
     }
+    
+    public static async Task PostQuery(this string query)
+    {
+        using var client = new HttpClient();
+        var response = await client.PostAsync(query, null);
+        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode) 
+            throw new ArgumentNullException($"server error code {response.StatusCode}");
+    }
 
     public static async Task<T?> PostQuery<T>(this string query)
     {

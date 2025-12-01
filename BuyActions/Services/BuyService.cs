@@ -22,6 +22,7 @@ public class BuyService(DataContext dataContext) : IBuyService
             .Sum(x => x.OrderedProduct!.Cost * x.Quantity);
         var isMoneyExist = cart.User.Wallet >= moneyToSpend;
         if (!isMoneyExist) throw new Exception("Not enough money on wallet !!!");
+        if (!cart.IsConfirmed) throw new Exception("Cart is not confirmed !!!");
 
         var user = await new UserClientService().SpendMoney(cart.User.Id, moneyToSpend);
         if (user != null) cart.User = user;
@@ -31,11 +32,12 @@ public class BuyService(DataContext dataContext) : IBuyService
             Cart = cart,
             SaleDate = DateTime.Now
         });
+        await new ShoppingCartService().MarkCartAsBought(cart.Id);
         await Task.Delay(5000);
     }
 }
 
-public class UserClientService
+public class UserClientService // todo need to refactor
 {
     private const string BaseAddress = "https://localhost:7004/UserManipulations";
     public async Task<User> GetUser(Guid userId)
@@ -48,5 +50,16 @@ public class UserClientService
     {
         var query = $"{BaseAddress}/SpendMoney?userId={userId}&money={money}";
         return (await query.PostQuery<User>())!;
+    }
+}
+
+public class ShoppingCartService // todo need to refactor
+{
+    private const string BaseAddress = "https://localhost:7002/ShoppingCart";
+
+    public async Task MarkCartAsBought(Guid cartId)
+    {
+        var query = $"{BaseAddress}/MarkCartAsBought?cartId={cartId}";
+        await query.PostQuery();
     }
 }

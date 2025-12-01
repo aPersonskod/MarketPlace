@@ -19,7 +19,7 @@ public class BuyActionsController(IBuyService buyService) : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -33,7 +33,7 @@ public class BuyActionsController(IBuyService buyService) : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 }

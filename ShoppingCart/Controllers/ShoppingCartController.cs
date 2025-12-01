@@ -10,6 +10,7 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
 {
     [HttpGet("[action]")]
     public async Task<IEnumerable<Place>> GetPlaces() => await shoppingCart.GetPlaces();
+
     [HttpGet("{userId:guid}")]
     public async Task<IActionResult> Get(Guid userId)
     {
@@ -19,12 +20,12 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
         }
         catch (Exception e)
         {
-            return NotFound(e.Message);
+            return NotFound(new { message = e.Message });
         }
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> AddOrder(Guid userId, Guid productId,int quantity)
+    public async Task<IActionResult> AddOrder(Guid userId, Guid productId, int quantity)
     {
         try
         {
@@ -32,7 +33,7 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -45,7 +46,21 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
+        }
+    }
+
+    [HttpPost("[action]")]
+    public async Task<IActionResult> MarkCartAsBought(Guid cartId)
+    {
+        try
+        {
+            await shoppingCart.MarkCartAsBought(cartId);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = e.Message });
         }
     }
 
@@ -58,7 +73,7 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new { message = e.Message });
         }
     }
 }
