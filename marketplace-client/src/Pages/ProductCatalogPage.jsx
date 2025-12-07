@@ -20,6 +20,7 @@ const ProductCatalogPage = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
+            if(result.is_confirmed) result.orders = [];
             setCart(result);
         } catch (err) {
             setError(err);
