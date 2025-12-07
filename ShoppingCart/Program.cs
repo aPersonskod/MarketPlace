@@ -12,9 +12,11 @@ builder.Services.AddControllers();
 
 builder.Services.Configure<GrpcProductSettings>(builder.Configuration.GetSection("Grpc:Products"));
 builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
+builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetSection("Kafka:ShoppingCart"));
 
 builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
+builder.Services.AddSingleton<IKafkaProducer<Cart>, ShoppingCartProducer<Cart>>();
 builder.Services.AddSingleton<UserClientService>();
 builder.Services.AddSingleton<DataContext>();
 

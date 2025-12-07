@@ -25,7 +25,9 @@ public class BuyService(DataContext dataContext, UserClientService userService, 
         if (!cart.IsConfirmed) throw new Exception("Cart is not confirmed !!!");
 
         var user = await userService.SpendMoney(cart.User.Id, moneyToSpend);
-        if (user != null) cart.User = user;
+        cart.User = user;
+        // something important and very slow
+        await Task.Delay(7000);
         dataContext.BuyReports.Add(new BuyReport()
         {
             Id = Guid.NewGuid(),
@@ -33,6 +35,5 @@ public class BuyService(DataContext dataContext, UserClientService userService, 
             SaleDate = DateTime.Now
         });
         await shoppingCartService.MarkCartAsBought(cart.Id);
-        await Task.Delay(5000);
     }
 }

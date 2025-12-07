@@ -97,12 +97,17 @@ const ConfirmationPage = () => {
     const handleBuy = async () => {
         let res = await confirmCart();
         if (res?.isConfirmed) {
-            console.log('ща будет покупка');
-            await buyCart(res.cart);
+            console.log('Покупка осуществлена !!!');
+            alert('Покупка осуществлена !!!');
+            //await buyCart(res.cart);
+            navigate('/');
         }
-        navigate('/');
     }
-  return (
+
+    if (loading) return <div>Loading data...</div>;
+    if (error) return <div>Error: {error.message}</div>;
+    
+    return (
       <>
           <div className='row gy-2'>
               <div className='col col-xs-12 col-sm-12'>
@@ -126,7 +131,7 @@ const ConfirmationPage = () => {
               </div>
           </div>
       </>
-  );
+    );
 }
 
 export default ConfirmationPage;

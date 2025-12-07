@@ -7,6 +7,7 @@ public interface IShoppingCart
     Task<Cart> Get(Guid userId);
     Task<Cart> AddOrder(Guid userId, Guid productId, int quantity);
     Task<Cart> ConfirmCart(Guid userId, Guid placeId);
+    Task<Cart> ConfirmAndBuyCart(Guid userId, Guid placeId);
     Task MarkCartAsBought(Guid cartId);
     Task<Cart> DeleteOrder(Guid userId, Guid productId);
 }

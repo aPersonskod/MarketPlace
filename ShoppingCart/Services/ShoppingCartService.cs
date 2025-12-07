@@ -3,7 +3,8 @@ using Models.Interfaces;
 
 namespace ShoppingCart.Services;
 
-public class ShoppingCartService(DataContext dataContext, IProductCatalog productCatalog, UserClientService userService) : IShoppingCart
+public class ShoppingCartService(DataContext dataContext, IProductCatalog productCatalog, UserClientService userService,
+    IKafkaProducer<Cart> kafkaCartProducer) : IShoppingCart
 {
     public Task<IEnumerable<Cart>> Get() => Task.FromResult<IEnumerable<Cart>>(dataContext.ShoppingCarts);
     public Task<IEnumerable<Place>> GetPlaces() => Task.FromResult<IEnumerable<Place>>(dataContext.Places);
@@ -52,6 +53,7 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
         return await Get(userId);
     }
 
+    [Obsolete("synchronous task that is too slow")]
     public async Task<Cart> ConfirmCart(Guid userId, Guid placeId)
     {
         var cart = dataContext.ShoppingCarts.FirstOrDefault(c => c.User.Id == userId && !c.IsConfirmed);
@@ -68,6 +70,32 @@ public class ShoppingCartService(DataContext dataContext, IProductCatalog produc
         if (isCartItemsNotNull && isUserHasMoney)
         {
             cart!.IsConfirmed = true;
+            return await Task.FromResult(cart);
+        }
+
+        var exceptionText = "";
+        if (!isCartItemsNotNull) exceptionText = "Not all items are filled in !!!";
+        if (!isUserHasMoney) exceptionText = "You have not enough money !!!";
+        throw new Exception($"Cart cant't be confirmed: {exceptionText}");
+    }
+
+    public async Task<Cart> ConfirmAndBuyCart(Guid userId, Guid placeId)
+    {
+        var cart = dataContext.ShoppingCarts.FirstOrDefault(c => c.User.Id == userId && !c.IsConfirmed);
+        if (cart == null)
+        {
+            cart = dataContext.ShoppingCarts.FirstOrDefault(c => c.User.Id == userId);
+            if (cart == null) throw new Exception("Very unusual error while confirming cart !!!");
+            cart.IsConfirmed = false;
+        }
+        cart.User = await userService.GetUser(userId) ?? cart.User;
+        cart.Place = dataContext.Places.FirstOrDefault(p => p.Id == placeId)!;
+        var isCartItemsNotNull = cart is { User: not null, Place: not null } && cart?.Orders.Count != 0;
+        var isUserHasMoney = cart?.User?.Wallet >= cart?.Orders.Sum(x => x.OrderedProduct?.Cost * x.Quantity);
+        if (isCartItemsNotNull && isUserHasMoney)
+        {
+            cart!.IsConfirmed = true;
+            await kafkaCartProducer.ProduceAsync(cart, default);
             return await Task.FromResult(cart);
         }
 

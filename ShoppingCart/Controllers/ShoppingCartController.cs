@@ -42,7 +42,7 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     {
         try
         {
-            return Ok(await shoppingCart.ConfirmCart(userId, placeId));
+            return Ok(await shoppingCart.ConfirmAndBuyCart(userId, placeId));
         }
         catch (Exception e)
         {

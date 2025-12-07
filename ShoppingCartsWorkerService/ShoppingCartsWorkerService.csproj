@@ -1,19 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Worker">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-ShoppingCartsWorkerService-25079ff3-fa89-475c-ae90-62fc688a331a</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.15"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1"/>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Models\Models.csproj" />
     </ItemGroup>
-
 </Project>
