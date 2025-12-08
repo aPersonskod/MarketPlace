@@ -1,10 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Models;
 
 namespace UserManipulations;
 
-public class DataContext
+public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
-    public List<User> Users { get => StaticData.Users; set => StaticData.Users = value; }
+    public DbSet<User> Users { get; set; }
+    //public List<User> Users { get => StaticData.Users; set => StaticData.Users = value; }
 }
 
 public class StaticData

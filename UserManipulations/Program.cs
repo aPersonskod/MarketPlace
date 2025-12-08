@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Interfaces;
 using UserManipulations;
@@ -13,7 +14,9 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 
 builder.Services.AddTransient<IUserManipulations, UserManipulationsService>();
-builder.Services.AddSingleton<DataContext>();
+
+builder.Services.AddDbContext<DataContext>(o 
+    => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
 var app = builder.Build();
 
