@@ -1,8 +1,15 @@
 using System.Text.Json.Serialization;
 
-namespace Models;
+namespace Models.Dtos;
 
-public class Product : ICloneable
+public class Product
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public int Cost { get; set; }
+}
+
+public class ProductDto : ICloneable
 {
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
@@ -12,7 +19,7 @@ public class Product : ICloneable
     public int Cost { get; set; }
     public object Clone()
     {
-        return new Product()
+        return new ProductDto()
         {
             Id = Id,
             Name = Name

@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Dtos;
 using Models.Interfaces;
 using ShoppingCart;
 using ShoppingCart.Services;
@@ -16,9 +18,10 @@ builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetS
 
 builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
-builder.Services.AddSingleton<IKafkaProducer<Cart>, ShoppingCartProducer<Cart>>();
+builder.Services.AddSingleton<IKafkaProducer<CartDto>, ShoppingCartProducer<CartDto>>();
 builder.Services.AddSingleton<UserClientService>();
-builder.Services.AddSingleton<DataContext>();
+builder.Services.AddDbContext<DataContext>(o 
+    => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
 var app = builder.Build();
 

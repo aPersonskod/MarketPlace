@@ -1,13 +1,15 @@
+using Models.Dtos;
+
 namespace Models.Interfaces;
 
 public interface IUserManipulations
 {
-    Task<IEnumerable<User>> Get();
-    Task<User> Get(Guid userId);
-    Task<User> Authorize(string email, string password);
-    Task<User> Add(User user);
-    Task<User> Update(User user);
+    Task<IEnumerable<UserDto>> Get();
+    Task<UserDto> Get(Guid userId);
+    Task<UserDto> Authorize(string email, string password);
+    Task<UserDto> Add(UserDto userDto);
+    Task<UserDto> Update(UserDto userDto);
     Task Delete(Guid userId);
-    Task<User> WalletReplenishment(Guid userId, int money);
-    Task<User> SpendMoney(Guid userId, int money);
+    Task<UserDto> WalletReplenishment(Guid userId, int money);
+    Task<UserDto> SpendMoney(Guid userId, int money);
 }

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Models;
+using Models.Dtos;
 using ShoppingCart.Settings;
 
 namespace ShoppingCart.Services;

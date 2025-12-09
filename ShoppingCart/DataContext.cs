@@ -1,11 +1,14 @@
+using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Dtos;
 
 namespace ShoppingCart;
 
-public class DataContext
+public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
-    public List<Cart> ShoppingCarts { get => StaticData.ShoppingCarts; set => StaticData.ShoppingCarts = value; }
-    public List<Place> Places { get => StaticData.Places; set => StaticData.Places = value; }
+    public DbSet<Cart> ShoppingCarts { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<Place> Places { get; set; }
 }
 
 internal class StaticData

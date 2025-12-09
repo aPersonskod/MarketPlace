@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using Models;
+using Models.Dtos;
 using Models.Interfaces;
 using ShoppingCartsWorkerService.Settings;
 
@@ -25,7 +25,7 @@ public class ShoppingCartConsumerService(IOptions<ShoppingCartKafkaSettings> opt
             {
                 var consumeResult = consumer.Consume(TimeSpan.FromSeconds(3));
                 if (consumeResult == null) continue;
-                var cart = JsonSerializer.Deserialize<Cart>(consumeResult.Message.Value);
+                var cart = JsonSerializer.Deserialize<CartDto>(consumeResult.Message.Value);
                 if (cart != null) await buyService.BuyCart(cart);
             }
             catch (Exception e)

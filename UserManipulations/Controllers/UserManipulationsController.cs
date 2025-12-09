@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Models;
+using Models.Dtos;
 using Models.Interfaces;
 
 namespace UserManipulations.Controllers;
@@ -9,7 +9,7 @@ namespace UserManipulations.Controllers;
 public class UserManipulationsController(IUserManipulations userManipulationsService) : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<User>> Get() => await userManipulationsService.Get();
+    public async Task<IEnumerable<UserDto>> Get() => await userManipulationsService.Get();
     [HttpGet("{userId:guid}")]
     public async Task<IActionResult> Get(Guid userId)
     {
@@ -37,11 +37,11 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     }
 
     [HttpPut]
-    public async Task<IActionResult> AddUser(User user)
+    public async Task<IActionResult> AddUser(UserDto userDto)
     {
         try
         {
-            return Ok(await userManipulationsService.Add(user));
+            return Ok(await userManipulationsService.Add(userDto));
         }
         catch (Exception e)
         {
@@ -50,11 +50,11 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     }
 
     [HttpPatch]
-    public async Task<IActionResult> UpdateUser(User user)
+    public async Task<IActionResult> UpdateUser(UserDto userDto)
     {
         try
         {
-            return Ok(await userManipulationsService.Update(user));
+            return Ok(await userManipulationsService.Update(userDto));
         }
         catch (Exception e)
         {

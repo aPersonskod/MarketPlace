@@ -1,80 +1,81 @@
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Dtos;
 using Models.Interfaces;
 
 namespace UserManipulations.Services;
 
 public class UserManipulationsService(DataContext dataContext) : IUserManipulations
 {
-    public Task<IEnumerable<User>> Get() => Task.FromResult<IEnumerable<User>>(dataContext.Users);
+    public Task<IEnumerable<UserDto>> Get() => Task.FromResult<IEnumerable<UserDto>>(dataContext.Users);
 
-    public async Task<User> Get(Guid userId)
+    public async Task<UserDto> Get(Guid userId)
     {
-        var user = await dataContext.Users.FindAsync(userId);
-        if (user != null) return await Task.FromResult(user);
-        throw new Exception("User not found");
+        var userDto = await dataContext.Users.FindAsync(userId);
+        if (userDto == null) throw new Exception("User not found");
+        return await Task.FromResult(userDto);
     }
 
-    public async Task<User> Authorize(string email, string password)
+    public async Task<UserDto> Authorize(string email, string password)
     {
-        var user = await dataContext.Users.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
-        if (user != null) return await Task.FromResult(user);
-        throw new Exception("User not found");
+        var userDto = await dataContext.Users.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
+        if (userDto == null) throw new Exception("User not found");
+        return await Task.FromResult(userDto);
     }
 
-    public async Task<User> Add(User user)
+    public async Task<UserDto> Add(UserDto userDto)
     {
-        if(await dataContext.Users.AnyAsync(x => x.Email == user.Email))
+        if(await dataContext.Users.AnyAsync(x => x.Email == userDto.Email))
             throw new Exception("User already exists");
-        var newUser = new User()
+        var newUserDto = new UserDto()
         {
             Id = Guid.NewGuid(),
-            Name = user.Name,
-            Email = user.Email,
-            Password = user.Password,
+            Name = userDto.Name,
+            Email = userDto.Email,
+            Password = userDto.Password,
         };
-        dataContext.Users.Add(newUser);
+        dataContext.Users.Add(newUserDto);
         await dataContext.SaveChangesAsync();
-        return await Task.FromResult(newUser);
+        return await Task.FromResult(newUserDto);
     }
     
-    public async Task<User> Update(User user)
+    public async Task<UserDto> Update(UserDto userDto)
     {
-        var foundUser = await dataContext.Users.FindAsync(user.Id);
-        if (foundUser == null) throw new Exception("User not found");
-        foundUser.Name = user.Name;
-        foundUser.Email = user.Email;
-        foundUser.Password = user.Password;
+        var foundUserDto = await dataContext.Users.FindAsync(userDto.Id);
+        if (foundUserDto == null) throw new Exception("User not found");
+        foundUserDto.Name = userDto.Name;
+        foundUserDto.Email = userDto.Email;
+        foundUserDto.Password = userDto.Password;
         await dataContext.SaveChangesAsync();
-        return await Task.FromResult(foundUser);
+        return await Task.FromResult(foundUserDto);
     }
 
     public async Task Delete(Guid userId)
     {
-        var foundUser = await dataContext.Users.FindAsync(userId);
-        if (foundUser == null) throw new Exception("User not found");
-        dataContext.Users.Remove(foundUser);
+        var foundUserDto = await dataContext.Users.FindAsync(userId);
+        if (foundUserDto == null) throw new Exception("User not found");
+        dataContext.Users.Remove(foundUserDto);
         await dataContext.SaveChangesAsync();
     }
 
-    public async Task<User> WalletReplenishment(Guid userId, int money)
+    public async Task<UserDto> WalletReplenishment(Guid userId, int money)
     {
-        var foundUser = await dataContext.Users.FindAsync(userId);
-        if (foundUser == null) throw new Exception("User not found");
-        foundUser.Wallet += money;
+        var foundUserDto = await dataContext.Users.FindAsync(userId);
+        if (foundUserDto == null) throw new Exception("User not found");
+        foundUserDto.Wallet += money;
         await dataContext.SaveChangesAsync();
-        return await Task.FromResult(foundUser);
+        return await Task.FromResult(foundUserDto);
     }
 
-    public async Task<User> SpendMoney(Guid userId, int money)
+    public async Task<UserDto> SpendMoney(Guid userId, int money)
     {
-        var foundUser = await dataContext.Users.FindAsync(userId);
-        if (foundUser == null) throw new Exception("User not found");
-        if (foundUser.Wallet >= money)
+        var foundUserDto = await dataContext.Users.FindAsync(userId);
+        if (foundUserDto == null) throw new Exception("User not found");
+        if (foundUserDto.Wallet >= money)
         {
-            foundUser.Wallet -= money;
+            foundUserDto.Wallet -= money;
             await dataContext.SaveChangesAsync();
-            return await Task.FromResult(foundUser);
+            return await Task.FromResult(foundUserDto);
         }
         throw new Exception("User has not enough money to spend !!!");
     }

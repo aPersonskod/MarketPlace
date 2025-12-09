@@ -1,13 +1,14 @@
 using Models;
+using Models.Dtos;
 
 namespace BuyActions;
 
 public class DataContext
 {
-    public List<BuyReport> BuyReports { get => StaticData.BuyReports; set => StaticData.BuyReports = value; }
+    public List<BuyReportDto> BuyReports { get => StaticData.BuyReports; set => StaticData.BuyReports = value; }
 }
 
 public class StaticData
 {
-    public static List<BuyReport> BuyReports { get; set; } = [];
+    public static List<BuyReportDto> BuyReports { get; set; } = [];
 }

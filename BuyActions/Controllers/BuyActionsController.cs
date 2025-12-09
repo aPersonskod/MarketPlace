@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Dtos;
 using Models.Interfaces;
 
 namespace BuyActions.Controllers;
@@ -9,7 +10,7 @@ namespace BuyActions.Controllers;
 public class BuyActionsController(IBuyService buyService) : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<BuyReport>> Get() => await buyService.Get();
+    public async Task<IEnumerable<BuyReportDto>> Get() => await buyService.Get();
     [HttpGet("{reportId:guid}")]
     public async Task<IActionResult> Get(Guid reportId)
     {
@@ -24,11 +25,11 @@ public class BuyActionsController(IBuyService buyService) : ControllerBase
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> BuyCart(Cart cart)
+    public async Task<IActionResult> BuyCart(CartDto cartDto)
     {
         try
         {
-            await buyService.BuyCart(cart);
+            await buyService.BuyCart(cartDto);
             return Ok();
         }
         catch (Exception e)

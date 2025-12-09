@@ -2,7 +2,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
-using Models;
+using Models.Dtos;
 using Models.Interfaces;
 using productServiceClient;
 using ShoppingCart.Settings;
@@ -37,7 +37,7 @@ public class ProductsServiceClient : IProductCatalog
         }
     }
 
-    public async Task<Product?> Get(Guid productId)
+    public async Task<Product> Get(Guid productId)
     {
         try
         {

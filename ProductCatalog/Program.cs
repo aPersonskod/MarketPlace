@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Interfaces;
 using ProductCatalog;
@@ -13,8 +14,10 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddGrpc();
 
+builder.Services.AddDbContext<DataContext>(o 
+    => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+
 builder.Services.AddTransient<IProductCatalog, ProductCatalogService>();
-builder.Services.AddSingleton<DataContext>();
 
 var app = builder.Build();
 

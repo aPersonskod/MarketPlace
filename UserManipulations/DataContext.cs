@@ -1,27 +1,26 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Models;
+using Models.Dtos;
 
 namespace UserManipulations;
 
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<UserDto> Users { get; set; }
     //public List<User> Users { get => StaticData.Users; set => StaticData.Users = value; }
 }
 
 public class StaticData
 {
-    public static List<User> Users { get; set; } =
+    public static List<UserDto> Users { get; set; } =
     [
-        new User()
+        new UserDto()
         {
             Id = Guid.NewGuid(),
             Name = "Петя Пяточкин",
             Email = "patochin228@gmail.com",
             Password = "12345"
         },
-        new User()
+        new UserDto()
         {
             Id = Guid.NewGuid(),
             Name = "Андрей Викторович",

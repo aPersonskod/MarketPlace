@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Dtos;
 using Models.Interfaces;
 
 namespace ProductCatalog.Controllers;
@@ -9,7 +10,7 @@ namespace ProductCatalog.Controllers;
 public class ProductCatalogController(IProductCatalog productCatalog) : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<Product>> Get() => await productCatalog.Get();
+    public async Task<IEnumerable<ProductDto>> Get() => await productCatalog.Get();
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)

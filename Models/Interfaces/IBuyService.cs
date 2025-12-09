@@ -1,8 +1,10 @@
+using Models.Dtos;
+
 namespace Models.Interfaces;
 
 public interface IBuyService
 {
-    Task<IEnumerable<BuyReport>> Get();
-    Task<BuyReport> Get(Guid reportId);
-    Task BuyCart(Cart cart);
+    Task<IEnumerable<BuyReportDto>> Get();
+    Task<BuyReportDto> Get(Guid reportId);
+    Task BuyCart(CartDto cartDto);
 }

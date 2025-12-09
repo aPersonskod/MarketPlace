@@ -1,3 +1,5 @@
+using Models.Dtos;
+
 namespace Models.Interfaces;
 
 public interface IProductCatalog
