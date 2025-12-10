@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
-using Models;
 using Models.Dtos;
+using Models.Extensions;
 using ShoppingCart.Settings;
 
 namespace ShoppingCart.Services;
@@ -8,12 +8,12 @@ namespace ShoppingCart.Services;
 public class UserClientService(IOptions<UserSettings> userSettings)
 {
     private readonly string _baseAddress = userSettings.Value.Address;
-    public async Task<User?> GetUser(Guid userId)
+    public async Task<UserDto?> GetUser(Guid userId)
     {
         var query = $"{_baseAddress}/{userId}";
         try
         {
-            var result = await query.GetQuery<User>();
+            var result = await query.GetQuery<UserDto>();
             return result;
         }
         catch (Exception e)

@@ -12,7 +12,7 @@ using ProductCatalog;
 namespace ProductCatalog.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251208144359_InitialMigration")]
+    [Migration("20251210001216_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -29,17 +29,14 @@ namespace ProductCatalog.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Cost")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "cost");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

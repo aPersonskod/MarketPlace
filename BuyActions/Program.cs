@@ -1,6 +1,7 @@
 using BuyActions;
 using BuyActions.Services;
 using BuyActions.Settings;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Interfaces;
 
@@ -15,11 +16,14 @@ builder.Services.AddCors();
 
 builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
 builder.Services.Configure<ShoppingCartSettings>(builder.Configuration.GetSection("Grpc:ShoppingCarts"));
+builder.Services.Configure<ProductCatalogSettings>(builder.Configuration.GetSection("Grpc:ProductCatalogs"));
 
 builder.Services.AddSingleton<ShoppingCartClientService>();
 builder.Services.AddSingleton<UserClientService>();
+builder.Services.AddTransient<IProductCatalog, ProductCatalogClientService>();
 builder.Services.AddTransient<IBuyService, BuyService>();
-builder.Services.AddSingleton<DataContext>();
+builder.Services.AddDbContext<DataContext>(o 
+    => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
 var app = builder.Build();
 

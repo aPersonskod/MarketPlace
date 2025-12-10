@@ -2,19 +2,41 @@ using System.Text.Json.Serialization;
 
 namespace Models.Dtos;
 
-public class BuyReport
+public class BuyReportDto : BaseDto
 {
-    public Guid Id { get; set; }
-    public Guid CartId { get; set; }
+    [JsonPropertyName("cart")]
+    public BuyReportCartDto BuyReportCart { get; set; }
+    
+    [JsonPropertyName("saleDate")]
     public DateTime SaleDate { get; set; }
 }
 
-public class BuyReportDto
+public class BuyReportCartDto : BaseDto
 {
-    [JsonPropertyName("id")]
-    public Guid Id { get; set; }
-    [JsonPropertyName("cart")]
-    public Cart Cart { get; set; }
-    [JsonPropertyName("sale-date")]
-    public DateTime SaleDate { get; set; }
+    [JsonPropertyName("place")]
+    public PlaceDto Place { get; set; }
+    
+    [JsonPropertyName("user")]
+    public UserDto User { get; set; }
+    
+    [JsonPropertyName("orders")]
+    public IEnumerable<BuyReportOrderDto> Orders { get; set; }
+    
+    [JsonPropertyName("amountToPay")]
+    public int AmountToPay { get; set; }
+    
+    [JsonPropertyName("isConfirmed")]
+    public bool IsConfirmed { get; set; }
+    
+    [JsonPropertyName("isBought")]
+    public bool IsBought { get; set; }
+}
+
+public class BuyReportOrderDto : BaseDto
+{
+    [JsonPropertyName("product")]
+    public ProductDto Product { get; set; }
+    
+    [JsonPropertyName("quantity")]
+    public int Quantity { get; set; }
 }

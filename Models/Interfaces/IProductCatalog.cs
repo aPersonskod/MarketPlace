@@ -4,6 +4,6 @@ namespace Models.Interfaces;
 
 public interface IProductCatalog
 {
-    Task<IEnumerable<Product>> Get();
-    Task<Product> Get(Guid id);
+    Task<IEnumerable<ProductDto>> Get();
+    Task<ProductDto> Get(Guid id);
 }

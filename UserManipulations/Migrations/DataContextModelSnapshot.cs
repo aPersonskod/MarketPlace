@@ -46,6 +46,16 @@ namespace UserManipulations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("49792511-261b-4edb-94a5-ecb8540e60ff"),
+                            Email = "patochin@gmail.com",
+                            Name = "Петя Пяточкин",
+                            Password = "12345",
+                            Wallet = 0
+                        });
                 });
 #pragma warning restore 612, 618
         }

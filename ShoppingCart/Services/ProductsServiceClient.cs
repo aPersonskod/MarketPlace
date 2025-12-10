@@ -19,12 +19,12 @@ public class ProductsServiceClient : IProductCatalog
         _client = new ProductService.ProductServiceClient(channel);
     }
     
-    public async Task<IEnumerable<Product>> Get()
+    public async Task<IEnumerable<ProductDto>> Get()
     {
         try
         {
             var reply = await _client.GetAllAsync(new Empty());
-            return await Task.FromResult(reply.Products.Select(x => new Product()
+            return await Task.FromResult(reply.Products.Select(x => new ProductDto()
             {
                 Id = Guid.Parse(x.Id),
                 Name = x.Name,
@@ -37,12 +37,12 @@ public class ProductsServiceClient : IProductCatalog
         }
     }
 
-    public async Task<Product> Get(Guid productId)
+    public async Task<ProductDto> Get(Guid productId)
     {
         try
         {
             var reply = await _client.GetAsync(new GetProductRequest() { Id = productId.ToString() });
-            return await Task.FromResult(new Product()
+            return await Task.FromResult(new ProductDto()
             {
                 Id = Guid.Parse(reply.Id),
                 Name = reply.Name,

@@ -1,7 +1,6 @@
-using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 
-namespace Models;
+namespace Models.Extensions;
 
 public static class QueryExtensions
 {

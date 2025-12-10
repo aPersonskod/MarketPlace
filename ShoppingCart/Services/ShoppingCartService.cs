@@ -9,26 +9,42 @@ public class ShoppingCartService(
     DataContext dataContext,
     IProductCatalog productCatalog,
     UserClientService userService,
-    IKafkaProducer<Cart> kafkaCartProducer) : IShoppingCart
+    IKafkaProducer<CartDto> kafkaCartProducer) : IShoppingCart
 {
-    public Task<IEnumerable<Cart>> Get() => Task.FromResult<IEnumerable<Cart>>(dataContext.ShoppingCarts);
-    public Task<IEnumerable<Place>> GetPlaces() => Task.FromResult<IEnumerable<Place>>(dataContext.Places);
-
-    public async Task<Cart> Get(Guid userId)
+    public Task<IEnumerable<CartDto>> GetCarts() => Task.FromResult(dataContext.ShoppingCarts.Select(GetCartDto));
+    public Task<IEnumerable<PlaceDto>> GetPlaces() => Task.FromResult(dataContext.Places.Select(GetPlaceDto));
+    public async Task<PlaceDto> GetPlace(Guid placeId)
     {
-        var foundUser = await userService.GetUser(userId);
-        if (foundUser == null) throw new Exception("User not found");
-        var cart = await dataContext.ShoppingCarts.FirstOrDefaultAsync(c => c.UserId == userId && !c.IsBought && !c.IsConfirmed);
-        if (cart != null) return await Task.FromResult(cart);
-        var newCart = new Cart() { Id = Guid.NewGuid(), UserId = foundUser.Id };
-        await dataContext.ShoppingCarts.AddAsync(newCart);
-        await dataContext.SaveChangesAsync();
-        return await Task.FromResult(newCart);
+        var place = await dataContext.Places.FindAsync(placeId);
+        if (place == null) throw new Exception("Place not found");
+        return await Task.FromResult(GetPlaceDto(place));
     }
 
-    public async Task<Cart> AddOrder(Guid userId, Guid productId, int quantity)
+    public Task<IEnumerable<OrderDto>> GetOrders(Guid cartId) =>
+        Task.FromResult(dataContext.Orders.Where(x => x.CartId == cartId).AsEnumerable().Select(GetOrderDto));
+
+    public async Task<CartDto> GetCart(Guid userId)
     {
-        var cart = await Get(userId);
+        var foundUserDto = await userService.GetUser(userId);
+        if (foundUserDto == null) throw new Exception("User not found");
+        var cart = await dataContext.ShoppingCarts.FirstOrDefaultAsync(c => c.UserId == userId && !c.IsBought && !c.IsConfirmed);
+        if (cart != null) return await Task.FromResult(GetCartDto(cart));
+        var newCart = new Cart() { Id = Guid.NewGuid(), UserId = foundUserDto.Id };
+        await dataContext.ShoppingCarts.AddAsync(newCart);
+        await dataContext.SaveChangesAsync();
+        return await Task.FromResult(GetCartDto(newCart));
+    }
+
+    public async Task<CartDto> GetCartById(Guid cartId)
+    {
+        var cart = await dataContext.ShoppingCarts.FindAsync(cartId);
+        if (cart == null) throw new Exception("Cart not found");
+        return await Task.FromResult(GetCartDto(cart));
+    }
+
+    public async Task<CartDto> AddOrder(Guid userId, Guid productId, int quantity)
+    {
+        var cart = await GetCart(userId);
         var foundOrderId = await dataContext.Orders.FirstOrDefaultAsync(x => x.CartId == cart.Id);
         if (foundOrderId != null)
         {
@@ -49,13 +65,13 @@ public class ShoppingCartService(
         }
 
         await ChangeAmountToPay(cart.Id);
-        return await Get(userId);
+        return await GetCart(userId);
     }
 
     [Obsolete("synchronous task that is too slow")]
-    public async Task<Cart> ConfirmCart(Guid userId, Guid placeId)
+    public async Task<CartDto> ConfirmCart(Guid userId, Guid placeId)
     {
-        var cart = await Get(userId);
+        var cart = await GetCart(userId);
         
         var isCartNotEmpty = await dataContext.Orders.AnyAsync(x => x.CartId == cart.Id);
         if (!isCartNotEmpty) throw new Exception($"Cart has no orders !!!");
@@ -67,12 +83,12 @@ public class ShoppingCartService(
         var foundCart = await dataContext.ShoppingCarts.FindAsync(cart.Id);
         foundCart!.IsConfirmed = true;
         await dataContext.SaveChangesAsync();
-        return await Task.FromResult(cart);
+        return await Task.FromResult(GetCartDto(foundCart));
     }
 
-    public async Task<Cart> ConfirmAndBuyCart(Guid userId, Guid placeId)
+    public async Task<CartDto> ConfirmAndBuyCart(Guid userId, Guid placeId)
     {
-        var cart = await Get(userId);
+        var cart = await GetCart(userId);
         
         var isCartNotEmpty = await dataContext.Orders.AnyAsync(x => x.CartId == cart.Id);
         if (!isCartNotEmpty) throw new Exception($"Cart has no orders !!!");
@@ -84,8 +100,8 @@ public class ShoppingCartService(
         var foundCart = await dataContext.ShoppingCarts.FindAsync(cart.Id);
         foundCart!.IsConfirmed = true;
         await dataContext.SaveChangesAsync();
-        await kafkaCartProducer.ProduceAsync(foundCart, default);
-        return await Task.FromResult(cart);
+        await kafkaCartProducer.ProduceAsync(GetCartDto(foundCart), default);
+        return await Task.FromResult(GetCartDto(foundCart));
     }
 
     public async Task MarkCartAsBought(Guid cartId)
@@ -96,21 +112,21 @@ public class ShoppingCartService(
         await dataContext.SaveChangesAsync();
     }
 
-    public async Task<Cart> DeleteOrder(Guid userId, Guid productId)
+    public async Task<CartDto> DeleteOrder(Guid userId, Guid productId)
     {
-        var foundCart = await Get(userId);
+        var foundCart = await GetCart(userId);
         var cart = await dataContext.ShoppingCarts.FindAsync(foundCart.Id);
         var order = await dataContext.Orders.FirstOrDefaultAsync(x => x.OrderedProductId == productId);
         if (order == null) throw new Exception("Order not found");
         dataContext.Orders.Remove(order);
         await dataContext.SaveChangesAsync();
         await ChangeAmountToPay(cart!.Id);
-        return await Task.FromResult(cart);
+        return await Task.FromResult(GetCartDto(cart));
     }
 
     private async Task ChangeAmountToPay(Guid cartId)
     {
-        var cart = dataContext.ShoppingCarts.First(x => x.Id == cartId);
+        var cart = await dataContext.ShoppingCarts.FirstAsync(x => x.Id == cartId);
         var orders = dataContext.Orders.Where(x => x.CartId == cartId);
         var isCartHaveOrders = await orders.AnyAsync(x => x.CartId == cartId);
         if (isCartHaveOrders)
@@ -130,4 +146,29 @@ public class ShoppingCartService(
         }
         await dataContext.SaveChangesAsync();
     }
+
+    private PlaceDto GetPlaceDto(Place place) => new()
+    {
+        Id = place.Id,
+        Address = place.Address,
+        WorkingTime = place.WorkingTime
+    };
+
+    private CartDto GetCartDto(Cart cart) => new()
+    {
+        Id = cart.Id,
+        UserId = cart.UserId,
+        PlaceId = cart.PlaceId,
+        AmountToPay = cart.AmountToPay,
+        IsConfirmed = cart.IsConfirmed,
+        IsBought = cart.IsBought
+    };
+    
+    private OrderDto GetOrderDto(Order order) => new()
+    {
+        Id = order.Id,
+        CartId = order.CartId,
+        OrderedProductId = order.OrderedProductId,
+        Quantity = order.Quantity
+    };
 }

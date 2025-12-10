@@ -25,6 +25,11 @@ namespace UserManipulations.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Email", "Name", "Password", "Wallet" },
+                values: new object[] { new Guid("49792511-261b-4edb-94a5-ecb8540e60ff"), "patochin@gmail.com", "Петя Пяточкин", "12345", 0 });
         }
 
         /// <inheritdoc />

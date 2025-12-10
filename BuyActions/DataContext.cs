@@ -1,11 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Dtos;
 
 namespace BuyActions;
 
-public class DataContext
+public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
-    public List<BuyReportDto> BuyReports { get => StaticData.BuyReports; set => StaticData.BuyReports = value; }
+    public DbSet<BuyReport> BuyReports { get; set; }
 }
 
 public class StaticData

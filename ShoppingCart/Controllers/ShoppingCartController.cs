@@ -9,14 +9,70 @@ namespace ShoppingCart.Controllers;
 public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
 {
     [HttpGet("[action]")]
-    public async Task<IEnumerable<Place>> GetPlaces() => await shoppingCart.GetPlaces();
+    public async Task<IEnumerable<PlaceDto>> GetPlaces() => await shoppingCart.GetPlaces();
+    
+    [HttpGet("[action]")]
+    public async Task<PlaceDto> GetPlace(Guid placeId) => await shoppingCart.GetPlace(placeId);
 
-    [HttpGet("{userId:guid}")]
-    public async Task<IActionResult> Get(Guid userId)
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetCart(Guid userId)
     {
         try
         {
-            return Ok(await shoppingCart.Get(userId));
+            return Ok(await shoppingCart.GetCart(userId));
+        }
+        catch (Exception e)
+        {
+            return NotFound(new { message = e.Message });
+        }
+    }
+    
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetCartById(Guid cartId)
+    {
+        try
+        {
+            return Ok(await shoppingCart.GetCart(cartId));
+        }
+        catch (Exception e)
+        {
+            return NotFound(new { message = e.Message });
+        }
+    }
+    
+    [HttpPost("[action]")]
+    public async Task<IActionResult> ConfirmCart(Guid userId, Guid placeId)
+    {
+        try
+        {
+            return Ok(await shoppingCart.ConfirmAndBuyCart(userId, placeId));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = e.Message });
+        }
+    }
+    
+    [HttpPost("[action]")]
+    public async Task<IActionResult> MarkCartAsBought(Guid cartId)
+    {
+        try
+        {
+            await shoppingCart.MarkCartAsBought(cartId);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = e.Message });
+        }
+    }
+    
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetCartOrders(Guid cartId)
+    {
+        try
+        {
+            return Ok(await shoppingCart.GetOrders(cartId));
         }
         catch (Exception e)
         {
@@ -30,33 +86,6 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
         try
         {
             return Ok(await shoppingCart.AddOrder(userId, productId, quantity));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(new { message = e.Message });
-        }
-    }
-
-    [HttpPost("[action]")]
-    public async Task<IActionResult> ConfirmCart(Guid userId, Guid placeId)
-    {
-        try
-        {
-            return Ok(await shoppingCart.ConfirmAndBuyCart(userId, placeId));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(new { message = e.Message });
-        }
-    }
-
-    [HttpPost("[action]")]
-    public async Task<IActionResult> MarkCartAsBought(Guid cartId)
-    {
-        try
-        {
-            await shoppingCart.MarkCartAsBought(cartId);
-            return Ok();
         }
         catch (Exception e)
         {

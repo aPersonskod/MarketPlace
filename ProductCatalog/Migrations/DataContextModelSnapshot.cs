@@ -26,17 +26,14 @@ namespace ProductCatalog.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Cost")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "cost");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

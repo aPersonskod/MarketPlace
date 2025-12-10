@@ -11,6 +11,7 @@ public class BuyActionsController(IBuyService buyService) : ControllerBase
 {
     [HttpGet]
     public async Task<IEnumerable<BuyReportDto>> Get() => await buyService.Get();
+    
     [HttpGet("{reportId:guid}")]
     public async Task<IActionResult> Get(Guid reportId)
     {
@@ -23,6 +24,9 @@ public class BuyActionsController(IBuyService buyService) : ControllerBase
             return BadRequest(new { message = e.Message });
         }
     }
+    
+    [HttpGet("[action]")]
+    public async Task<IEnumerable<BuyReportDto>> GetByUserId(Guid userId) => await buyService.GetByUserId(userId);
 
     [HttpPost("[action]")]
     public async Task<IActionResult> BuyCart(CartDto cartDto)

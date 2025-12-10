@@ -14,10 +14,10 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddGrpc();
 
+builder.Services.AddTransient<IProductCatalog, ProductCatalogService>();
+
 builder.Services.AddDbContext<DataContext>(o 
     => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
-
-builder.Services.AddTransient<IProductCatalog, ProductCatalogService>();
 
 var app = builder.Build();
 
