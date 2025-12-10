@@ -95,7 +95,7 @@ function Header() {
             <Navbar key={expand} expand={expand} className="bg-body-tertiary mb-3"
                     style={{borderRadius: '21px', backgroundColor: '#ececec'}}>
                 <Container fluid>
-                    <Navbar.Brand href="/">Marketplace</Navbar.Brand>
+                    <Navbar.Brand href={isLoggedIn ? '/main' : '/'}>Marketplace</Navbar.Brand>
                     <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`}/>
                     <Navbar.Offcanvas
                         id={`offcanvasNavbar-expand-${expand}`}

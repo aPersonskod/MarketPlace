@@ -12,7 +12,7 @@ using ShoppingCart;
 namespace ShoppingCart.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251210000856_InitialMigration")]
+    [Migration("20251210161939_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -40,7 +40,7 @@ namespace ShoppingCart.Migrations
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("PlaceId")
+                    b.Property<Guid?>("PlaceId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")

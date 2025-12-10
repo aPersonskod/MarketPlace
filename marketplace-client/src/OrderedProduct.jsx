@@ -1,6 +1,6 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
-const OrderedProduct = ({ productId, productName, quantity}) => {
+const OrderedProduct = ({ productId, quantity}) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -53,12 +53,11 @@ const OrderedProduct = ({ productId, productName, quantity}) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    const [product, setProduct] = useState({});
 
     const removeFromCart = async () => {
         setLoading(true);
         setError(null);
-        setSuccess(false);
         try {
             let userId = localStorage.getItem('marketplace-user-id');
             let query = `https://localhost:7002/ShoppingCart/DeleteOrder?userId=${userId}&productId=${productId}`;
@@ -77,8 +76,7 @@ const OrderedProduct = ({ productId, productName, quantity}) => {
 
             const data = await response.json();
             console.log('Update successful:', data);
-            setSuccess(true);
-            window.location.reload();
+            if(data) window.location.reload();
             // Optionally, update local state or re-fetch data after successful update
         } catch (error) {
             setError(error.message);
@@ -87,10 +85,31 @@ const OrderedProduct = ({ productId, productName, quantity}) => {
             setLoading(false);
         }
     }
+    const fetchProductData = async () => {
+        try {
+            const response = await fetch(`https://localhost:7001/ProductCatalog/${productId}`);
+            if (!response.ok) {
+                alert(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setProduct(data);
+        } catch (e) {
+            setError(e);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchProductData();
+    }, [productId]);
+
+    if (loading) return <div>Loading data...</div>;
+    if (error) return <div>Error: {error.message}</div>;
 
     return (
         <div style={styles.container}>
-            <h3 style={styles.productName}>{productName}</h3>
+            <h3 style={styles.productName}>{product.name}</h3>
             <h3 style={styles.productName}>{quantity}шт.</h3>
             
             <br/>

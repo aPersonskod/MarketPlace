@@ -12,7 +12,7 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     public async Task<IEnumerable<PlaceDto>> GetPlaces() => await shoppingCart.GetPlaces();
     
     [HttpGet("[action]")]
-    public async Task<PlaceDto> GetPlace(Guid placeId) => await shoppingCart.GetPlace(placeId);
+    public async Task<PlaceDto> GetPlace(Guid placeId) => await shoppingCart.GetPlace(placeId); // todo IActionResult
 
     [HttpGet("[action]")]
     public async Task<IActionResult> GetCart(Guid userId)
@@ -32,7 +32,7 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     {
         try
         {
-            return Ok(await shoppingCart.GetCart(cartId));
+            return Ok(await shoppingCart.GetCartById(cartId));
         }
         catch (Exception e)
         {

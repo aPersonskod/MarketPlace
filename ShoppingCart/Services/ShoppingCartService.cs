@@ -45,10 +45,10 @@ public class ShoppingCartService(
     public async Task<CartDto> AddOrder(Guid userId, Guid productId, int quantity)
     {
         var cart = await GetCart(userId);
-        var foundOrderId = await dataContext.Orders.FirstOrDefaultAsync(x => x.CartId == cart.Id);
-        if (foundOrderId != null)
+        var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.CartId == cart.Id && x.OrderedProductId == productId);
+        if (foundOrder != null)
         {
-            var order = await dataContext.Orders.FindAsync(foundOrderId);
+            var order = await dataContext.Orders.FindAsync(foundOrder.Id);
             order!.Quantity += quantity;
         }
         else
@@ -63,9 +63,22 @@ public class ShoppingCartService(
             };
             await dataContext.Orders.AddAsync(newOrder);
         }
+        await dataContext.SaveChangesAsync();
 
         await ChangeAmountToPay(cart.Id);
         return await GetCart(userId);
+    }
+    
+    public async Task<CartDto> DeleteOrder(Guid userId, Guid productId)
+    {
+        var foundCart = await GetCart(userId);
+        var cart = await dataContext.ShoppingCarts.FindAsync(foundCart.Id);
+        var order = await dataContext.Orders.FirstOrDefaultAsync(x => x.OrderedProductId == productId);
+        if (order == null) throw new Exception("Order not found");
+        dataContext.Orders.Remove(order);
+        await dataContext.SaveChangesAsync();
+        await ChangeAmountToPay(cart!.Id);
+        return await Task.FromResult(GetCartDto(cart));
     }
 
     [Obsolete("synchronous task that is too slow")]
@@ -86,7 +99,7 @@ public class ShoppingCartService(
         return await Task.FromResult(GetCartDto(foundCart));
     }
 
-    public async Task<CartDto> ConfirmAndBuyCart(Guid userId, Guid placeId)
+    public async Task<CartDto> ConfirmAndBuyCart(Guid userId, Guid? placeId)
     {
         var cart = await GetCart(userId);
         
@@ -98,7 +111,10 @@ public class ShoppingCartService(
         if (!isUserHasEnoughMoney) throw new Exception($"You have not enough money !!!");
         
         var foundCart = await dataContext.ShoppingCarts.FindAsync(cart.Id);
-        foundCart!.IsConfirmed = true;
+        if(foundCart == null) throw new Exception($"Undefined cart !!!");
+        foundCart.PlaceId = placeId;
+        if (foundCart.PlaceId == null) throw new Exception($"Cart's place is empty !!!");
+        foundCart.IsConfirmed = true;
         await dataContext.SaveChangesAsync();
         await kafkaCartProducer.ProduceAsync(GetCartDto(foundCart), default);
         return await Task.FromResult(GetCartDto(foundCart));
@@ -110,18 +126,6 @@ public class ShoppingCartService(
         if (cart == null) throw new Exception("Cart is not exist");
         cart.IsBought = true;
         await dataContext.SaveChangesAsync();
-    }
-
-    public async Task<CartDto> DeleteOrder(Guid userId, Guid productId)
-    {
-        var foundCart = await GetCart(userId);
-        var cart = await dataContext.ShoppingCarts.FindAsync(foundCart.Id);
-        var order = await dataContext.Orders.FirstOrDefaultAsync(x => x.OrderedProductId == productId);
-        if (order == null) throw new Exception("Order not found");
-        dataContext.Orders.Remove(order);
-        await dataContext.SaveChangesAsync();
-        await ChangeAmountToPay(cart!.Id);
-        return await Task.FromResult(GetCartDto(cart));
     }
 
     private async Task ChangeAmountToPay(Guid cartId)

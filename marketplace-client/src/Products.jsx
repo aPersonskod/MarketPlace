@@ -34,7 +34,7 @@ function Products() {
                 <div style={{margin:'5px'}}>
                     <div className='d-flex flex-wrap'>
                         {data.map((item, index) => (
-                            <ProductQuantitySelector productId={item.id} productName={item.name} productCost={item.cost}  key={index} />
+                            <ProductQuantitySelector productId={item.id} productName={item.name} productCost={item.cost} key={index} />
                         ))}
                     </div>
                 </div>

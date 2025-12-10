@@ -46,7 +46,7 @@ namespace ShoppingCart.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PlaceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PlaceId = table.Column<Guid>(type: "uuid", nullable: true),
                     AmountToPay = table.Column<int>(type: "integer", nullable: false),
                     IsConfirmed = table.Column<bool>(type: "boolean", nullable: false),
                     IsBought = table.Column<bool>(type: "boolean", nullable: false)

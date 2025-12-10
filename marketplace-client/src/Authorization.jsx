@@ -67,7 +67,18 @@ const Authorization = ({
 
     const handleAuth = async () => {
         try {
-            const response = await fetch(`https://localhost:7004/UserManipulations/Authorize?email=${formData.email}&password=${formData.password}`);
+            let userCredentials = {
+                email: formData.email,
+                password: formData.password
+            };
+            const response = await fetch(`https://localhost:7004/UserManipulations/Authorize`, {
+                method: 'POST',
+                headers: {
+                    'accept': '*/*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userCredentials),
+            });
             if (!response.ok) {
                 let localError = await response.json();
                 alert(localError.message);
@@ -75,10 +86,10 @@ const Authorization = ({
             }
             const result = await response.json();
             localStorage.setItem('marketplace-user-id', result.id);
+            navigateNext();
         } catch (err) {
             setError(err);
         }
-        navigateNext();
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -102,6 +113,9 @@ const Authorization = ({
             setIsLoading(false);
         }
     };
+
+    if (isLoading) return <div>Loading data...</div>;
+    if (error) return <div>Error: {error.message}</div>;
 
     return (
         <>

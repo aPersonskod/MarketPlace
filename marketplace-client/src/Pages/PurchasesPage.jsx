@@ -8,7 +8,8 @@ const PurchasesPage = () => {
 
     const fetchBuyActions = async () => {
         try {
-            const response = await fetch(`https://localhost:7003/BuyActions`);
+            let userId = localStorage.getItem('marketplace-user-id');
+            const response = await fetch(`https://localhost:7003/BuyActions/GetByUserId?userId=${userId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -25,7 +26,7 @@ const PurchasesPage = () => {
         return (
             <ul>
                 {orders.map(order => (
-                    <li key={order.id}>{order.orderedProduct.name}, цена:{order.orderedProduct.cost}, {order.quantity}шт.</li>
+                    <li key={order.id}>{order.product.name}, цена:{order.product.cost}, {order.quantity}шт.</li>
                 ))}
             </ul>
         );
@@ -73,37 +74,10 @@ const PurchasesPage = () => {
                         <td key={index+buyAction.cart.id}>{buyAction.cart.user.name}</td>
                         <td key={index+buyAction.cart.place.id}>{buyAction.cart.place.address}</td>
                         <td key={index+index}>{getProducts(buyAction.cart.orders)}</td>
-                        <td key={index+buyAction.cart.amount_to_pay}>{buyAction.cart.amount_to_pay}</td>
+                        <td key={index+buyAction.cart.amountToPay}>{buyAction.cart.amountToPay}</td>
                         <td key={index+buyAction.saleDate}>{getFormatedDate(buyAction.saleDate)}</td>
                     </tr>
                 ))}
-{/*                <tr>
-                    <td>1</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                </tr>*/}
                 </tbody>
             </Table>
         </>

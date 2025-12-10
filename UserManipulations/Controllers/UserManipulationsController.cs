@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Models.Dtos;
 using Models.Interfaces;
+using UserManipulations.Dtos;
 
 namespace UserManipulations.Controllers;
 
@@ -23,12 +24,12 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
     }
 
-    [HttpGet("[action]")]
-    public async Task<IActionResult> Authorize(string email, string password)
+    [HttpPost("[action]")]
+    public async Task<IActionResult> Authorize([FromBody]CredentialsDto credentials)
     {
         try
         {
-            return Ok(await userManipulationsService.Authorize(email, password));
+            return Ok(await userManipulationsService.Authorize(credentials.email, credentials.password));
         }
         catch (Exception e)
         {

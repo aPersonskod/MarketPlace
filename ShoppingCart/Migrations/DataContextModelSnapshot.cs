@@ -37,7 +37,7 @@ namespace ShoppingCart.Migrations
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("PlaceId")
+                    b.Property<Guid?>("PlaceId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")

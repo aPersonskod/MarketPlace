@@ -4,7 +4,7 @@ const SumToPay = ({cart, loading, error}) => {
     
     return (
         <>
-            <p className='fs24'>Сумма к оплате: {cart.amount_to_pay}</p>
+            <p className='fs24'>Сумма к оплате: {cart.amountToPay}</p>
         </>
     );
 }

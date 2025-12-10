@@ -15,12 +15,12 @@ const ProductCatalogPage = () => {
     const fetchCartData = async () => {
         try {
             let userId = localStorage.getItem('marketplace-user-id');
-            const response = await fetch(`https://localhost:7002/ShoppingCart/${userId}`);
+            const response = await fetch(`https://localhost:7002/ShoppingCart/GetCart?userId=${userId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
-            if(result.is_confirmed) result.orders = [];
+            if(result.isConfirmed) setOrders([]);
             setCart(result);
         } catch (err) {
             setError(err);
@@ -35,6 +35,9 @@ const ProductCatalogPage = () => {
     const handleConfirmation = () => {
         navigate('confirmation');
     }
+
+    if (loading) return <div>Loading data...</div>;
+    if (error) return <div>Error: {error.message}</div>;
     
     return (
         <>
@@ -48,7 +51,7 @@ const ProductCatalogPage = () => {
                 <div className='col col-xs-12 col-sm-12 col-lg-6'>
                     <p className='fs24'>Корзина:</p>
                     <div className='divStyle xsDivStyle mdDivStyle'>
-                        <ProductCart cart={cart} loading={loading} error={error}/>
+                        <ProductCart cart={cart}/>
                     </div>
                 </div>
                 <div className='col col-xs-12 col-sm-12'>

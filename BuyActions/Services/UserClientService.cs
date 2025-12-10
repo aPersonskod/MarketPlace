@@ -25,13 +25,10 @@ public class UserClientService(IOptions<UserSettings> userOptions)
 public class ProductCatalogClientService(IOptions<ProductCatalogSettings> productOptions) : IProductCatalog
 {
     private readonly string _baseAddress = productOptions.Value.Address;
-    public Task<IEnumerable<ProductDto>> Get()
+    public async Task<IEnumerable<ProductDto>> Get() => (await _baseAddress.GetQuery<IEnumerable<ProductDto>>())!;
+    public async Task<ProductDto> Get(Guid id)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<ProductDto> Get(Guid id)
-    {
-        throw new NotImplementedException();
+        var query = $"{_baseAddress}/{id}";
+        return (await query.GetQuery<ProductDto>())!;
     }
 }
