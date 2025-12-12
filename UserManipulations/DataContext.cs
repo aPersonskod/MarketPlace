@@ -3,9 +3,16 @@ using Models;
 
 namespace UserManipulations;
 
-public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+public sealed class DataContext : DbContext
 {
+    private readonly ILogger<DataContext> _logger;
     public DbSet<User> Users { get; set; }
+
+    public DataContext(DbContextOptions<DataContext> options, ILogger<DataContext> logger) : base(options)
+    {
+        _logger = logger;
+        Database.EnsureCreated();
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasData(
@@ -16,6 +23,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 Password = "12345"
             }
         );
+        _logger.LogInformation("Database was created !!!");
     }
 }
 

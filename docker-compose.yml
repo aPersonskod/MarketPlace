@@ -1,0 +1,31 @@
+version: "3.9"
+networks:
+  market-place-dev:
+    driver: bridge
+services:
+  user-app:
+    container_name: user-manipulations
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7004:8080"
+    networks: 
+      - market-place-dev
+    depends_on:
+      - postgres_um_db
+  postgres_um_db:
+    container_name: postgres-um
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: marketplace-users-db
+    ports:
+      - "5432:5432"
+    networks:
+      - market-place-dev
+    volumes:
+      - postgres-um-data:/var/lib/postgresql/18/data
+volumes:
+  postgres-um-data:

@@ -12,7 +12,7 @@ using UserManipulations;
 namespace UserManipulations.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251209234225_InitialMigration")]
+    [Migration("20251212205521_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
