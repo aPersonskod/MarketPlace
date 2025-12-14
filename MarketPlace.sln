@@ -2,7 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microservices", "Microservices", "{4C59C76A-33EA-4FF8-85C9-606831016825}"
 	ProjectSection(SolutionItems) = preProject
-		Dockerfile = Dockerfile
 		.dockerignore = .dockerignore
 	EndProjectSection
 EndProject

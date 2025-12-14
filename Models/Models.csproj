@@ -2,6 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <PackageId>Marketplace.Models</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Turov Andrey</Authors>
+        <Description>This library contains models, interfaces and extensions for marketplace microservices.</Description>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>

@@ -6,7 +6,7 @@ services:
   user-app:
     container_name: user-manipulations
     build:
-      context: .
+      context: ./UserManipulations
       dockerfile: Dockerfile
     ports:
       - "7004:8080"
