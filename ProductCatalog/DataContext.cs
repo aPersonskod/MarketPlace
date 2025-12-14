@@ -4,8 +4,9 @@ using Models.Dtos;
 
 namespace ProductCatalog;
 
-public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+public sealed class DataContext : DbContext
 {
+    public DataContext(DbContextOptions<DataContext> options) : base(options) => Database.EnsureCreated();
     public DbSet<Product> Products { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

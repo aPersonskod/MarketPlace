@@ -12,7 +12,7 @@ using ProductCatalog;
 namespace ProductCatalog.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251210001216_InitialMigration")]
+    [Migration("20251214155604_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

@@ -4,8 +4,9 @@ using Models.Dtos;
 
 namespace BuyActions;
 
-public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+public sealed class DataContext : DbContext
 {
+    public DataContext(DbContextOptions<DataContext> options) : base(options) => Database.EnsureCreated();
     public DbSet<BuyReport> BuyReports { get; set; }
 }
 

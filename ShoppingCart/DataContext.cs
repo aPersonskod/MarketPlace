@@ -4,8 +4,9 @@ using Models.Dtos;
 
 namespace ShoppingCart;
 
-public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+public sealed class DataContext : DbContext
 {
+    public DataContext(DbContextOptions<DataContext> options) : base(options) => Database.EnsureCreated();
     public DbSet<Cart> ShoppingCarts { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Place> Places { get; set; }
