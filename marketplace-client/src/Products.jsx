@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import ProductQuantitySelector from "./ProductQuantitySelector.jsx";
+import {ApiHelper} from "./ApiHelper.jsx";
 
 function Products() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const apiHelper = new ApiHelper();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('https://localhost:7001/ProductCatalog');
+                const response = await fetch(apiHelper.productCatalogBaseAddress);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

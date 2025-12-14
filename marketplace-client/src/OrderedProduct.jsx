@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {ApiHelper} from "./ApiHelper.jsx";
 
 const OrderedProduct = ({ productId, quantity}) => {
     // Basic inline styles for quick demonstration
@@ -54,13 +55,14 @@ const OrderedProduct = ({ productId, quantity}) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [product, setProduct] = useState({});
+    const apiHelper = new ApiHelper();
 
     const removeFromCart = async () => {
         setLoading(true);
         setError(null);
         try {
             let userId = localStorage.getItem('marketplace-user-id');
-            let query = `https://localhost:7002/ShoppingCart/DeleteOrder?userId=${userId}&productId=${productId}`;
+            let query = `${apiHelper.shoppingCartBaseAddress}/DeleteOrder?userId=${userId}&productId=${productId}`;
             const response = await fetch(query, {
                 method: 'DELETE',
                 headers: {
@@ -87,7 +89,7 @@ const OrderedProduct = ({ productId, quantity}) => {
     }
     const fetchProductData = async () => {
         try {
-            const response = await fetch(`https://localhost:7001/ProductCatalog/${productId}`);
+            const response = await fetch(`${apiHelper.productCatalogBaseAddress}/${productId}`);
             if (!response.ok) {
                 alert(`HTTP error! status: ${response.status}`);
             }

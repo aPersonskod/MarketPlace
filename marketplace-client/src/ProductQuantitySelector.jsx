@@ -1,5 +1,6 @@
 import {useState} from "react";
 import Button from "react-bootstrap/Button";
+import {ApiHelper} from "./ApiHelper.jsx";
 
 const ProductQuantitySelector = ({ productName, productCost, productId, initialQuantity = 0, minQuantity = 0, maxQuantity = 99 }) => {
     // Basic inline styles for quick demonstration
@@ -56,6 +57,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, initialQ
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const apiHelper = new ApiHelper();
     const increment = () => {
         if (quantity < maxQuantity) {
             setQuantity(prev => prev + 1);
@@ -75,7 +77,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, initialQ
         if (quantity >= 1) {
             try {
                 let userId = localStorage.getItem('marketplace-user-id');
-                let query = `https://localhost:7002/ShoppingCart/AddOrder?userId=${userId}&productId=${productId}&quantity=${quantity}`;
+                let query = `${apiHelper.shoppingCartBaseAddress}/AddOrder?userId=${userId}&productId=${productId}&quantity=${quantity}`;
                 const response = await fetch(query, {
                     method: 'POST',
                     headers: {

@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import { useNavigate } from 'react-router';
 import './Authorization.css';
+import {ApiHelper} from "./ApiHelper.jsx";
 
 const Authorization = ({
                            onLoginSuccess,
@@ -17,6 +18,7 @@ const Authorization = ({
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const apiHelper = new ApiHelper();
     //const { login } = useAuth();
     
     useEffect(() => {
@@ -71,7 +73,7 @@ const Authorization = ({
                 email: formData.email,
                 password: formData.password
             };
-            const response = await fetch(`https://localhost:7004/UserManipulations/Authorize`, {
+            const response = await fetch(`${apiHelper.userManipulationBaseAddress}/Authorize`, {
                 method: 'POST',
                 headers: {
                     'accept': '*/*',

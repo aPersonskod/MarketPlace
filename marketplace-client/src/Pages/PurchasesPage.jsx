@@ -1,15 +1,17 @@
 import Table from 'react-bootstrap/Table';
 import {useEffect, useState} from "react";
+import {ApiHelper} from "../ApiHelper.jsx";
 
 const PurchasesPage = () => {
     const [buyActions, setBuyActions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const apiHelper = new ApiHelper();
 
     const fetchBuyActions = async () => {
         try {
             let userId = localStorage.getItem('marketplace-user-id');
-            const response = await fetch(`https://localhost:7003/BuyActions/GetByUserId?userId=${userId}`);
+            const response = await fetch(`${apiHelper.buyActionsBaseAddress}/GetByUserId?userId=${userId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

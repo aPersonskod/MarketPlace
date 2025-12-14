@@ -15,7 +15,7 @@ const ProductCatalogPage = () => {
     const fetchCartData = async () => {
         try {
             let userId = localStorage.getItem('marketplace-user-id');
-            const response = await fetch(`https://localhost:7002/ShoppingCart/GetCart?userId=${userId}`);
+            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

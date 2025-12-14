@@ -7,6 +7,7 @@ import Products from "../Products.jsx";
 import ProductCart from "../ProductCart.jsx";
 import Places from "../Places.jsx";
 import SumToPay from "../SumToPay.jsx";
+import {ApiHelper} from "../ApiHelper.jsx";
 const ConfirmationPage = () => {
     const navigate = useNavigate();
     const [selectedPlaceId, setSelectedPlaceId] = useState('');
@@ -14,11 +15,12 @@ const ConfirmationPage = () => {
     const [isCartConfirmed, setIsCartConfirmed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const apiHelper = new ApiHelper();
 
     const fetchCartData = async () => {
         try {
             let userId = localStorage.getItem('marketplace-user-id');
-            const response = await fetch(`https://localhost:7002/ShoppingCart/GetCart?userId=${userId}`);
+            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -34,7 +36,7 @@ const ConfirmationPage = () => {
     const confirmCart = async () => {
         try {
             let userId = localStorage.getItem('marketplace-user-id');
-            let query = `https://localhost:7002/ShoppingCart/ConfirmCart?userId=${userId}&placeId=${selectedPlaceId}`;
+            let query = `${apiHelper.shoppingCartBaseAddress}/ConfirmCart?userId=${userId}&placeId=${selectedPlaceId}`;
             const response = await fetch(query, {
                 method: 'POST',
                 headers: {
@@ -63,7 +65,7 @@ const ConfirmationPage = () => {
     
     const buyCart = async (cartParam) => {
         try {
-            let query = `https://localhost:7003/BuyActions/BuyCart`;
+            let query = `${apiHelper.buyActionsBaseAddress}/BuyCart`;
             const response = await fetch(query, {
                 method: 'POST',
                 headers: {

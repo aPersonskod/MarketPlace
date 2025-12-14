@@ -10,6 +10,7 @@ import NotLoggedLogo from './assets/NotLoggedLogo.jsx';
 import {Dropdown} from "react-bootstrap";
 import {useState, useEffect} from "react";
 import { useNavigate } from 'react-router';
+import {ApiHelper} from "./ApiHelper.jsx";
 
 function Header() {
     const expand = 'md';
@@ -20,6 +21,7 @@ function Header() {
         width: window.innerWidth,
         height: window.innerHeight,
     });
+    const apiHelper = new ApiHelper();
     
     useEffect(() => {
         const handleResize = () => {
@@ -44,7 +46,7 @@ function Header() {
     const walletReplenishment = async () => {
         try {
             let money = 300;
-            let query = `https://localhost:7004/UserManipulations/WalletReplenishment?userId=${user.id}&money=${money}`;
+            let query = `${apiHelper.userManipulationBaseAddress}/WalletReplenishment?userId=${user.id}&money=${money}`;
             const response = await fetch(query, {
                 method: 'POST',
                 headers: {
@@ -67,7 +69,7 @@ function Header() {
     const getUserData = async () => {
         try {
             let id = localStorage.getItem('marketplace-user-id');
-            let query = `https://localhost:7004/UserManipulations/${id}`;
+            let query = `${apiHelper.userManipulationBaseAddress}/UserManipulations/${id}`;
             const response = await fetch(query, {
                 method: 'GET',
                 headers: {
