@@ -119,20 +119,23 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    networks:
+      - market-place-dev
     environment:
-      ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_SERVERS: zookeeper:2888:3888
 
-  kafka1:
+  kafka:
     image: confluentinc/cp-kafka:7.3.2
-    hostname: kafka1
-    container_name: kafka1
+    hostname: kafka
+    container_name: kafka
     ports:
       - "9092:9092"
+    networks:
+      - market-place-dev
     environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
@@ -141,7 +144,8 @@ services:
       KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      # когда было 3 не консьюмилось и хз почему
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
 
@@ -153,7 +157,7 @@ services:
     networks:
       - market-place-dev
     depends_on:
-      - kafka1
+      - kafka
 
   frontend-app:
     container_name: react-frontend
@@ -172,7 +176,7 @@ services:
       - shopping-cart-app
       - product-catalog-app
       - buy-actions-app
-      - kafka1
+      - kafka
     
     
 volumes:

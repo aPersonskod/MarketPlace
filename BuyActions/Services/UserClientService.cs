@@ -1,3 +1,5 @@
+using System.Net;
+using System.Runtime.CompilerServices;
 using BuyActions.Settings;
 using Microsoft.Extensions.Options;
 using Models.Dtos;
@@ -29,6 +31,28 @@ public class ProductCatalogClientService(IOptions<ProductCatalogSettings> produc
     public async Task<ProductDto> Get(Guid id)
     {
         var query = $"{_baseAddress}/{id}";
-        return (await query.GetQuery<ProductDto>())!;
+        var response = new ProductDto();
+        
+        var clientHandler = new HttpClientHandler();
+        clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+        using var client = new HttpClient(clientHandler);
+        HttpResponseMessage async = await client.GetAsync(query);
+        
+        if (async.IsSuccessStatusCode)
+        {
+            response = await async.Content.ReadFromJsonAsync<ProductDto>();
+        }
+        else
+        {
+            /*var interpolatedStringHandler = new DefaultInterpolatedStringHandler(18, 1);
+            interpolatedStringHandler.AppendLiteral("server error code ");
+            interpolatedStringHandler.AppendFormatted<HttpStatusCode>(async.StatusCode);
+            throw new ArgumentNullException(interpolatedStringHandler.ToStringAndClear());*/
+            throw new ArgumentNullException("something went wrong !!!");
+        }
+        
+        return await Task.FromResult(response!);
+        
+        //return (await query.GetQuery<ProductDto>())!;
     }
 }
