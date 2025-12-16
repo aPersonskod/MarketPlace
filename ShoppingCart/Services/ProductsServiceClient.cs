@@ -12,10 +12,18 @@ namespace ShoppingCart.Services;
 public class ProductsServiceClient : IProductCatalog
 {
     private readonly ProductService.ProductServiceClient _client;
+    private readonly ILogger<ProductsServiceClient> _logger;
 
-    public ProductsServiceClient(IOptions<GrpcProductSettings> grpcOptions)
+    public ProductsServiceClient(IOptions<GrpcProductSettings> grpcOptions, ILogger<ProductsServiceClient> logger)
     {
-        var channel = GrpcChannel.ForAddress(grpcOptions.Value.Address);
+        _logger = logger;
+        _logger.LogInformation($"Product client service {grpcOptions.Value.HttpsAddress}");
+        var httpHandler = new HttpClientHandler();
+        // Return true to allow certificates that are untrusted/invalid
+        httpHandler.ServerCertificateCustomValidationCallback = 
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+        var channel = GrpcChannel.ForAddress(grpcOptions.Value.HttpsAddress, 
+            new GrpcChannelOptions { HttpHandler = httpHandler });
         _client = new ProductService.ProductServiceClient(channel);
     }
     
@@ -41,7 +49,9 @@ public class ProductsServiceClient : IProductCatalog
     {
         try
         {
+            _logger.LogInformation($"Try to get product by id: {productId}");
             var reply = await _client.GetAsync(new GetProductRequest() { Id = productId.ToString() });
+            _logger.LogInformation($"product name: {reply.Name}");
             return await Task.FromResult(new ProductDto()
             {
                 Id = Guid.Parse(reply.Id),
@@ -51,6 +61,7 @@ public class ProductsServiceClient : IProductCatalog
         }
         catch (RpcException e)
         {
+            _logger.LogError($"product service exception: {e.Status.Detail}");
             throw new RpcException(new Status(e.StatusCode, e.Status.Detail));
         }
     }

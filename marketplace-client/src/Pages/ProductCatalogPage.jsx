@@ -5,6 +5,7 @@ import ProductCart from "../ProductCart.jsx";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from 'react-router';
 import {useEffect, useState} from "react";
+import {ApiHelper} from "../ApiHelper.jsx";
 
 const ProductCatalogPage = () => {
     const navigate = useNavigate();
@@ -14,8 +15,11 @@ const ProductCatalogPage = () => {
 
     const fetchCartData = async () => {
         try {
+            let apiHelper = new ApiHelper();
             let userId = localStorage.getItem('marketplace-user-id');
-            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`);
+            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`;
+            alert(query);
+            const response = await fetch(query);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

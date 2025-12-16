@@ -9,7 +9,8 @@ public class ShoppingCartService(
     DataContext dataContext,
     IProductCatalog productCatalog,
     UserClientService userService,
-    IKafkaProducer<CartDto> kafkaCartProducer) : IShoppingCart
+    IKafkaProducer<CartDto> kafkaCartProducer,
+    ILogger<ShoppingCartService> logger) : IShoppingCart
 {
     public Task<IEnumerable<CartDto>> GetCarts() => Task.FromResult(dataContext.ShoppingCarts.Select(GetCartDto));
     public Task<IEnumerable<PlaceDto>> GetPlaces() => Task.FromResult(dataContext.Places.Select(GetPlaceDto));
@@ -44,16 +45,22 @@ public class ShoppingCartService(
 
     public async Task<CartDto> AddOrder(Guid userId, Guid productId, int quantity)
     {
+        logger.LogInformation($"Start adding order, userId: {userId}, productId: {productId}, quantity: {quantity}");
         var cart = await GetCart(userId);
+        logger.LogInformation($"cartId: {cart.Id}");
+        logger.LogInformation($"orders count: {dataContext.Orders.Count()}");
         var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.CartId == cart.Id && x.OrderedProductId == productId);
         if (foundOrder != null)
         {
             var order = await dataContext.Orders.FindAsync(foundOrder.Id);
+            logger.LogInformation($"foundOrderId: {foundOrder.Id}");
             order!.Quantity += quantity;
         }
         else
         {
+            logger.LogInformation($"We try to create order, because they don't exist");
             var product = await productCatalog.Get(productId);
+            logger.LogInformation($"found product: {product.Name}");
             var newOrder = new Order()
             {
                 Id = Guid.NewGuid(),

@@ -2,5 +2,6 @@ namespace ShoppingCart.Settings;
 
 public class GrpcProductSettings
 {
-    public string Address { get; set; }
+    public string HttpAddress { get; set; }
+    public string HttpsAddress { get; set; }
 }

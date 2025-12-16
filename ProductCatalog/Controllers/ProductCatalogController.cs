@@ -24,4 +24,7 @@ public class ProductCatalogController(IProductCatalog productCatalog) : Controll
             return BadRequest(new { message = e.Message });
         }
     }
+
+    [HttpGet("test")]
+    public async Task<IActionResult> Test() => Ok("It is working !!!");
 }

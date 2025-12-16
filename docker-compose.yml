@@ -3,13 +3,98 @@ networks:
   market-place-dev:
     driver: bridge
 services:
+  product-catalog-app:
+    container_name: product-catalog
+    build:
+      context: ./ProductCatalog
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    networks:
+      - market-place-dev
+    environment:
+      ASPNETCORE_URLS: "https://+:8081;http://+:8080"
+      ASPNETCORE_HTTPS_PORT: "5001"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    volumes:
+      - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
+      - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
+    depends_on:
+      - postgres_product_catalog_db
+  postgres_product_catalog_db:
+    container_name: postgres-product-catalog
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: marketplace-product-catalog-db
+    ports:
+      - "5433:5432"
+    networks:
+      - market-place-dev
+    volumes:
+      - postgres-product-catalog-data:/var/lib/postgresql/18/data
+
+  shopping-cart-app:
+    container_name: shopping-cart
+    build:
+      context: ./ShoppingCart
+      dockerfile: Dockerfile
+    ports:
+      - "5002:8080"
+    networks:
+      - market-place-dev
+    depends_on:
+      - postgres_shopping_cart_db
+  postgres_shopping_cart_db:
+    container_name: postgres-shopping-cart
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: marketplace-shopping-cart-db
+    ports:
+      - "5434:5432"
+    networks:
+      - market-place-dev
+    volumes:
+      - postgres-shopping-cart-data:/var/lib/postgresql/18/data
+
+  buy-actions-app:
+    container_name: buy-actions
+    build:
+      context: ./BuyActions
+      dockerfile: Dockerfile
+    ports:
+      - "5003:8080"
+    networks:
+      - market-place-dev
+    depends_on:
+      - postgres_buy_actions_db
+  postgres_buy_actions_db:
+    container_name: postgres-buy-actions
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: marketplace-buy-action-db
+    ports:
+      - "5435:5432"
+    networks:
+      - market-place-dev
+    volumes:
+      - postgres-buy-actions-data:/var/lib/postgresql/18/data
+
   user-manipulations-app:
     container_name: user-manipulations
     build:
       context: ./UserManipulations
       dockerfile: Dockerfile
     ports:
-      - "7004:8080"
+      - "5004:8080"
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
     networks: 
       - market-place-dev
     depends_on:
@@ -22,125 +107,54 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: marketplace-users-db
     ports:
-      - "5432:5432"
+      - "5436:5432"
     networks:
       - market-place-dev
     volumes:
       - postgres-um-data:/var/lib/postgresql/18/data
-#  shopping-cart-app:
-#    container_name: shopping-cart
-#    build:
-#      context: ./ShoppingCart
-#      dockerfile: Dockerfile
-#    ports:
-#      - "7002:8080"
-#    networks:
-#      - market-place-dev
-#    depends_on:
-#      - postgres_shopping_cart_db
-#  postgres_shopping_cart_db:
-#    container_name: postgres-shopping-cart
-#    image: postgres:latest
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: password
-#      POSTGRES_DB: marketplace-shopping-cart-db
-#    ports:
-#      - "5432:5432"
-#    networks:
-#      - market-place-dev
-#    volumes:
-#      - postgres-shopping-cart-data:/var/lib/postgresql/18/data    
-#  product-catalog-app:
-#    container_name: product-catalog
-#    build:
-#      context: ./ProductCatalog
-#      dockerfile: Dockerfile
-#    ports:
-#      - "7001:8080"
-#    networks:
-#      - market-place-dev
-#    depends_on:
-#      - postgres_product_catalog_db
-#  postgres_product_catalog_db:
-#    container_name: postgres-product-catalog
-#    image: postgres:latest
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: password
-#      POSTGRES_DB: marketplace-product-catalog-db
-#    ports:
-#      - "5432:5432"
-#    networks:
-#      - market-place-dev
-#    volumes:
-#      - postgres-product-catalog-data:/var/lib/postgresql/18/data
-#  buy-actions-app:
-#    container_name: buy-actions
-#    build:
-#      context: ./BuyActions
-#      dockerfile: Dockerfile
-#    ports:
-#      - "7003:8080"
-#    networks:
-#      - market-place-dev
-#    depends_on:
-#      - postgres_buy_actions_db
-#  postgres_buy_actions_db:
-#    container_name: postgres-buy-actions
-#    image: postgres:latest
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: password
-#      POSTGRES_DB: marketplace-buy-action-db
-#    ports:
-#      - "5432:5432"
-#    networks:
-#      - market-place-dev
-#    volumes:
-#      - postgres-buy-actions-data:/var/lib/postgresql/18/data
-#  
-#  zookeeper:
-#    image: confluentinc/cp-zookeeper:7.3.2
-#    hostname: zookeeper
-#    container_name: zookeeper
-#    ports:
-#      - "2181:2181"
-#    environment:
-#      ZOOKEEPER_SERVER_ID: 1
-#      ZOOKEEPER_CLIENT_PORT: 2181
-#      ZOOKEEPER_TICK_TIME: 2000
-#      ZOOKEEPER_SERVERS: zookeeper:2888:3888
-#
-#  kafka1:
-#    image: confluentinc/cp-kafka:7.3.2
-#    hostname: kafka1
-#    container_name: kafka1
-#    ports:
-#      - "9092:9092"
-#    environment:
-#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-#      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-#      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-#      KAFKA_BROKER_ID: 1
-#      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-#      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-#      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-#    depends_on:
-#      - zookeeper
-#  
-#  shopping-carts-ws:
-#    container_name: shopping-cart-ws
-#    build:
-#      context: ./ShoppingCartsWorkerService
-#      dockerfile: Dockerfile
-#    networks:
-#      - market-place-dev
-#    depends_on:
-#      - kafka1
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper:2888:3888
+
+  kafka1:
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: kafka1
+    container_name: kafka1
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+    depends_on:
+      - zookeeper
+
+  shopping-carts-ws:
+    container_name: shopping-cart-ws
+    build:
+      context: ./ShoppingCartsWorkerService
+      dockerfile: Dockerfile
+    networks:
+      - market-place-dev
+    depends_on:
+      - kafka1
+
   frontend-app:
     container_name: react-frontend
     build:
@@ -148,9 +162,17 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5174:80"
+    environment:
+      - WATCHPACK_POLLING=true
     volumes:
       - ./marketplace-client:/app
       - /app/node_modules
+    depends_on:
+      - user-manipulations-app
+      - shopping-cart-app
+      - product-catalog-app
+      - buy-actions-app
+      - kafka1
     
     
 volumes:

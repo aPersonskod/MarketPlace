@@ -69,7 +69,7 @@ function Header() {
     const getUserData = async () => {
         try {
             let id = localStorage.getItem('marketplace-user-id');
-            let query = `${apiHelper.userManipulationBaseAddress}/UserManipulations/${id}`;
+            let query = `${apiHelper.userManipulationBaseAddress}/${id}`;
             const response = await fetch(query, {
                 method: 'GET',
                 headers: {
