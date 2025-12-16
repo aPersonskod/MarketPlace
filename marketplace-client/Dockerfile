@@ -1,16 +1,20 @@
-# --- Stage 1: Build the application ---
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+# Use a specific Node.js version base image
+FROM node:20-alpine
 
-# --- Stage 2: Serve the application with Nginx ---
-FROM nginx:alpine
-# Copy the built assets from the 'build' stage to the Nginx serving directory
-COPY --from=build /app/dist /usr/share/nginx/html
-# Expose port 80 to the host machine
-EXPOSE 80
-# Command to start Nginx and serve the static files
-CMD ["nginx", "-g", "daemon off;"]
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json (or npm-shrinkwrap.json)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port Vite runs on (default is 5173)
+EXPOSE 5173
+
+# Command to run the development server
+CMD ["npm", "run", "dev"]

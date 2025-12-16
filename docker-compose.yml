@@ -165,12 +165,7 @@ services:
       context: ./marketplace-client
       dockerfile: Dockerfile
     ports:
-      - "5174:80"
-    environment:
-      - WATCHPACK_POLLING=true
-    volumes:
-      - ./marketplace-client:/app
-      - /app/node_modules
+      - "3000:5173"
     depends_on:
       - user-manipulations-app
       - shopping-cart-app

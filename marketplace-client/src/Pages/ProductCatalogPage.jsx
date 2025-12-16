@@ -18,7 +18,6 @@ const ProductCatalogPage = () => {
             let apiHelper = new ApiHelper();
             let userId = localStorage.getItem('marketplace-user-id');
             let query = `${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`;
-            alert(query);
             const response = await fetch(query);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
