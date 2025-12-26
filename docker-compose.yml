@@ -8,6 +8,7 @@ services:
     build:
       context: ./ProductCatalog
       dockerfile: Dockerfile
+    image: mrandreyprogrammer/product-catalog:latest
     ports:
       - "5000:8080"
       - "5001:8081"
@@ -41,6 +42,7 @@ services:
     build:
       context: ./ShoppingCart
       dockerfile: Dockerfile
+    image: mrandreyprogrammer/shopping-cart:latest
     ports:
       - "5002:8080"
     networks:
@@ -66,6 +68,7 @@ services:
     build:
       context: ./BuyActions
       dockerfile: Dockerfile
+    image: mrandreyprogrammer/buy-actions:latest
     ports:
       - "5003:8080"
     networks:
@@ -91,6 +94,7 @@ services:
     build:
       context: ./UserManipulations
       dockerfile: Dockerfile
+    image: mrandreyprogrammer/user-manipulations:latest
     ports:
       - "5004:8080"
     environment:
@@ -154,6 +158,7 @@ services:
     build:
       context: ./ShoppingCartsWorkerService
       dockerfile: Dockerfile
+    image: mrandreyprogrammer/shopping-cart-ws:latest
     networks:
       - market-place-dev
     depends_on:
@@ -164,6 +169,7 @@ services:
     build:
       context: ./marketplace-client
       dockerfile: Dockerfile
+    image: mrandreyprogrammer/react-frontend:latest
     ports:
       - "3000:5173"
     depends_on:
