@@ -14,9 +14,19 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddCors();
 
-builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
-builder.Services.Configure<ShoppingCartSettings>(builder.Configuration.GetSection("Grpc:ShoppingCarts"));
-builder.Services.Configure<ProductCatalogSettings>(builder.Configuration.GetSection("Grpc:ProductCatalogs"));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:UsersDev"));
+    builder.Services.Configure<ShoppingCartSettings>(builder.Configuration.GetSection("Grpc:ShoppingCartsDev"));
+    builder.Services.Configure<ProductCatalogSettings>(builder.Configuration.GetSection("Grpc:ProductCatalogsDev"));
+}
+else
+{
+    builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
+    builder.Services.Configure<ShoppingCartSettings>(builder.Configuration.GetSection("Grpc:ShoppingCarts"));
+    builder.Services.Configure<ProductCatalogSettings>(builder.Configuration.GetSection("Grpc:ProductCatalogs"));
+}
+
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));  
 
 builder.Services.AddSingleton<ShoppingCartClientService>();

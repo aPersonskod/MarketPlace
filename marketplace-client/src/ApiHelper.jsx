@@ -1,12 +1,12 @@
 export class ApiHelper {
     dev = (isHttps) => {
-        return isHttps ? 'https://localhost:7' : 'http://localhost:5';
+        return isHttps ? 'https://localhost:700' : 'http://localhost:500';
     };
     base = (serviceName) => {
         return `http://${serviceName}:8080`;
     };
-    productCatalogBaseAddress =   `https://localhost:5001/ProductCatalog`;
-    shoppingCartBaseAddress =     `${this.dev(false)}002/ShoppingCart`;
-    buyActionsBaseAddress =       `${this.dev(false)}003/BuyActions`;
-    userManipulationBaseAddress = `${this.dev(false)}004/UserManipulations`;
+    productCatalogBaseAddress =   `${this.dev(false)}1/ProductCatalog`;
+    shoppingCartBaseAddress =     `${this.dev(false)}2/ShoppingCart`;
+    buyActionsBaseAddress =       `${this.dev(false)}3/BuyActions`;
+    userManipulationBaseAddress = `${this.dev(false)}4/UserManipulations`;
 }

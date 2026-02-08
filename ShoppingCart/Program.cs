@@ -11,10 +11,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddControllers();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<GrpcProductSettings>(builder.Configuration.GetSection("Grpc:ProductsDev"));
+    builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:UsersDev"));
+    builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetSection("Kafka:ShoppingCartDev"));
+}
+else
+{
+    builder.Services.Configure<GrpcProductSettings>(builder.Configuration.GetSection("Grpc:Products"));
+    builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
+    builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetSection("Kafka:ShoppingCart"));
+}
 
-builder.Services.Configure<GrpcProductSettings>(builder.Configuration.GetSection("Grpc:Products"));
-builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
-builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetSection("Kafka:ShoppingCart"));
 
 builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
