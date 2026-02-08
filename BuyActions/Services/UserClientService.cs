@@ -1,5 +1,3 @@
-using System.Net;
-using System.Runtime.CompilerServices;
 using BuyActions.Settings;
 using Microsoft.Extensions.Options;
 using Models.Dtos;

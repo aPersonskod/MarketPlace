@@ -1,8 +1,8 @@
+using System.Reflection;
 using BuyActions;
 using BuyActions.Services;
 using BuyActions.Settings;
 using Microsoft.EntityFrameworkCore;
-using Models;
 using Models.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,13 +17,22 @@ builder.Services.AddCors();
 builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
 builder.Services.Configure<ShoppingCartSettings>(builder.Configuration.GetSection("Grpc:ShoppingCarts"));
 builder.Services.Configure<ProductCatalogSettings>(builder.Configuration.GetSection("Grpc:ProductCatalogs"));
+builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));  
 
 builder.Services.AddSingleton<ShoppingCartClientService>();
 builder.Services.AddSingleton<UserClientService>();
 builder.Services.AddTransient<IProductCatalog, ProductCatalogClientService>();
 builder.Services.AddTransient<IBuyService, BuyService>();
-builder.Services.AddDbContext<DataContext>(o 
-    => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<DataContext>(o 
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
+}
+else
+{
+    builder.Services.AddDbContext<DataContext>(o 
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+}
 
 var app = builder.Build();
 

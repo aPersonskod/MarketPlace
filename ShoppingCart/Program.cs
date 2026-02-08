@@ -20,8 +20,16 @@ builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
 builder.Services.AddSingleton<IKafkaProducer<CartDto>, ShoppingCartProducer<CartDto>>();
 builder.Services.AddSingleton<UserClientService>();
-builder.Services.AddDbContext<DataContext>(o 
-    => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<DataContext>(o 
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
+}
+else
+{
+    builder.Services.AddDbContext<DataContext>(o 
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+}
 
 var app = builder.Build();
 

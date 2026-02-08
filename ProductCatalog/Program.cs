@@ -16,8 +16,16 @@ builder.Services.AddGrpc();
 
 builder.Services.AddTransient<IProductCatalog, ProductCatalogService>();
 
-builder.Services.AddDbContext<DataContext>(o 
-    => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<DataContext>(o 
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
+}
+else
+{
+    builder.Services.AddDbContext<DataContext>(o 
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+}
 
 var app = builder.Build();
 

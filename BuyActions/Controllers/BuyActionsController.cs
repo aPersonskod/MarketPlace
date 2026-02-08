@@ -1,23 +1,28 @@
+using BuyActions.Commands;
+using BuyActions.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Models;
 using Models.Dtos;
-using Models.Interfaces;
 
 namespace BuyActions.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class BuyActionsController(IBuyService buyService) : ControllerBase
+public class BuyActionsController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<BuyReportDto>> Get() => await buyService.Get();
-    
+    public async IAsyncEnumerable<BuyReportDto?> Get()
+    {
+        var reports = await mediator.Send(new GetBuyReportsQuery());
+        await foreach (var buyReportDto in reports) yield return buyReportDto;
+    }
+
     [HttpGet("{reportId:guid}")]
     public async Task<IActionResult> Get(Guid reportId)
     {
         try
         {
-            return Ok(await buyService.Get(reportId));
+            return Ok(await mediator.Send(new GetBuyReportByIdQuery(reportId)));
         }
         catch (Exception e)
         {
@@ -26,14 +31,14 @@ public class BuyActionsController(IBuyService buyService) : ControllerBase
     }
     
     [HttpGet("[action]")]
-    public async Task<IEnumerable<BuyReportDto>> GetByUserId(Guid userId) => await buyService.GetByUserId(userId);
+    public async Task<IEnumerable<BuyReportDto?>> GetByUserId(Guid userId) => await mediator.Send(new GetBuyReportByUserIdQuery(userId));
 
     [HttpPost("[action]")]
     public async Task<IActionResult> BuyCart(CartDto cartDto)
     {
         try
         {
-            await buyService.BuyCart(cartDto);
+            await mediator.Send(new BuyCartCommand(cartDto));
             return Ok();
         }
         catch (Exception e)
