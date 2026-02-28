@@ -16,10 +16,10 @@ public class UserManipulationsService(DataContext dataContext) : IUserManipulati
         return await Task.FromResult(GetUserDto(user));
     }
 
-    public async Task<UserDto> Authorize(string email, string password)
+    public async Task<UserDto?> Authorize(string email, string password)
     {
         var user = await dataContext.Users.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
-        if (user == null) throw new Exception("User not found");
+        if (user == null) return new UserDto();
         return await Task.FromResult(GetUserDto(user));
     }
 
@@ -78,11 +78,16 @@ public class UserManipulationsService(DataContext dataContext) : IUserManipulati
         throw new Exception("User has not enough money to spend !!!");
     }
 
-    private UserDto GetUserDto(User user) => new()
+    private UserDto GetUserDto(User user)
     {
-        Id = user.Id,
-        Name = user.Name,
-        Email = user.Email,
-        Wallet = user.Wallet
-    };
+        var dto = new UserDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Wallet = user.Wallet,
+            Role = user.Role
+        };
+        return dto;
+    }
 }

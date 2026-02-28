@@ -1,5 +1,3 @@
 namespace UserManipulations.Dtos;
 
-public record CredentialsDto(string email, string password)
-{
-}
+public record CredentialsDto(string Email, string Password);

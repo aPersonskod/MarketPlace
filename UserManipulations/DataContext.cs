@@ -11,7 +11,7 @@ public sealed class DataContext : DbContext
     public DataContext(DbContextOptions<DataContext> options, ILogger<DataContext> logger) : base(options)
     {
         _logger = logger;
-        Database.EnsureCreated();
+        //Database.EnsureCreated(); // need to be comment when create/apply migration
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,6 +23,7 @@ public sealed class DataContext : DbContext
                 Password = "12345"
             }
         );
+        modelBuilder.Entity<User>().Property(u => u.Role).HasConversion<string>().HasDefaultValue(Role.user);
         _logger.LogInformation("Database was created !!!");
     }
 }

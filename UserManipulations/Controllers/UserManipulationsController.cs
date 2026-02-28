@@ -1,13 +1,19 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Models.Dtos;
 using Models.Interfaces;
 using UserManipulations.Dtos;
+using UserManipulations.Settings;
 
 namespace UserManipulations.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserManipulationsController(IUserManipulations userManipulationsService) : ControllerBase
+public class UserManipulationsController(IUserManipulations userManipulationsService, IOptions<AuthSettings> authSettings) : ControllerBase
 {
     [HttpGet]
     public async Task<IEnumerable<UserDto>> Get() => await userManipulationsService.Get();
@@ -27,14 +33,25 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     [HttpPost("[action]")]
     public async Task<IActionResult> Authorize([FromBody]CredentialsDto credentials)
     {
-        try
+        var userDto = await userManipulationsService.Authorize(credentials.Email, credentials.Password);
+        if (userDto == null) return Unauthorized();
+        var claims = new List<Claim>()
         {
-            return Ok(await userManipulationsService.Authorize(credentials.email, credentials.password));
-        }
-        catch (Exception e)
+            new Claim(ClaimTypes.Role, userDto.Role.ToString())
+        };
+        var jwt = new JwtSecurityToken(
+            issuer: authSettings.Value.Issuer,
+            audience: authSettings.Value.Audience,
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(10),
+            signingCredentials: new SigningCredentials(authSettings.Value.SecurityKey, SecurityAlgorithms.HmacSha256)
+        );
+        var response = new 
         {
-            return BadRequest(new { message = e.Message });
-        }
+            access_token = new JwtSecurityTokenHandler().WriteToken(jwt),
+            userName = userDto.Name
+        };
+        return Ok(response);
     }
 
     [HttpPut]
@@ -77,6 +94,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
     }
     [HttpPost("[action]")]
+    [Authorize]
     public async Task<IActionResult> WalletReplenishment(Guid userId, int money)
     {
         try
@@ -90,6 +108,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     }
 
     [HttpPost("[action]")]
+    [Authorize]
     public async Task<IActionResult> SpendMoney(Guid userId, int money)
     {
         try

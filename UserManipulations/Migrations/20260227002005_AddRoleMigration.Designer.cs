@@ -12,8 +12,8 @@ using UserManipulations;
 namespace UserManipulations.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251212205521_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260227002005_AddRoleMigration")]
+    partial class AddRoleMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,12 @@ namespace UserManipulations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("user");
+
                     b.Property<int>("Wallet")
                         .HasColumnType("integer");
 
@@ -57,6 +63,7 @@ namespace UserManipulations.Migrations
                             Email = "patochin@gmail.com",
                             Name = "Петя Пяточкин",
                             Password = "12345",
+                            Role = "user",
                             Wallet = 0
                         });
                 });

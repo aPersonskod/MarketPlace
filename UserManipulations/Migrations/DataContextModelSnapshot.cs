@@ -40,12 +40,18 @@ namespace UserManipulations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("user");
+
                     b.Property<int>("Wallet")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new
@@ -54,6 +60,7 @@ namespace UserManipulations.Migrations
                             Email = "patochin@gmail.com",
                             Name = "Петя Пяточкин",
                             Password = "12345",
+                            Role = "user",
                             Wallet = 0
                         });
                 });

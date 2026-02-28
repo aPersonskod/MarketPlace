@@ -12,4 +12,7 @@ public class UserDto : BaseDto
     
     [JsonPropertyName("wallet")]
     public int Wallet { get; set; }
+    
+    [JsonPropertyName("role")]
+    public Role Role { get; set; }
 }
