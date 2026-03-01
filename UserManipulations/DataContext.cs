@@ -23,7 +23,7 @@ public sealed class DataContext : DbContext
                 Password = "12345"
             }
         );
-        modelBuilder.Entity<User>().Property(u => u.Role).HasConversion<string>().HasDefaultValue(Role.user);
+        //modelBuilder.Entity<User>().Property(u => u.Role).HasConversion<string>().HasDefaultValue(Role.user);
         _logger.LogInformation("Database was created !!!");
     }
 }

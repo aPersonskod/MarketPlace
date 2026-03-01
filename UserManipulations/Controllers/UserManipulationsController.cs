@@ -1,9 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
+//using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+//using Microsoft.IdentityModel.Tokens;
 using Models.Dtos;
 using Models.Interfaces;
 using UserManipulations.Dtos;
@@ -33,7 +33,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     [HttpPost("[action]")]
     public async Task<IActionResult> Authorize([FromBody]CredentialsDto credentials)
     {
-        var userDto = await userManipulationsService.Authorize(credentials.Email, credentials.Password);
+        /*var userDto = await userManipulationsService.Authorize(credentials.Email, credentials.Password);
         if (userDto == null) return Unauthorized();
         var claims = new List<Claim>()
         {
@@ -51,7 +51,15 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
             access_token = new JwtSecurityTokenHandler().WriteToken(jwt),
             userName = userDto.Name
         };
-        return Ok(response);
+        return Ok(response);*/
+        try
+        {
+            return Ok(await userManipulationsService.Authorize(credentials.Email, credentials.Password));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = e.Message });
+        }
     }
 
     [HttpPut]

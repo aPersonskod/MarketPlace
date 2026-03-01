@@ -86,7 +86,7 @@ public class UserManipulationsService(DataContext dataContext) : IUserManipulati
             Name = user.Name,
             Email = user.Email,
             Wallet = user.Wallet,
-            Role = user.Role
+            //Role = user.Role
         };
         return dto;
     }

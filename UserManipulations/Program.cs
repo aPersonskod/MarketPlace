@@ -1,6 +1,6 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+//using Microsoft.IdentityModel.Tokens;
 using Models.Interfaces;
 using UserManipulations;
 using UserManipulations.Services;
@@ -14,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddControllers();
-builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
+/*builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters()
     {
@@ -26,7 +26,7 @@ builder.Services.AddAuthentication("Bearer")
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Key"]!)),
         ValidateIssuerSigningKey = true
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();*/
 
 builder.Services.AddTransient<IUserManipulations, UserManipulationsService>();
 
