@@ -12,6 +12,7 @@ const ProductCatalogPage = () => {
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [ammountToPay, setAmmountToPay] = useState(0);
 
     const fetchCartData = async () => {
         try {
@@ -48,13 +49,13 @@ const ProductCatalogPage = () => {
                 <div className='col col-xs-12 col-sm-12 col-lg-6'>
                     <p className='fs24'>Продукты:</p>
                     <div className='divStyle xsDivStyle mdDivStyle'>
-                        <Products/>
+                        <Products cart={cart} setAmmountToPay={setAmmountToPay}/>
                     </div>
                 </div>
                 <div className='col col-xs-12 col-sm-12 col-lg-6'>
                     <p className='fs24'>Корзина:</p>
                     <div className='divStyle xsDivStyle mdDivStyle'>
-                        <ProductCart cart={cart}/>
+                        <ProductCart key={ammountToPay} cart={cart}/>
                     </div>
                 </div>
                 <div className='col col-xs-12 col-sm-12'>

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Models;
 using Models.Dtos;
 using Models.Interfaces;
@@ -22,7 +23,7 @@ public class ShoppingCartService(
     }
 
     public Task<IEnumerable<OrderDto>> GetOrders(Guid cartId) =>
-        Task.FromResult(dataContext.Orders.Where(x => x.CartId == cartId).AsEnumerable().Select(GetOrderDto));
+        Task.FromResult(dataContext.Orders.Where(x => x.CartId == cartId && x.Quantity > 0).AsEnumerable().Select(GetOrderDto));
 
     public async Task<CartDto> GetCart(Guid userId)
     {
@@ -54,7 +55,7 @@ public class ShoppingCartService(
         {
             var order = await dataContext.Orders.FindAsync(foundOrder.Id);
             logger.LogInformation($"foundOrderId: {foundOrder.Id}");
-            order!.Quantity += quantity;
+            order!.Quantity = quantity;
         }
         else
         {
@@ -76,12 +77,29 @@ public class ShoppingCartService(
         return await GetCart(userId);
     }
     
+    public async Task<CartDto> SubtractOrder(Guid userId, Guid productId, int quantity)
+    {
+        logger.LogInformation($"Start subtracting order, userId: {userId}, productId: {productId}, quantity: {quantity}");
+        var cart = await GetCart(userId);
+        logger.LogInformation($"cartId: {cart.Id}");
+        logger.LogInformation($"orders count: {dataContext.Orders.Count()}");
+        var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.CartId == cart.Id && x.OrderedProductId == productId);
+        if (foundOrder == null) throw new Exception("Order not found when subtracting");
+        var order = await dataContext.Orders.FindAsync(foundOrder.Id);
+        logger.LogInformation($"foundOrderId: {foundOrder.Id}");
+        order!.Quantity -= quantity;
+        await dataContext.SaveChangesAsync();
+        if(order.Quantity < 1) await DeleteOrder(userId, productId);
+        await ChangeAmountToPay(cart.Id);
+        return await GetCart(userId);
+    }
+
     public async Task<CartDto> DeleteOrder(Guid userId, Guid productId)
     {
         var foundCart = await GetCart(userId);
         var cart = await dataContext.ShoppingCarts.FindAsync(foundCart.Id);
         var order = await dataContext.Orders.FirstOrDefaultAsync(x => x.OrderedProductId == productId);
-        if (order == null) throw new Exception("Order not found");
+        if (order == null) throw new Exception("Order not found when deleting");
         dataContext.Orders.Remove(order);
         await dataContext.SaveChangesAsync();
         await ChangeAmountToPay(cart!.Id);
