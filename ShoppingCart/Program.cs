@@ -24,6 +24,11 @@ else
     builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetSection("Kafka:ShoppingCart"));
 }
 
+builder.Services.AddStackExchangeRedisCache(o =>
+{
+    o.Configuration = "localhost";
+    o.InstanceName = "shopping_cart";
+});
 
 builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
 builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
