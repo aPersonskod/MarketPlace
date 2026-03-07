@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Models;
 using Models.Dtos;
+using Models.Extensions;
 using Models.Interfaces;
 
 namespace ShoppingCart.Services;
@@ -26,24 +27,18 @@ public class ShoppingCartService(
 
     public async Task<IEnumerable<OrderDto>> GetOrders(Guid cartId)
     {
-        var cachedOrders = new List<Order>();
-        var ordersString = await cache.GetStringAsync(cartId.ToString());
-        if (!string.IsNullOrEmpty(ordersString)) cachedOrders = JsonSerializer.Deserialize<List<Order>>(ordersString);
+        var cachedOrders = await cache.GetRecordAsync<List<Order>>(cartId.ToString());
 
-        if (cachedOrders!.Count == 0)
+        if (cachedOrders?.Count == 0)
         {
             cachedOrders = dataContext.Orders.Where(x => x.CartId == cartId && x.Quantity > 0).ToList();
             if (cachedOrders.Count > 0)
             {
-                ordersString = JsonSerializer.Serialize(cachedOrders);
                 // сохранение в кэш на 10 минут
-                await cache.SetStringAsync(cartId.ToString(), ordersString, new DistributedCacheEntryOptions()
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-                });
+                await cache.SetRecordAsync(cartId.ToString(), cachedOrders, TimeSpan.FromMinutes(10));
             }
         }
-        return cachedOrders.Select(GetOrderDto);
+        return cachedOrders?.Select(GetOrderDto) ?? [];
     }
 
     public async Task<CartDto> GetCart(Guid userId)
@@ -139,7 +134,7 @@ public class ShoppingCartService(
         var isCartNotEmpty = orders?.Any(x => x.CartId == cart.Id) ?? false;
         if (!isCartNotEmpty) throw new Exception($"Cart has no orders !!!");
         // todo very lazy code
-        foreach (var order in orders)
+        foreach (var order in orders!)
         {
             var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.Id == order.Id);
             if (foundOrder == null)
@@ -177,12 +172,13 @@ public class ShoppingCartService(
     private async Task ChangeAmountToPay(Guid cartId)
     {
         var cart = await dataContext.ShoppingCarts.FirstAsync(x => x.Id == cartId);
-        var orders = (await cache.GetRecordAsync<List<Order>>(cartId.ToString())).Where(x => x.CartId == cartId).ToList();
-        var isCartHaveOrders = orders.Any(x => x.CartId == cartId);
+        var allOrders = await cache.GetRecordAsync<List<Order>>(cartId.ToString());
+        var orders = allOrders?.Where(x => x.CartId == cartId).ToList();
+        var isCartHaveOrders = orders?.Any(x => x.CartId == cartId) ?? false;
         if (isCartHaveOrders)
         {
             var sum = 0;
-            foreach (var order in orders)
+            foreach (var order in orders!)
             {
                 var foundProduct = await productCatalog.Get(order.OrderedProductId);
                 sum += order.Quantity * foundProduct?.Cost ?? 0;
@@ -221,19 +217,4 @@ public class ShoppingCartService(
         OrderedProductId = order.OrderedProductId,
         Quantity = order.Quantity
     };
-}
-
-public static class DisturbedCacheExt
-{
-    public static async Task SetRecordAsync<T>(this IDistributedCache cache, string recordId, T data, TimeSpan expiry = default)
-    {
-        var jsonData = JsonSerializer.Serialize(data);
-        await cache.SetStringAsync(recordId, jsonData, new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = expiry });
-    }
-
-    public static async Task<T> GetRecordAsync<T>(this IDistributedCache cache, string recordId)
-    {
-        var jsonData = await cache.GetStringAsync(recordId);
-        return jsonData == null ? default! : JsonSerializer.Deserialize<T>(jsonData)!;
-    }
 }

@@ -16,34 +16,27 @@ if (builder.Environment.IsDevelopment())
     builder.Services.Configure<GrpcProductSettings>(builder.Configuration.GetSection("Grpc:ProductsDev"));
     builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:UsersDev"));
     builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetSection("Kafka:ShoppingCartDev"));
+    builder.Services.AddStackExchangeRedisCache(o =>
+    {
+        o.Configuration = builder.Configuration.GetValue<string>("Redis:ConfigurationDev");
+        o.InstanceName = builder.Configuration.GetValue<string>("Redis:InstanceNameDev");
+    });
+    builder.Services.AddDbContext<DataContext>(o 
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
 }
 else
 {
     builder.Services.Configure<GrpcProductSettings>(builder.Configuration.GetSection("Grpc:Products"));
     builder.Services.Configure<UserSettings>(builder.Configuration.GetSection("Grpc:Users"));
     builder.Services.Configure<ShoppingCartKafkaSettings>(builder.Configuration.GetSection("Kafka:ShoppingCart"));
-}
-
-builder.Services.AddStackExchangeRedisCache(o =>
-{
-    o.Configuration = "localhost";
-    o.InstanceName = "shopping_cart";
-});
-
-builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
-builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
-builder.Services.AddSingleton<IKafkaProducer<CartDto>, ShoppingCartProducer<CartDto>>();
-builder.Services.AddSingleton<UserClientService>();
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddDbContext<DataContext>(o 
-        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
-}
-else
-{
     builder.Services.AddDbContext<DataContext>(o 
         => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 }
+
+builder.Services.AddTransient<IProductCatalog, ProductsServiceClient>();
+builder.Services.AddTransient<IShoppingCart, ShoppingCartService>();
+builder.Services.AddScoped<IKafkaProducer<CartDto>, ShoppingCartProducer<CartDto>>();
+builder.Services.AddScoped<UserClientService>();
 
 var app = builder.Build();
 
