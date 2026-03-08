@@ -1,7 +1,9 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Models;
 using Models.Dtos;
+using Models.Extensions;
 using Models.Interfaces;
 
 namespace ShoppingCart.Services;
@@ -11,7 +13,8 @@ public class ShoppingCartService(
     IProductCatalog productCatalog,
     UserClientService userService,
     IKafkaProducer<CartDto> kafkaCartProducer,
-    ILogger<ShoppingCartService> logger) : IShoppingCart
+    ILogger<ShoppingCartService> logger,
+    IDistributedCache cache) : IShoppingCart
 {
     public Task<IEnumerable<CartDto>> GetCarts() => Task.FromResult(dataContext.ShoppingCarts.Select(GetCartDto));
     public Task<IEnumerable<PlaceDto>> GetPlaces() => Task.FromResult(dataContext.Places.Select(GetPlaceDto));
@@ -22,8 +25,21 @@ public class ShoppingCartService(
         return await Task.FromResult(GetPlaceDto(place));
     }
 
-    public Task<IEnumerable<OrderDto>> GetOrders(Guid cartId) =>
-        Task.FromResult(dataContext.Orders.Where(x => x.CartId == cartId && x.Quantity > 0).AsEnumerable().Select(GetOrderDto));
+    public async Task<IEnumerable<OrderDto>> GetOrders(Guid cartId)
+    {
+        var cachedOrders = await cache.GetRecordAsync<List<Order>>(cartId.ToString());
+
+        if (cachedOrders?.Count == 0)
+        {
+            cachedOrders = dataContext.Orders.Where(x => x.CartId == cartId && x.Quantity > 0).ToList();
+            if (cachedOrders.Count > 0)
+            {
+                // сохранение в кэш на 10 минут
+                await cache.SetRecordAsync(cartId.ToString(), cachedOrders, TimeSpan.FromMinutes(10));
+            }
+        }
+        return cachedOrders?.Select(GetOrderDto) ?? [];
+    }
 
     public async Task<CartDto> GetCart(Guid userId)
     {
@@ -50,12 +66,13 @@ public class ShoppingCartService(
         var cart = await GetCart(userId);
         logger.LogInformation($"cartId: {cart.Id}");
         logger.LogInformation($"orders count: {dataContext.Orders.Count()}");
-        var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.CartId == cart.Id && x.OrderedProductId == productId);
+        
+        var orders = await cache.GetRecordAsync<List<Order>?>(cart.Id.ToString()) ?? [];
+        var foundOrder = orders.FirstOrDefault(x => x.CartId == cart.Id && x.OrderedProductId == productId);
         if (foundOrder != null)
         {
-            var order = await dataContext.Orders.FindAsync(foundOrder.Id);
             logger.LogInformation($"foundOrderId: {foundOrder.Id}");
-            order!.Quantity = quantity;
+            foundOrder.Quantity = quantity;
         }
         else
         {
@@ -69,27 +86,11 @@ public class ShoppingCartService(
                 OrderedProductId = product.Id,
                 Quantity = quantity
             };
-            await dataContext.Orders.AddAsync(newOrder);
+            
+            orders.Add(newOrder);
         }
-        await dataContext.SaveChangesAsync();
+        await cache.SetRecordAsync(cart.Id.ToString(), orders.Where(x => x.Quantity > 0), TimeSpan.FromMinutes(10));
 
-        await ChangeAmountToPay(cart.Id);
-        return await GetCart(userId);
-    }
-    
-    public async Task<CartDto> SubtractOrder(Guid userId, Guid productId, int quantity)
-    {
-        logger.LogInformation($"Start subtracting order, userId: {userId}, productId: {productId}, quantity: {quantity}");
-        var cart = await GetCart(userId);
-        logger.LogInformation($"cartId: {cart.Id}");
-        logger.LogInformation($"orders count: {dataContext.Orders.Count()}");
-        var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.CartId == cart.Id && x.OrderedProductId == productId);
-        if (foundOrder == null) throw new Exception("Order not found when subtracting");
-        var order = await dataContext.Orders.FindAsync(foundOrder.Id);
-        logger.LogInformation($"foundOrderId: {foundOrder.Id}");
-        order!.Quantity -= quantity;
-        await dataContext.SaveChangesAsync();
-        if(order.Quantity < 1) await DeleteOrder(userId, productId);
         await ChangeAmountToPay(cart.Id);
         return await GetCart(userId);
     }
@@ -98,10 +99,11 @@ public class ShoppingCartService(
     {
         var foundCart = await GetCart(userId);
         var cart = await dataContext.ShoppingCarts.FindAsync(foundCart.Id);
-        var order = await dataContext.Orders.FirstOrDefaultAsync(x => x.OrderedProductId == productId);
+        var orders = await cache.GetRecordAsync<List<Order>?>(cart!.Id.ToString());
+        var order = orders?.FirstOrDefault(x => x.OrderedProductId == productId);
         if (order == null) throw new Exception("Order not found when deleting");
-        dataContext.Orders.Remove(order);
-        await dataContext.SaveChangesAsync();
+        orders?.Remove(order);
+        await cache.SetRecordAsync(cart.Id.ToString(), orders?.Where(x => x.Quantity > 0), TimeSpan.FromMinutes(10));
         await ChangeAmountToPay(cart!.Id);
         return await Task.FromResult(GetCartDto(cart));
     }
@@ -128,8 +130,22 @@ public class ShoppingCartService(
     {
         var cart = await GetCart(userId);
         
-        var isCartNotEmpty = await dataContext.Orders.AnyAsync(x => x.CartId == cart.Id);
+        var orders = await cache.GetRecordAsync<List<Order>?>(cart.Id.ToString());
+        var isCartNotEmpty = orders?.Any(x => x.CartId == cart.Id) ?? false;
         if (!isCartNotEmpty) throw new Exception($"Cart has no orders !!!");
+        // todo very lazy code
+        foreach (var order in orders!)
+        {
+            var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.Id == order.Id);
+            if (foundOrder == null)
+            {
+                await dataContext.Orders.AddAsync(order);
+            }
+            else
+            {
+                foundOrder.Quantity = order.Quantity;
+            }
+        }
         
         var foundUser = await userService.GetUser(userId);
         var isUserHasEnoughMoney = foundUser!.Wallet >= cart.AmountToPay;
@@ -156,12 +172,13 @@ public class ShoppingCartService(
     private async Task ChangeAmountToPay(Guid cartId)
     {
         var cart = await dataContext.ShoppingCarts.FirstAsync(x => x.Id == cartId);
-        var orders = dataContext.Orders.Where(x => x.CartId == cartId);
-        var isCartHaveOrders = await orders.AnyAsync(x => x.CartId == cartId);
+        var allOrders = await cache.GetRecordAsync<List<Order>>(cartId.ToString());
+        var orders = allOrders?.Where(x => x.CartId == cartId).ToList();
+        var isCartHaveOrders = orders?.Any(x => x.CartId == cartId) ?? false;
         if (isCartHaveOrders)
         {
             var sum = 0;
-            foreach (var order in orders)
+            foreach (var order in orders!)
             {
                 var foundProduct = await productCatalog.Get(order.OrderedProductId);
                 sum += order.Quantity * foundProduct?.Cost ?? 0;

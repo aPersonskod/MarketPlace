@@ -20,6 +20,11 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<DataContext>(o 
         => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
+    builder.Services.AddStackExchangeRedisCache(o =>
+    {
+        o.Configuration = builder.Configuration.GetValue<string>("Redis:ConfigurationDev");
+        o.InstanceName = builder.Configuration.GetValue<string>("Redis:InstanceNameDev");
+    });
 }
 else
 {
