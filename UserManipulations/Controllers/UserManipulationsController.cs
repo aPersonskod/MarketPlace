@@ -94,7 +94,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
     }
     [HttpPost("[action]")]
-    [Authorize]
+    //[Authorize]
     public async Task<IActionResult> WalletReplenishment(Guid userId, int money)
     {
         try
@@ -108,7 +108,7 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     }
 
     [HttpPost("[action]")]
-    [Authorize]
+    //[Authorize]
     public async Task<IActionResult> SpendMoney(Guid userId, int money)
     {
         try

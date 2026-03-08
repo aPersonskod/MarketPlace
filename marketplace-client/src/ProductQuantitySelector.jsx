@@ -1,8 +1,8 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import {ApiHelper} from "./ApiHelper.jsx";
 
-const ProductQuantitySelector = ({ productName, productCost, productId, initialQuantity = 0, minQuantity = 0, maxQuantity = 99 }) => {
+const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cartId, minQuantity = 0, maxQuantity = 99}) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -53,92 +53,163 @@ const ProductQuantitySelector = ({ productName, productCost, productId, initialQ
         }
     };
     
-    const [quantity, setQuantity] = useState(initialQuantity);
+    const [counter, setCounter] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const apiHelper = new ApiHelper();
-    const increment = () => {
-        if (quantity < maxQuantity) {
-            setQuantity(prev => prev + 1);
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
+    const fetchOrders = async () => {
+        try {
+            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCartOrders?cartId=${cartId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const orders = await response.json();
+            let currentQuantity = getInitialQuantity(productId, orders);
+            console.log(currentQuantity);
+            setCounter(currentQuantity);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const getInitialQuantity = (productId, orders) => {
+        if (orders.length === 0) return 0;
+        let orderedProduct = orders.find(p => p.orderedProductId === productId);
+        let result = orderedProduct === undefined ? 0 : orderedProduct.quantity;
+        return result;
+    }
+
+
+    const increment = async () => {
+        if (counter < maxQuantity) {
+            let tempQuantity = counter + 1;
+            await updateCart(tempQuantity);
         }
     };
 
-    const decrement = () => {
-        if (quantity > minQuantity) {
-            setQuantity(prev => prev - 1);
+    const decrement = async () => {
+        if (counter > minQuantity) {
+            let tempQuantity = counter - 1;
+            await updateCart(tempQuantity);
         }
     };
-    
-    const putToShoppingCart = async () => {
+
+    const addToShoppingCartBtnHandler = async () => {
         setLoading(true);
         setError(null);
         setSuccess(false);
-        if (quantity >= 1) {
-            try {
-                let userId = localStorage.getItem('marketplace-user-id');
-                let query = `${apiHelper.shoppingCartBaseAddress}/AddOrder?userId=${userId}&productId=${productId}&quantity=${quantity}`;
-                const response = await fetch(query, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }//,
-                    //body: JSON.stringify(requestBody),
-                });
+        let tempQuantity = 1;
+        await updateCart(tempQuantity);
+    }
 
-                if (!response.ok) {
-                    //throw new Error(`HTTP error! status: ${response.status}`);
-                    alert(`HTTP error! status: ${response.status}`);
-                }
+    const updateCart = async (amount) => {
+        setCounter(amount);
+        await addProductToCart(amount);
+        await refreshAnotherComponents();
+    }
 
-                const data = await response.json();
-                console.log('Update successful:', data);
-                setSuccess(true);
-                window.location.reload();
-                // Optionally, update local state or re-fetch data after successful update
-            } catch (error) {
-                setError(error.message);
-                console.error('Error updating user:', error);
-            } finally {
-                setLoading(false);
+    const addProductToCart = async (amount) => {
+        setLoading(true);
+        setError(null);
+        setSuccess(false);
+        try {
+            let userId = localStorage.getItem('marketplace-user-id');
+            let query = `${apiHelper.shoppingCartBaseAddress}/AddOrder?userId=${userId}&productId=${productId}&quantity=${amount}`;
+            const response = await fetch(query, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }//,
+                //body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                //throw new Error(`HTTP error! status: ${response.status}`);
+                alert(`ADD HTTP error! status: ${response.status}`);
             }
+
+            const data = await response.json();
+            console.log('Update successful:', data);
+            setSuccess(true);
+            // Optionally, update local state or re-fetch data after successful update
+        } catch (error) {
+            setError(error.message);
+            console.error('Error updating user:', error);
+        } finally {
+            setLoading(false);
         }
     }
+
+    const refreshAnotherComponents = async () => {
+        // must go after setting count to db !!!
+        try {
+            let apiHelper = new ApiHelper();
+            let userId = localStorage.getItem('marketplace-user-id');
+            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`;
+            const response = await fetch(query);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            // update ProductCartComponent
+            setAmmountToPay(result.amountToPay);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    //if (loading) return <div>Loading data...</div>;
+    if (error) return <div>Error: {error.message}</div>;
 
     return (
         <div style={styles.container}>
             <h3 style={styles.productName}>{productName}</h3>
 
+            {
+            counter !== 0 &&    
             <div style={styles.quantityControl}>
                 <button
                     onClick={decrement}
-                    disabled={quantity <= minQuantity}
+                    disabled={counter <= minQuantity}
                     style={{
                         ...styles.button,
                         ...styles.decrementButton,
-                        opacity: quantity <= minQuantity ? 0.5 : 1
+                        opacity: counter <= minQuantity ? 0.5 : 1
                     }}
                 >
                     -
                 </button>
 
-                <span style={styles.quantityDisplay}>{quantity}</span>
+                <span style={styles.quantityDisplay}>{counter}</span>
 
                 <button
                     onClick={increment}
-                    disabled={quantity >= maxQuantity}
+                    disabled={counter >= maxQuantity}
                     style={{
                         ...styles.button,
                         ...styles.incrementButton,
-                        opacity: quantity >= maxQuantity ? 0.5 : 1
+                        opacity: counter >= maxQuantity ? 0.5 : 1
                     }}
                 >
                     +
                 </button>
             </div>
+            }
             <br/>
             <p className='fs21'>Цена: {productCost}</p>
-            <Button onClick={putToShoppingCart}>Добавить в корзину</Button>
+            {
+                counter === 0 && <Button onClick={addToShoppingCartBtnHandler}>Добавить в корзину</Button>
+            }
         </div>
     );
 }
