@@ -10,10 +10,10 @@ import ProductCatalogPage from "./Pages/ProductCatalogPage.jsx";
 import ConfirmationPage from "./Pages/ConfirmationPage.jsx";
 
 const router = createBrowserRouter([
-    { path: '/', Component: Authorization },
-    { path: '/main', Component: App, children: [
+    { path: '/auth', Component: Authorization },
+    { path: '/registration', Component: Registration },
+    { path: '/', Component: App, children: [
         { path: '', Component: ProductCatalogPage },
-        { path: 'registration', Component: Registration },
         { path: 'confirmation', Component: ConfirmationPage },
         { path: 'purchases', Component: PurchasesPage }
     ] }

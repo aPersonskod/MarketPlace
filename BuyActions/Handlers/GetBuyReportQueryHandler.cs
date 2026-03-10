@@ -15,7 +15,7 @@ public class GetBuyReportQueryHandler(IMediator mediator) : IRequestHandler<GetB
         var cartDto = await mediator.Send(new GetCartQuery(request.Report.CartId), cancellationToken);
         if (cartDto == null) throw new Exception("Cart not found !!!");
         
-        var userDto = await mediator.Send(new GetUserQuery(cartDto.UserId), cancellationToken);
+        var userDto = await mediator.Send(new GetUserQuery(request.AccessToken), cancellationToken);
         if (userDto == null) throw new Exception("User not found !!!");
         
         if (cartDto.PlaceId == null) throw new Exception("Place not found !!!");

@@ -18,7 +18,7 @@ public class BuyCartCommandHandler(DataContext dataContext, IMediator mediator) 
         await Task.Delay(5000, cancellationToken);
         
         var userDto = await mediator.Send(
-                new UserSpendMoneyCommand(request.CartDto.UserId, request.CartDto.AmountToPay), cancellationToken);
+                new UserSpendMoneyCommand(request.CartDto.AmountToPay, request.AccessToken), cancellationToken);
         if (userDto == null) throw new Exception("Can't buy cart, user server is not working !!!");
         
         dataContext.BuyReports.Add(new BuyReport()

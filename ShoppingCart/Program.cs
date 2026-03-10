@@ -1,4 +1,6 @@
+using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.Dtos;
 using Models.Interfaces;
@@ -23,6 +25,19 @@ if (builder.Environment.IsDevelopment())
     });
     builder.Services.AddDbContext<DataContext>(o 
         => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
+    builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
+    builder.Services.AddAuthentication("Bearer")
+        .AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Auth:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Auth:Audience"],
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Key"]!)),
+            ValidateIssuerSigningKey = true
+        });
+    builder.Services.AddAuthorization();
 }
 else
 {
@@ -48,6 +63,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(a => a.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();

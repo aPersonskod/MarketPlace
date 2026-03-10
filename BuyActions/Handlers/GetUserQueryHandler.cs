@@ -14,7 +14,7 @@ public class GetUserQueryHandler(IOptions<UserSettings> userOptions) : IRequestH
         if(cancellationToken.IsCancellationRequested)
             return await Task.FromResult<UserDto?>(null);
         
-        var query = $"{userOptions.Value.Address}/{request.UserId}";
-        return await query.GetQuery<UserDto>();
+        var query = $"{userOptions.Value.Address}";
+        return await query.GetQuery<UserDto>(request.AccessToken);
     }
 }

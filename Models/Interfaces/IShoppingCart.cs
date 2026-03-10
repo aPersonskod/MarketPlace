@@ -8,11 +8,11 @@ public interface IShoppingCart
     Task<IEnumerable<PlaceDto>> GetPlaces();
     Task<PlaceDto> GetPlace(Guid placeId);
     Task<IEnumerable<OrderDto>> GetOrders(Guid cartId);
-    Task<CartDto> GetCart(Guid userId);
+    Task<CartDto> GetCart(string? accessToken);
     Task<CartDto> GetCartById(Guid cartId);
-    Task<CartDto> AddOrder(Guid userId, Guid productId, int quantity);
-    Task<CartDto> ConfirmCart(Guid userId, Guid placeId);
-    Task<CartDto> ConfirmAndBuyCart(Guid userId, Guid? placeId);
+    Task<CartDto> AddOrder(Guid productId, int quantity, string? accessToken = null);
+    Task<CartDto> ConfirmCart(Guid placeId, string? accessToken = null);
+    Task<CartDto> ConfirmAndBuyCart(Guid? placeId, string? accessToken = null);
     Task MarkCartAsBought(Guid cartId);
-    Task<CartDto> DeleteOrder(Guid userId, Guid productId);
+    Task<CartDto> DeleteOrder(Guid productId, string? accessToken = null);
 }

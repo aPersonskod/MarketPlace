@@ -24,9 +24,10 @@ const Authorization = ({
     useEffect(() => {
         navigateNext();
     }, [])
-    const navigateNext = () => {
-        if (localStorage.getItem('marketplace-user-id')) {
-            navigate('/main');
+    const navigateNext = async () => {
+        let userDto = await apiHelper.getUser();
+        if (userDto !== null) {
+            navigate('/');
         }
     };
 
@@ -87,7 +88,8 @@ const Authorization = ({
                 return;
             }
             const result = await response.json();
-            localStorage.setItem('marketplace-user-id', result.id);
+            let token = result.accessToken;
+            localStorage.setItem('uToken', token);
             navigateNext();
         } catch (err) {
             setError(err);

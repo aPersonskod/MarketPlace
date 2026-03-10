@@ -19,8 +19,15 @@ const ConfirmationPage = () => {
 
     const fetchCartData = async () => {
         try {
-            let userId = localStorage.getItem('marketplace-user-id');
-            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`);
+            let token = apiHelper.getAccessToken();
+            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart`;
+            let options = {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+            const response = await fetch(query, options);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -35,15 +42,16 @@ const ConfirmationPage = () => {
     
     const confirmCart = async () => {
         try {
-            let userId = localStorage.getItem('marketplace-user-id');
-            let query = `${apiHelper.shoppingCartBaseAddress}/ConfirmCart?userId=${userId}&placeId=${selectedPlaceId}`;
-            const response = await fetch(query, {
+            let token = apiHelper.getAccessToken();
+            let query = `${apiHelper.shoppingCartBaseAddress}/ConfirmCart?placeId=${selectedPlaceId}`;
+            let options = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                }//,
-                //body: JSON.stringify(requestBody),
-            });
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+            const response = await fetch(query, options);
 
             if (!response.ok) {
                 let myLocalError = await response.json();

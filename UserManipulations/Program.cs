@@ -12,7 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors();
+builder.Services.AddCors(o => 
+    o.AddPolicy("CorsPolicy", b =>
+    {
+        b.AllowAnyMethod()
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyHeader()
+            .AllowCredentials();
+    }));
 builder.Services.AddControllers();
 builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
 builder.Services.AddAuthentication("Bearer")
@@ -34,6 +41,11 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<DataContext>(o 
         => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
+    builder.Services.AddStackExchangeRedisCache(o =>  
+    {  
+        o.Configuration = builder.Configuration.GetValue<string>("Redis:ConfigurationDev");  
+        o.InstanceName = builder.Configuration.GetValue<string>("Redis:InstanceNameDev");  
+    });
 }
 else
 {
@@ -50,7 +62,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(a => a.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseCors("CorsPolicy");
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();

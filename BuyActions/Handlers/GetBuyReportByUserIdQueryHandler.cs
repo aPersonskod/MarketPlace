@@ -13,8 +13,8 @@ public class GetBuyReportByUserIdQueryHandler(DataContext dataContext, IMediator
         var buyReportDtos = new List<BuyReportDto>();
         await foreach (var buyReport in dataContext.BuyReports)
         {
-            var buyReportDto = await mediator.Send(new GetBuyReportQuery(buyReport), cancellationToken);
-            if (buyReportDto?.BuyReportCart.User.Id == request.UserId) buyReportDtos.Add(buyReportDto);
+            var buyReportDto = await mediator.Send(new GetBuyReportQuery(buyReport, request.AccessToken), cancellationToken);
+            if (buyReportDto is not null) buyReportDtos.Add(buyReportDto);
         }
 
         return await Task.FromResult<IEnumerable<BuyReportDto>>(buyReportDtos);

@@ -41,7 +41,7 @@ function Products({cart, setAmmountToPay}) {
                     <div className='d-flex flex-wrap'>
                         {products.map((product, index) => (
                             <ProductQuantitySelector key={index} productId={product.id} productName={product.name} 
-                            productCost={product.cost} setAmmountToPay={setAmmountToPay} cartId={cart.id}/>
+                            productCost={product.cost} setAmmountToPay={setAmmountToPay} cart={cart}/>
                         ))}
                     </div>
                 </div>
