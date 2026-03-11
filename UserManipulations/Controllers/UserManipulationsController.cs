@@ -1,10 +1,13 @@
-//using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
-//using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Models.Dtos;
+using Models.Extensions;
 using Models.Interfaces;
 using UserManipulations.Dtos;
 using UserManipulations.Settings;
@@ -13,16 +16,23 @@ namespace UserManipulations.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserManipulationsController(IUserManipulations userManipulationsService, IOptions<AuthSettings> authSettings) : ControllerBase
+public class UserManipulationsController(
+    IUserManipulations userManipulationsService,
+    IOptions<AuthSettings> authSettings,
+    IDistributedCache cache) : ControllerBase
 {
+    [HttpGet("[action]")]
+    public async Task<IEnumerable<UserDto>> GetAll() => await userManipulationsService.Get();
+    
     [HttpGet]
-    public async Task<IEnumerable<UserDto>> Get() => await userManipulationsService.Get();
-    [HttpGet("{userId:guid}")]
-    public async Task<IActionResult> Get(Guid userId)
+    [Authorize]
+    public async Task<IActionResult> Get()
     {
         try
         {
-            return Ok(await userManipulationsService.Get(userId));
+            var userDto = await GetUser();
+            if (userDto == null) return Unauthorized();
+            return Ok(userDto);
         }
         catch (Exception e)
         {
@@ -30,10 +40,18 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
     }
 
+    private async Task<UserDto?> GetUser()
+    {
+        var token = await HttpContext.GetTokenAsync("access_token");
+        if (token == null) return null;
+        var userDto = await cache.GetRecordAsync<UserDto>(token);
+        return userDto ?? null;
+    }
+
     [HttpPost("[action]")]
     public async Task<IActionResult> Authorize([FromBody]CredentialsDto credentials)
     {
-        /*var userDto = await userManipulationsService.Authorize(credentials.Email, credentials.Password);
+        var userDto = await userManipulationsService.Authorize(credentials.Email, credentials.Password);
         if (userDto == null) return Unauthorized();
         var claims = new List<Claim>()
         {
@@ -46,20 +64,9 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
             expires: DateTime.Now.AddMinutes(10),
             signingCredentials: new SigningCredentials(authSettings.Value.SecurityKey, SecurityAlgorithms.HmacSha256)
         );
-        var response = new 
-        {
-            access_token = new JwtSecurityTokenHandler().WriteToken(jwt),
-            userName = userDto.Name
-        };
-        return Ok(response);*/
-        try
-        {
-            return Ok(await userManipulationsService.Authorize(credentials.Email, credentials.Password));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(new { message = e.Message });
-        }
+        var response = new AuthorizationResponseDto(new JwtSecurityTokenHandler().WriteToken(jwt), userDto.Name);
+        await cache.SetRecordAsync(response.AccessToken, userDto, TimeSpan.FromMinutes(10));
+        return Ok(response);
     }
 
     [HttpPut]
@@ -102,12 +109,17 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
         }
     }
     [HttpPost("[action]")]
-    //[Authorize]
-    public async Task<IActionResult> WalletReplenishment(Guid userId, int money)
+    [Authorize]
+    public async Task<IActionResult> WalletReplenishment(int money)
     {
         try
         {
-            return Ok(await userManipulationsService.WalletReplenishment(userId, money));
+            var token = await HttpContext.GetTokenAsync("access_token");
+            var userDto = await GetUser();
+            if (userDto == null) return Unauthorized();
+            var updatedUserDto = await userManipulationsService.WalletReplenishment(userDto.Id, money);
+            await cache.SetRecordAsync(token!, updatedUserDto, TimeSpan.FromMinutes(10));
+            return Ok(updatedUserDto);
         }
         catch (Exception e)
         {
@@ -116,12 +128,17 @@ public class UserManipulationsController(IUserManipulations userManipulationsSer
     }
 
     [HttpPost("[action]")]
-    //[Authorize]
-    public async Task<IActionResult> SpendMoney(Guid userId, int money)
+    [Authorize]
+    public async Task<IActionResult> SpendMoney(int money)
     {
         try
         {
-            return Ok(await userManipulationsService.SpendMoney(userId, money));
+            var token = await HttpContext.GetTokenAsync("access_token");
+            var userDto = await GetUser();
+            if (userDto == null) return Unauthorized();
+            var updatedUserDto = await userManipulationsService.SpendMoney(userDto.Id, money);
+            await cache.SetRecordAsync(token!, updatedUserDto, TimeSpan.FromMinutes(10));
+            return Ok(updatedUserDto);
         }
         catch (Exception e)
         {

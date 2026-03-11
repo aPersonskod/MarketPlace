@@ -3,4 +3,4 @@ using Models.Dtos;
 
 namespace BuyActions.Queries;
 
-public record GetBuyReportByUserIdQuery(Guid UserId) : IRequest<IEnumerable<BuyReportDto?>>;
+public record GetBuyReportByUserIdQuery(string AccessToken) : IRequest<IEnumerable<BuyReportDto?>>;

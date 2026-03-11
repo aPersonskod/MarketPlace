@@ -13,6 +13,6 @@ public class GetBuyReportByIdQueryHandler(DataContext dataContext, IMediator med
         var buyReport =
             await dataContext.BuyReports.FirstOrDefaultAsync(x => x.Id == request.ReportId, cancellationToken);
         if (buyReport == null) throw new Exception("Buy report not found");
-        return await mediator.Send(new GetBuyReportQuery(buyReport), cancellationToken);
+        return await mediator.Send(new GetBuyReportQuery(buyReport, request.AccessToken), cancellationToken);
     }
 }

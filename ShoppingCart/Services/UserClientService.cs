@@ -7,14 +7,14 @@ namespace ShoppingCart.Services;
 
 public class UserClientService(IOptions<UserSettings> userSettings, ILogger<UserClientService> logger)
 {
-    private readonly string _baseAddress = userSettings.Value.HttpAddress;
-    public async Task<UserDto?> GetUser(Guid userId)
+    private readonly string _baseAddress = userSettings.Value.HttpsAddress;
+    public async Task<UserDto?> GetUser(string? accessToken = null)
     {
-        var query = $"{_baseAddress}/{userId}";
+        var query = $"{_baseAddress}";
         logger.LogInformation(query);
         try
         {
-            var result = await query.GetQuery<UserDto>();
+            var result = await query.GetQuery<UserDto>(accessToken);
             logger.LogInformation($"user: {result?.Name}");
             return result;
         }

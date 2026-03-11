@@ -1,8 +1,9 @@
 import {useState, useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import {ApiHelper} from "./ApiHelper.jsx";
+import { useNavigate } from 'react-router';
 
-const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cartId, minQuantity = 0, maxQuantity = 99}) => {
+const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cart, minQuantity = 0, maxQuantity = 99}) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -58,6 +59,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const apiHelper = new ApiHelper();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchOrders();
@@ -65,7 +67,8 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCartOrders?cartId=${cartId}`);
+            if(cart === null) return;
+            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCartOrders?cartId=${cart.id}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -103,30 +106,36 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     };
 
     const addToShoppingCartBtnHandler = async () => {
+        let user = await apiHelper.getUser();
+        if(user === null) {
+            navigate('auth');
+            return;
+        }
         setLoading(true);
         setError(null);
         setSuccess(false);
         let tempQuantity = 1;
-        await updateCart(tempQuantity);
+        await updateCart(tempQuantity, user);
     }
 
-    const updateCart = async (amount) => {
+    const updateCart = async (amount, user) => {
         setCounter(amount);
-        await addProductToCart(amount);
+        await addProductToCart(amount, user);
         await refreshAnotherComponents();
     }
 
-    const addProductToCart = async (amount) => {
+    const addProductToCart = async (amount, user) => {
         setLoading(true);
         setError(null);
         setSuccess(false);
         try {
-            let userId = localStorage.getItem('marketplace-user-id');
-            let query = `${apiHelper.shoppingCartBaseAddress}/AddOrder?userId=${userId}&productId=${productId}&quantity=${amount}`;
+            let token = apiHelper.getAccessToken();
+            let query = `${apiHelper.shoppingCartBaseAddress}/AddOrder?productId=${productId}&quantity=${amount}`;
             const response = await fetch(query, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization' : `Bearer ${token}`
                 }//,
                 //body: JSON.stringify(requestBody),
             });
@@ -151,10 +160,14 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     const refreshAnotherComponents = async () => {
         // must go after setting count to db !!!
         try {
-            let apiHelper = new ApiHelper();
-            let userId = localStorage.getItem('marketplace-user-id');
-            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`;
-            const response = await fetch(query);
+            let token = apiHelper.getAccessToken();
+            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart`;
+            const response = await fetch(query, {
+                method: 'GET',
+                headers: {
+                    'Authorization' : `Bearer ${token}`
+                }
+            });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

@@ -3,4 +3,4 @@ using Models.Dtos;
 
 namespace BuyActions.Queries;
 
-public record GetUserQuery(Guid UserId) : IRequest<UserDto?>;
+public record GetUserQuery(string AccessToken) : IRequest<UserDto?>;

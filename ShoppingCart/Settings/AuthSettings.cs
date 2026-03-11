@@ -1,7 +1,7 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace UserManipulations.Settings;
+namespace ShoppingCart.Settings;
 
 public class AuthSettings
 {

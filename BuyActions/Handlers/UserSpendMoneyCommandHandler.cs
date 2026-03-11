@@ -15,7 +15,7 @@ public class UserSpendMoneyCommandHandler(IOptions<UserSettings> userOptions)
         if (cancellationToken.IsCancellationRequested)
             return await Task.FromResult<UserDto?>(null);
 
-        var query = $"{userOptions.Value.Address}/SpendMoney?userId={request.UserId}&money={request.Money}";
-        return await query.PostQuery<UserDto>();
+        var query = $"{userOptions.Value.Address}/SpendMoney?money={request.Money}";
+        return await query.PostQuery<UserDto>(request.AccessToken);
     }
 }

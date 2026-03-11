@@ -41,11 +41,11 @@ public class ShoppingCartService(
         return cachedOrders?.Select(GetOrderDto) ?? [];
     }
 
-    public async Task<CartDto> GetCart(Guid userId)
+    public async Task<CartDto> GetCart(string? accessToken = null)
     {
-        var foundUserDto = await userService.GetUser(userId);
+        var foundUserDto = await userService.GetUser(accessToken);
         if (foundUserDto == null) throw new Exception("User not found");
-        var cart = await dataContext.ShoppingCarts.FirstOrDefaultAsync(c => c.UserId == userId && !c.IsBought && !c.IsConfirmed);
+        var cart = await dataContext.ShoppingCarts.FirstOrDefaultAsync(c => c.UserId == foundUserDto.Id && !c.IsBought && !c.IsConfirmed);
         if (cart != null) return await Task.FromResult(GetCartDto(cart));
         var newCart = new Cart() { Id = Guid.NewGuid(), UserId = foundUserDto.Id };
         await dataContext.ShoppingCarts.AddAsync(newCart);
@@ -60,10 +60,9 @@ public class ShoppingCartService(
         return await Task.FromResult(GetCartDto(cart));
     }
 
-    public async Task<CartDto> AddOrder(Guid userId, Guid productId, int quantity)
+    public async Task<CartDto> AddOrder(Guid productId, int quantity, string? accessToken = null)
     {
-        logger.LogInformation($"Start adding order, userId: {userId}, productId: {productId}, quantity: {quantity}");
-        var cart = await GetCart(userId);
+        var cart = await GetCart(accessToken);
         logger.LogInformation($"cartId: {cart.Id}");
         logger.LogInformation($"orders count: {dataContext.Orders.Count()}");
         
@@ -92,12 +91,12 @@ public class ShoppingCartService(
         await cache.SetRecordAsync(cart.Id.ToString(), orders.Where(x => x.Quantity > 0), TimeSpan.FromMinutes(10));
 
         await ChangeAmountToPay(cart.Id);
-        return await GetCart(userId);
+        return await GetCart(accessToken);
     }
 
-    public async Task<CartDto> DeleteOrder(Guid userId, Guid productId)
+    public async Task<CartDto> DeleteOrder(Guid productId, string? accessToken = null)
     {
-        var foundCart = await GetCart(userId);
+        var foundCart = await GetCart(accessToken);
         var cart = await dataContext.ShoppingCarts.FindAsync(foundCart.Id);
         var orders = await cache.GetRecordAsync<List<Order>?>(cart!.Id.ToString());
         var order = orders?.FirstOrDefault(x => x.OrderedProductId == productId);
@@ -109,14 +108,14 @@ public class ShoppingCartService(
     }
 
     [Obsolete("synchronous task that is too slow")]
-    public async Task<CartDto> ConfirmCart(Guid userId, Guid placeId)
+    public async Task<CartDto> ConfirmCart(Guid placeId, string? accessToken = null)
     {
-        var cart = await GetCart(userId);
+        var cart = await GetCart(accessToken);
         
         var isCartNotEmpty = await dataContext.Orders.AnyAsync(x => x.CartId == cart.Id);
         if (!isCartNotEmpty) throw new Exception($"Cart has no orders !!!");
         
-        var foundUser = await userService.GetUser(userId);
+        var foundUser = await userService.GetUser(accessToken);
         var isUserHasEnoughMoney = foundUser!.Wallet >= cart.AmountToPay;
         if (!isUserHasEnoughMoney) throw new Exception($"You have not enough money !!!");
         
@@ -126,9 +125,9 @@ public class ShoppingCartService(
         return await Task.FromResult(GetCartDto(foundCart));
     }
 
-    public async Task<CartDto> ConfirmAndBuyCart(Guid userId, Guid? placeId)
+    public async Task<CartDto> ConfirmAndBuyCart(Guid? placeId, string? accessToken = null)
     {
-        var cart = await GetCart(userId);
+        var cart = await GetCart(accessToken);
         
         var orders = await cache.GetRecordAsync<List<Order>?>(cart.Id.ToString());
         var isCartNotEmpty = orders?.Any(x => x.CartId == cart.Id) ?? false;
@@ -147,7 +146,7 @@ public class ShoppingCartService(
             }
         }
         
-        var foundUser = await userService.GetUser(userId);
+        var foundUser = await userService.GetUser(accessToken);
         var isUserHasEnoughMoney = foundUser!.Wallet >= cart.AmountToPay;
         if (!isUserHasEnoughMoney) throw new Exception($"You have not enough money !!!");
         
@@ -157,7 +156,7 @@ public class ShoppingCartService(
         if (foundCart.PlaceId == null) throw new Exception($"Cart's place is empty !!!");
         foundCart.IsConfirmed = true;
         await dataContext.SaveChangesAsync();
-        await kafkaCartProducer.ProduceAsync(GetCartDto(foundCart), default);
+        await kafkaCartProducer.ProduceAsync(GetCartDto(foundCart), default, accessToken!);
         return await Task.FromResult(GetCartDto(foundCart));
     }
 

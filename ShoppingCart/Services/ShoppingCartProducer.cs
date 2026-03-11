@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
@@ -24,12 +25,17 @@ public class ShoppingCartProducer<TMessage> : IKafkaProducer<TMessage>
         _topic = options.Value.Topic;
     }
     
-    public async Task ProduceAsync(TMessage message, CancellationToken cancellationToken)
+    public async Task ProduceAsync(TMessage message, CancellationToken cancellationToken, string accessToken)
     {
+        var headers = new Headers
+        {
+            { "accessToken", Encoding.UTF8.GetBytes(accessToken) }
+        };
         await _producer.ProduceAsync(_topic, new Message<string,TMessage>()
         {
             Key = Guid.NewGuid().ToString(),
-            Value = message
+            Value = message,
+            Headers = headers
         }, cancellationToken);
     }
 

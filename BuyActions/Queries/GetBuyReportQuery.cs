@@ -4,4 +4,4 @@ using Models.Dtos;
 
 namespace BuyActions.Queries;
 
-public record GetBuyReportQuery(BuyReport Report) : IRequest<BuyReportDto?>;
+public record GetBuyReportQuery(BuyReport Report, string AccessToken) : IRequest<BuyReportDto?>;

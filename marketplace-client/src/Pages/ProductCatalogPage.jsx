@@ -13,14 +13,23 @@ const ProductCatalogPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [ammountToPay, setAmmountToPay] = useState(0);
+    let apiHelper = new ApiHelper();
 
     const fetchCartData = async () => {
         try {
-            let apiHelper = new ApiHelper();
-            let userId = localStorage.getItem('marketplace-user-id');
-            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart?userId=${userId}`;
-            const response = await fetch(query);
+            let token = apiHelper.getAccessToken();
+            if (token === null) return;
+            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart`;
+            let options = {
+                method: 'GET',
+                headers: {
+                    'Authorization' : `Bearer ${token}`
+                }
+            };
+            const response = await fetch(query, options);
             if (!response.ok) {
+                setCart(null);
+                return;
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
@@ -37,7 +46,9 @@ const ProductCatalogPage = () => {
         fetchCartData();
     }, []);
     const handleConfirmation = () => {
-        navigate('confirmation');
+        if(cart !== null){
+            navigate('confirmation');
+        }
     }
 
     if (loading) return <div>Loading data...</div>;
@@ -58,9 +69,11 @@ const ProductCatalogPage = () => {
                         <ProductCart key={ammountToPay} cart={cart}/>
                     </div>
                 </div>
+                {((cart !== null) && (cart.ammountToPay !== 0)) &&
                 <div className='col col-xs-12 col-sm-12'>
                     <Button onClick={handleConfirmation}>Подтвердить заказ</Button>
                 </div>
+                }
             </div>
         </>
     );

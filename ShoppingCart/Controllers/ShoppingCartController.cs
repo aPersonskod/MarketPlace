@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dtos;
 using Models.Interfaces;
@@ -15,11 +17,13 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     public async Task<PlaceDto> GetPlace(Guid placeId) => await shoppingCart.GetPlace(placeId); // todo IActionResult
 
     [HttpGet("[action]")]
-    public async Task<IActionResult> GetCart(Guid userId)
+    [Authorize]
+    public async Task<IActionResult> GetCart()
     {
         try
         {
-            return Ok(await shoppingCart.GetCart(userId));
+            var token = await HttpContext.GetTokenAsync("access_token");
+            return Ok(await shoppingCart.GetCart(token));
         }
         catch (Exception e)
         {
@@ -41,11 +45,13 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     }
     
     [HttpPost("[action]")]
-    public async Task<IActionResult> ConfirmCart(Guid userId, Guid placeId)
+    [Authorize]
+    public async Task<IActionResult> ConfirmCart(Guid placeId)
     {
         try
         {
-            return Ok(await shoppingCart.ConfirmAndBuyCart(userId, placeId));
+            var token = await HttpContext.GetTokenAsync("access_token");
+            return Ok(await shoppingCart.ConfirmAndBuyCart(placeId, token));
         }
         catch (Exception e)
         {
@@ -81,11 +87,13 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> AddOrder(Guid userId, Guid productId, int quantity)
+    [Authorize]
+    public async Task<IActionResult> AddOrder(Guid productId, int quantity)
     {
         try
         {
-            return Ok(await shoppingCart.AddOrder(userId, productId, quantity));
+            var token = await HttpContext.GetTokenAsync("access_token");
+            return Ok(await shoppingCart.AddOrder(productId, quantity, token));
         }
         catch (Exception e)
         {
@@ -94,11 +102,13 @@ public class ShoppingCartController(IShoppingCart shoppingCart) : ControllerBase
     }
 
     [HttpDelete("[action]")]
-    public async Task<IActionResult> DeleteOrder(Guid userId, Guid productId)
+    [Authorize]
+    public async Task<IActionResult> DeleteOrder(Guid productId)
     {
         try
         {
-            return Ok(await shoppingCart.DeleteOrder(userId, productId));
+            var token = await HttpContext.GetTokenAsync("access_token");
+            return Ok(await shoppingCart.DeleteOrder(productId, token));
         }
         catch (Exception e)
         {

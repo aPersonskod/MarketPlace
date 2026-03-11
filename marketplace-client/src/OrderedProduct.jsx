@@ -61,12 +61,13 @@ const OrderedProduct = ({ productId, quantity}) => {
         setLoading(true);
         setError(null);
         try {
-            let userId = localStorage.getItem('marketplace-user-id');
-            let query = `${apiHelper.shoppingCartBaseAddress}/DeleteOrder?userId=${userId}&productId=${productId}`;
+            let token = apiHelper.getAccessToken();
+            let query = `${apiHelper.shoppingCartBaseAddress}/DeleteOrder?productId=${productId}`;
             const response = await fetch(query, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization' : `Bearer ${token}`
                 }//,
                 //body: JSON.stringify(requestBody),
             });

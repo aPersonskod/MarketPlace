@@ -3,4 +3,4 @@ using Models.Dtos;
 
 namespace BuyActions.Commands;
 
-public record UserSpendMoneyCommand(Guid UserId, int Money) : IRequest<UserDto?>;
+public record UserSpendMoneyCommand(int Money, string AccessToken) : IRequest<UserDto?>;

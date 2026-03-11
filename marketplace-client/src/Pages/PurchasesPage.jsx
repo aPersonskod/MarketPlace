@@ -10,8 +10,17 @@ const PurchasesPage = () => {
 
     const fetchBuyActions = async () => {
         try {
-            let userId = localStorage.getItem('marketplace-user-id');
-            const response = await fetch(`${apiHelper.buyActionsBaseAddress}/GetByUserId?userId=${userId}`);
+            let user = await apiHelper.getUser();
+            if (user === null) setBuyActions([]);
+            let token = apiHelper.getAccessToken();
+            let query = `${apiHelper.buyActionsBaseAddress}/GetByUserId`;
+            let options = {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+            const response = await fetch(query, options);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

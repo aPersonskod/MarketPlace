@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
-        <PackageReference Include="Marketplace.Models" Version="1.0.0" />
+        <!--<PackageReference Include="Marketplace.Models" Version="1.0.0" />-->
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1"/>
     </ItemGroup>
 
@@ -18,5 +18,9 @@
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Models\Models.csproj" />
     </ItemGroup>
 </Project>

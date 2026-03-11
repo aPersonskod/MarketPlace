@@ -3,4 +3,4 @@ using Models.Dtos;
 
 namespace BuyActions.Queries;
 
-public record GetBuyReportsQuery() : IRequest<IAsyncEnumerable<BuyReportDto?>>;
+public record GetBuyReportsQuery(string AccessToken) : IRequest<IAsyncEnumerable<BuyReportDto?>>;

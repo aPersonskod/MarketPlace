@@ -14,7 +14,7 @@ import {ApiHelper} from "./ApiHelper.jsx";
 
 function Header() {
     const expand = 'md';
-    const isLoggedIn = localStorage.getItem('marketplace-user-id') !== null;
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState({});
     const navigate = useNavigate();
     const [screenSize, setScreenSize] = useState({
@@ -40,23 +40,30 @@ function Header() {
         };
     },[]);
     const logOutHandler = () => {
-        localStorage.removeItem('marketplace-user-id');
-        navigate('/');
+        localStorage.removeItem('uToken');
+        navigate('/auth');
     };
     const walletReplenishment = async () => {
         try {
+            let userDto = await apiHelper.getUser();
+            if(userDto === null) navigate('/auth');
             let money = 300;
             let query = `${apiHelper.userManipulationBaseAddress}/WalletReplenishment?userId=${user.id}&money=${money}`;
             const response = await fetch(query, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiHelper.getAccessToken()}`
                 }//,
                 //body: JSON.stringify(requestBody),
             });
     
             if (!response.ok) {
                 //throw new Error(`HTTP error! status: ${response.status}`);
+                if(response.status === 401) {
+                    navigate('/auth');
+                    return;
+                }
                 alert(`HTTP error! status: ${response.status}`);
             }
 
@@ -68,26 +75,14 @@ function Header() {
     };
     const getUserData = async () => {
         try {
-            let id = localStorage.getItem('marketplace-user-id');
-            let query = `${apiHelper.userManipulationBaseAddress}/${id}`;
-            const response = await fetch(query, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }//,
-                //body: JSON.stringify(requestBody),
-            });
-
-            if (!response.ok) {
-                //throw new Error(`HTTP error! status: ${response.status}`);
-                alert(`HTTP error! status: ${response.status}`);
-                localStorage.removeItem('marketplace-user-id');
-                navigate('/');
+            let userDto = await apiHelper.getUser();
+            if (userDto !== null){
+                setIsLoggedIn(true);
+                setUser(userDto);
             }
-
-            const data = await response.json();
-            setUser(data);
+            //else{ navigate('auth'); }
         } catch (error) {
+        
             console.error('Error updating user:', error);
         }
     }
@@ -97,7 +92,7 @@ function Header() {
             <Navbar key={expand} expand={expand} className="bg-body-tertiary mb-3"
                     style={{borderRadius: '21px', backgroundColor: '#ececec'}}>
                 <Container fluid>
-                    <Navbar.Brand href={isLoggedIn ? '/main' : '/'}>Marketplace</Navbar.Brand>
+                    <Navbar.Brand href={isLoggedIn ? '/' : '/auth'}>Marketplace</Navbar.Brand>
                     <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`}/>
                     <Navbar.Offcanvas
                         id={`offcanvasNavbar-expand-${expand}`}
@@ -111,8 +106,8 @@ function Header() {
                         </Offcanvas.Header>
                         <Offcanvas.Body>
                             <Nav className="justify-content-start flex-grow-1 pe-3">
-                                <Nav.Link href="/main">Home</Nav.Link>
-                                <Nav.Link href="/main/purchases">History</Nav.Link>
+                                <Nav.Link href="/">Home</Nav.Link>
+                                <Nav.Link href="/purchases">History</Nav.Link>
                             </Nav>
                             <NavDropdown
                                 drop={screenSize.width < 768 ? 'down-centered' : 'start'}
@@ -134,7 +129,7 @@ function Header() {
                                         Выход
                                     </NavDropdown.Item>
                                 }
-
+                                {!isLoggedIn && <Button onClick={() => {navigate('/auth');}}>Войти</Button>}
                             </NavDropdown>
                         </Offcanvas.Body>
                     </Navbar.Offcanvas>
