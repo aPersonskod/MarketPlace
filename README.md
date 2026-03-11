@@ -1,5 +1,8 @@
 # MarketPlace
-Asp.net Core проект маркетплейса с микросервисной архитектурой, Postgresql базами, Apache Kafka, REST и GRPC взаимодействием.
+Asp.net Core проект маркетплейса с микросервисной архитектурой.
+
+Стэк:
+PostgreSQL БД, Apache Kafka, Redis, REST и gRPC, JWT Auth.
 Проект полностью упакован в docker-compose.
 
 Проект Marketplace является веб-приложением магазина. Данный проект позволяет просматривать каталог товара,
