@@ -73,11 +73,13 @@ const ConfirmationPage = () => {
     
     const buyCart = async (cartParam) => {
         try {
+            let token = apiHelper.getAccessToken();
             let query = `${apiHelper.buyActionsBaseAddress}/BuyCart`;
             const response = await fetch(query, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(cartParam),
             });

@@ -156,7 +156,7 @@ public class ShoppingCartService(
         if (foundCart.PlaceId == null) throw new Exception($"Cart's place is empty !!!");
         foundCart.IsConfirmed = true;
         await dataContext.SaveChangesAsync();
-        await kafkaCartProducer.ProduceAsync(GetCartDto(foundCart), default);
+        await kafkaCartProducer.ProduceAsync(GetCartDto(foundCart), default, accessToken!);
         return await Task.FromResult(GetCartDto(foundCart));
     }
 

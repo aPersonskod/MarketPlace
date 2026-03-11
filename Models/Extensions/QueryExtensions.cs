@@ -10,7 +10,7 @@ public static class QueryExtensions
         using var client = new HttpClient();
         if (token != null)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", token);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         var response = await client.GetAsync(query);
         response.EnsureSuccessStatusCode();
@@ -23,7 +23,7 @@ public static class QueryExtensions
         using var client = new HttpClient();
         if (token != null)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer {token}");   
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         var response = await client.PostAsync(query, null);
         response.EnsureSuccessStatusCode();
@@ -36,7 +36,7 @@ public static class QueryExtensions
         using var client = new HttpClient();
         if (token != null)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer {token}");   
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         var response = await client.PostAsync(query, null);
         response.EnsureSuccessStatusCode();
@@ -49,7 +49,7 @@ public static class QueryExtensions
         using var client = new HttpClient();
         if (token != null)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer {token}");   
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         var content = JsonContent.Create(entity);
         var response = await client.PostAsync(query, content);
@@ -63,7 +63,7 @@ public static class QueryExtensions
         using var client = new HttpClient();
         if (token != null)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer {token}");   
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         var response = await client.DeleteAsync(query);
         response.EnsureSuccessStatusCode();
@@ -76,7 +76,7 @@ public static class QueryExtensions
         using var client = new HttpClient();
         if (token != null)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer {token}");   
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         var content = JsonContent.Create(entity);
         var response = await client.PatchAsync(query, content);

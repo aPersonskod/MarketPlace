@@ -23,18 +23,6 @@ public class UserManipulationsController(
 {
     [HttpGet("[action]")]
     public async Task<IEnumerable<UserDto>> GetAll() => await userManipulationsService.Get();
-    /*[HttpGet("{userId:guid}")]
-    public async Task<IActionResult> Get(Guid userId)
-    {
-        try
-        {
-            return Ok(await userManipulationsService.Get(userId));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(new { message = e.Message });
-        }
-    }*/
     
     [HttpGet]
     [Authorize]
@@ -126,9 +114,12 @@ public class UserManipulationsController(
     {
         try
         {
+            var token = await HttpContext.GetTokenAsync("access_token");
             var userDto = await GetUser();
             if (userDto == null) return Unauthorized();
-            return Ok(await userManipulationsService.WalletReplenishment(userDto.Id, money));
+            var updatedUserDto = await userManipulationsService.WalletReplenishment(userDto.Id, money);
+            await cache.SetRecordAsync(token!, updatedUserDto, TimeSpan.FromMinutes(10));
+            return Ok(updatedUserDto);
         }
         catch (Exception e)
         {
@@ -142,9 +133,12 @@ public class UserManipulationsController(
     {
         try
         {
+            var token = await HttpContext.GetTokenAsync("access_token");
             var userDto = await GetUser();
             if (userDto == null) return Unauthorized();
-            return Ok(await userManipulationsService.SpendMoney(userDto.Id, money));
+            var updatedUserDto = await userManipulationsService.SpendMoney(userDto.Id, money);
+            await cache.SetRecordAsync(token!, updatedUserDto, TimeSpan.FromMinutes(10));
+            return Ok(updatedUserDto);
         }
         catch (Exception e)
         {

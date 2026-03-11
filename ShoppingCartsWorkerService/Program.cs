@@ -1,4 +1,3 @@
-using Models.Interfaces;
 using ShoppingCartsWorkerService;
 using ShoppingCartsWorkerService.Settings;
 
@@ -14,8 +13,7 @@ else
     builder.Services.Configure<BuyActionsSettings>(builder.Configuration.GetSection("Grpc:BuyActions"));
 }
 
-
-builder.Services.AddTransient<IBuyService, BuyServiceClient>();
+builder.Services.AddTransient<IBuyCartService, BuyCartService>();
 builder.Services.AddHostedService<ShoppingCartConsumerService>();
 
 var host = builder.Build();

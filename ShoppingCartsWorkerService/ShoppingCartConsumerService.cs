@@ -1,13 +1,15 @@
+using System.Text;
 using System.Text.Json;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using Models.Dtos;
-using Models.Interfaces;
 using ShoppingCartsWorkerService.Settings;
 
 namespace ShoppingCartsWorkerService;
 
-public class ShoppingCartConsumerService(IOptions<ShoppingCartKafkaSettings> options, IBuyService buyService) : BackgroundService
+public class ShoppingCartConsumerService(
+    IOptions<ShoppingCartKafkaSettings> options, 
+    IBuyCartService buyService) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -26,7 +28,12 @@ public class ShoppingCartConsumerService(IOptions<ShoppingCartKafkaSettings> opt
                 var consumeResult = consumer.Consume(TimeSpan.FromSeconds(3));
                 if (consumeResult == null) continue;
                 var cart = JsonSerializer.Deserialize<CartDto>(consumeResult.Message.Value);
-                if (cart != null) await buyService.BuyCart(cart);
+                if (cart == null) continue;
+                // Accessing the headers
+                var accessTokenHeader = consumeResult.Message.Headers?.FirstOrDefault(x => x.Key == "accessToken");
+                if (accessTokenHeader == null) continue;
+                var accessToken = Encoding.UTF8.GetString(accessTokenHeader.GetValueBytes());
+                await buyService.BuyCartAsync(cart, accessToken);
             }
             catch (Exception e)
             {

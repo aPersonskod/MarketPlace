@@ -75,31 +75,6 @@ function Header() {
     };
     const getUserData = async () => {
         try {
-/*             let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.userManipulationBaseAddress}`;
-            const response = await fetch(query, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                //throw new Error(`HTTP error! status: ${response.status}`);
-                if(response.status === 401) {
-                    navigate('/auth');
-                    return;
-                }
-                alert(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            if(data){
-                setIsLoggedIn(true);
-                setUser(data[0]);
-            }    */ 
-
             let userDto = await apiHelper.getUser();
             if (userDto !== null){
                 setIsLoggedIn(true);
@@ -117,7 +92,7 @@ function Header() {
             <Navbar key={expand} expand={expand} className="bg-body-tertiary mb-3"
                     style={{borderRadius: '21px', backgroundColor: '#ececec'}}>
                 <Container fluid>
-                    <Navbar.Brand href={isLoggedIn ? '/main' : '/'}>Marketplace</Navbar.Brand>
+                    <Navbar.Brand href={isLoggedIn ? '/' : '/auth'}>Marketplace</Navbar.Brand>
                     <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`}/>
                     <Navbar.Offcanvas
                         id={`offcanvasNavbar-expand-${expand}`}
