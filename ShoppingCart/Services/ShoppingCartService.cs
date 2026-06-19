@@ -132,7 +132,7 @@ public class ShoppingCartService(
         var orders = await cache.GetRecordAsync<List<Order>?>(cart.Id.ToString());
         var isCartNotEmpty = orders?.Any(x => x.CartId == cart.Id) ?? false;
         if (!isCartNotEmpty) throw new Exception($"Cart has no orders !!!");
-        // todo very lazy code
+        // todo very lazy code (used because redis)
         foreach (var order in orders!)
         {
             var foundOrder = await dataContext.Orders.FirstOrDefaultAsync(x => x.Id == order.Id);

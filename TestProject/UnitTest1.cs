@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Models;
 using Models.Dtos;
 
 namespace TestProject;
@@ -21,4 +22,3 @@ public class Tests
         Assert.That(shoppingCarts, Is.Not.Null);*/
     }
 }
-
