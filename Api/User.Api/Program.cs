@@ -47,24 +47,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler();
 
-app.MapPost("/api/user-service/login", async (IUserService userService, IOptions<AuthSettings> authSettings,
-        [FromBody] UserCredentialsDto credentialsDto) =>
+app.MapPost("/api/user-service/login", async (IUserService userService, [FromBody] UserCredentialsDto credentialsDto) =>
     {
-        var userDto = await userService.Authorize(credentialsDto);
-        if (userDto == null) return Results.Unauthorized();
-        var claims = new List<Claim>()
-        {
-            new Claim(JwtRegisteredClaimNames.Jti, userDto.Id.ToString()),
-            new Claim(ClaimTypes.Role, userDto.Role),
-        };
-        var jwt = new JwtSecurityToken(
-            issuer: authSettings.Value.Issuer,
-            audience: authSettings.Value.Audience,
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(10),
-            signingCredentials: new SigningCredentials(authSettings.Value.SecurityKey, SecurityAlgorithms.HmacSha256)
-        );
-        var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+        var token = await userService.Authorize(credentialsDto);
         return Results.Ok(token);
     })
     .WithDescription("User authorization")

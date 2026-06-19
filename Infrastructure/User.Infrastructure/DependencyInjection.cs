@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using User.Application.Interfaces;
+using User.Infrastructure.Authorization;
 using User.Infrastructure.Data;
 using User.Infrastructure.Repositories;
 using User.Infrastructure.Settings;
@@ -19,6 +20,7 @@ public static class DependencyInjection
         IConfiguration configuration, IWebHostEnvironment environment)
     {
         services.Configure<AuthSettings>(configuration.GetSection("Auth"));
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(o =>
             {
@@ -30,8 +32,7 @@ public static class DependencyInjection
                     ValidAudience = configuration["Auth:Audience"],
                     ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Auth:Key"]!)),
-                    ValidateIssuerSigningKey = true,
-                    //RoleClaimType = "role"
+                    ValidateIssuerSigningKey = true
                 };
                 
                 // Debugging Hook
@@ -39,7 +40,6 @@ public static class DependencyInjection
                 {
                     OnAuthenticationFailed = context =>
                     {
-                        // Put a breakpoint here to read context.Exception.Message
                         Console.WriteLine($"Auth failed: {context.Exception.Message}");
                         return Task.CompletedTask;
                     }

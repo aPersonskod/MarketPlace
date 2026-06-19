@@ -2,10 +2,11 @@ using Models;
 using User.Application.Dto;
 using User.Application.Exceptions;
 using User.Application.Interfaces;
+using UnauthorizedAccessException = User.Application.Exceptions.UnauthorizedAccessException;
 
 namespace User.Application.Services;
 
-public class UserService(IUserRepository repository) : IUserService
+public class UserService(IUserRepository repository, IJwtTokenGenerator jwtTokenGenerator) : IUserService
 {
     public async Task<IEnumerable<UserDto>> Get()
     {
@@ -21,7 +22,7 @@ public class UserService(IUserRepository repository) : IUserService
 
     public async Task<UserDto> Add(CreateUserDto userDto)
     {
-        if(!Enum.TryParse<Role>(userDto.Role, out var role)) throw new Exception("Invalid role");
+        if(!Enum.TryParse<Role>(userDto.Role, out var role)) throw new ArgumentException("Invalid role");
         var user = Models.User.CreateUser(
             userDto.Name,
             userDto.Email,
@@ -37,10 +38,11 @@ public class UserService(IUserRepository repository) : IUserService
         await repository.DeleteAsync(userId);
     }
 
-    public async Task<UserDto?> Authorize(UserCredentialsDto credentials)
+    public async Task<string> Authorize(UserCredentialsDto credentials)
     {
         var user = await repository.Authorize(credentials);
-        return GetUserDto(user);
+        if (user == null) throw new UnauthorizedAccessException("Invalid credentials");
+        return jwtTokenGenerator.GenerateJwtToken(user.Id, user.Role);
     }
 
     public async Task<UserDto> TopUpMoney(UserMoneyDto userMoneyDto)
@@ -57,8 +59,8 @@ public class UserService(IUserRepository repository) : IUserService
     
     private UserDto GetUserDto(Models.User? user)
     {
-        if (user == null) throw new NotFoundException("Convert to dto error: user not found");
-        if (!Enum.TryParse<Models.Role>(user.Role, out var role)) throw new Exception("Convert to dto error: Invalid role");
+        if (user == null) throw new NotFoundException("User not found");
+        if (!Enum.TryParse<Models.Role>(user.Role, out var role)) throw new ArgumentException("Invalid role");
         var dto = new UserDto
         {
             Id = user.Id,
