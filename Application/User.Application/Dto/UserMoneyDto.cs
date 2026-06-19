@@ -12,4 +12,3 @@ public class UserMoneyDto : MoneyDto
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
 }
-

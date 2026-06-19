@@ -1,16 +1,11 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Models;
 using User.Api.Middleware.Error;
 using User.Application;
 using User.Application.Dto;
 using User.Application.Interfaces;
 using User.Infrastructure;
-using User.Infrastructure.Settings;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 var builder = WebApplication.CreateBuilder(args);

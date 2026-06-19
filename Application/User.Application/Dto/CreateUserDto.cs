@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Models;
 
 namespace User.Application.Dto;
 

@@ -15,6 +15,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         {
             NotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
             ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request"),
+            FluentValidation.ValidationException => (StatusCodes.Status400BadRequest, "Bad Request"),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
@@ -26,6 +27,17 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
             Detail = exception.Message,
             Instance = httpContext.Request.Path,
         };
+        
+        if (exception is FluentValidation.ValidationException validationException)
+        {
+            var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    failureGroup => failureGroup.Key,
+                    failureGroup => failureGroup.Select(f => f.ErrorMessage).ToArray()
+                );
+            problemDetails.Extensions.Add("errors", errors);
+        }
         
         httpContext.Response.StatusCode = problemDetails.Status.Value;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);

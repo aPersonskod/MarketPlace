@@ -20,18 +20,4 @@ public class UserTests
         Assert.That(exception1.Message, Does.Contain("Not enough money"));
         Assert.That(exception2.Message, Does.Contain("Incorrect money amount"));
     }
-
-    [Test]
-    public void Test_Deposit()
-    {
-        var her = new List<User>();
-        var her2 = her.Select(GetUserDto);
-    }
-    
-    private string GetUserDto(User? user)
-    {
-        if (user == null) throw new Exception("Convert to dto error: user not found");
-        if (!Enum.TryParse<Models.Role>(user.Role, out var role)) throw new Exception("Convert to dto error: Invalid role");
-        return "dto";
-    }
 }

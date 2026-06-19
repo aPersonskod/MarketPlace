@@ -1,12 +1,15 @@
+using FluentValidation;
 using Models;
 using User.Application.Dto;
 using User.Application.Exceptions;
 using User.Application.Interfaces;
+using User.Application.Validations;
 using UnauthorizedAccessException = User.Application.Exceptions.UnauthorizedAccessException;
 
 namespace User.Application.Services;
 
-public class UserService(IUserRepository repository, IJwtTokenGenerator jwtTokenGenerator) : IUserService
+public class UserService(IUserRepository repository, IJwtTokenGenerator jwtTokenGenerator, 
+    IValidator<CreateUserDto> createUserValidator, IValidator<UserMoneyDto> moneyDtoValidator) : IUserService
 {
     public async Task<IEnumerable<UserDto>> Get()
     {
@@ -22,6 +25,7 @@ public class UserService(IUserRepository repository, IJwtTokenGenerator jwtToken
 
     public async Task<UserDto> Add(CreateUserDto userDto)
     {
+        await createUserValidator.ValidateAndThrowAsync(userDto);
         if(!Enum.TryParse<Role>(userDto.Role, out var role)) throw new ArgumentException("Invalid role");
         var user = Models.User.CreateUser(
             userDto.Name,
@@ -47,12 +51,14 @@ public class UserService(IUserRepository repository, IJwtTokenGenerator jwtToken
 
     public async Task<UserDto> TopUpMoney(UserMoneyDto userMoneyDto)
     {
+        await moneyDtoValidator.ValidateAndThrowAsync(userMoneyDto);
         var user = await repository.WalletReplenishment(userMoneyDto);
         return GetUserDto(user);
     }
 
     public async Task<UserDto> SpendMoney(UserMoneyDto userMoneyDto)
     {
+        await moneyDtoValidator.ValidateAndThrowAsync(userMoneyDto);
         var user = await repository.SpendMoney(userMoneyDto);
         return GetUserDto(user);
     }
