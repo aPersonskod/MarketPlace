@@ -1,5 +1,6 @@
 using Models;
 using User.Application.Dto;
+using User.Application.Exceptions;
 using User.Application.Interfaces;
 
 namespace User.Application.Services;
@@ -56,7 +57,7 @@ public class UserService(IUserRepository repository) : IUserService
     
     private UserDto GetUserDto(Models.User? user)
     {
-        if (user == null) throw new Exception("Convert to dto error: user not found");
+        if (user == null) throw new NotFoundException("Convert to dto error: user not found");
         if (!Enum.TryParse<Models.Role>(user.Role, out var role)) throw new Exception("Convert to dto error: Invalid role");
         var dto = new UserDto
         {

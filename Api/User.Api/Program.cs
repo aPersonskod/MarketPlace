@@ -1,14 +1,17 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Models;
 using User.Api.Middleware.Error;
 using User.Application;
 using User.Application.Dto;
 using User.Application.Interfaces;
 using User.Infrastructure;
 using User.Infrastructure.Settings;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddUserInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddUserApplication();
-builder.Services.AddCors(o => 
+builder.Services.AddCors(o =>
     o.AddPolicy("CorsPolicy", b =>
     {
         b.AllowAnyMethod()
@@ -42,16 +45,17 @@ app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseExceptionHandler();
 
 app.MapPost("/api/user-service/login", async (IUserService userService, IOptions<AuthSettings> authSettings,
-        [FromBody]UserCredentialsDto credentialsDto) =>
+        [FromBody] UserCredentialsDto credentialsDto) =>
     {
         var userDto = await userService.Authorize(credentialsDto);
         if (userDto == null) return Results.Unauthorized();
         var claims = new List<Claim>()
         {
-            new Claim("Id", userDto.Id.ToString()),
-            new Claim("Role", userDto.Role)
+            new Claim(JwtRegisteredClaimNames.Jti, userDto.Id.ToString()),
+            new Claim(ClaimTypes.Role, userDto.Role),
         };
         var jwt = new JwtSecurityToken(
             issuer: authSettings.Value.Issuer,
@@ -75,29 +79,29 @@ app.MapPost("/api/user-service", async (IUserService userService, [FromBody] Cre
 
 app.MapGet("/api/user-service/get-all", async (ClaimsPrincipal user, IUserService userService) =>
     {
-        var idStr = user.FindFirst("id")?.Value;
-        if (!Guid.TryParse(idStr, out var id)) return Results.Unauthorized();
+        var idStr = user.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+        if (!Guid.TryParse(idStr, out _)) return Results.Unauthorized();
         return Results.Ok(await userService.Get());
     })
     .WithDescription("Get users")
     .WithName("GetUsers")
-    .RequireAuthorization()
+    .RequireAuthorization(new AuthorizeAttribute { Roles = "admin" })
     .WithOpenApi();
 
 app.MapGet("/api/user-service", async (ClaimsPrincipal user, IUserService userService) =>
     {
-        var idStr = user.FindFirst("id")?.Value;
+        var idStr = user.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
         if (!Guid.TryParse(idStr, out var id)) return Results.Unauthorized();
         return Results.Ok(await userService.Get(id));
     })
     .WithDescription("Get user by id")
     .WithName("GetUserById")
-    .RequireAuthorization()
+    .RequireAuthorization(new AuthorizeAttribute { Roles = "admin, user" })
     .WithOpenApi();
 
 app.MapDelete("/api/user-service", async (ClaimsPrincipal user, IUserService userService) =>
     {
-        var idStr = user.FindFirst("id")?.Value;
+        var idStr = user.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
         if (!Guid.TryParse(idStr, out var id)) return Results.Unauthorized();
         await userService.Delete(id);
         return Results.NoContent();
@@ -107,12 +111,12 @@ app.MapDelete("/api/user-service", async (ClaimsPrincipal user, IUserService use
     .RequireAuthorization()
     .WithOpenApi();
 
-app.MapPatch("/api/user-service/top-up-money", async (ClaimsPrincipal user, IUserService userService, 
-            [FromQuery] int money) =>
+app.MapPatch("/api/user-service/top-up-money", async (ClaimsPrincipal user, IUserService userService,
+        [FromBody] MoneyDto moneyDto) =>
     {
-        var idStr = user.FindFirst("id")?.Value;
+        var idStr = user.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
         if (!Guid.TryParse(idStr, out var id)) return Results.Unauthorized();
-        var userMoneyDto = new UserMoneyDto() { Id = id, Money = money };
+        var userMoneyDto = new UserMoneyDto() { Id = id, Money = moneyDto.Money };
         return Results.Ok(await userService.TopUpMoney(userMoneyDto));
     })
     .WithDescription("Money replenishment")
@@ -120,12 +124,12 @@ app.MapPatch("/api/user-service/top-up-money", async (ClaimsPrincipal user, IUse
     .RequireAuthorization()
     .WithOpenApi();
 
-app.MapPatch("/api/user-service/spend-money", async (ClaimsPrincipal user, IUserService userService, 
-            [FromBody] int money) =>
+app.MapPatch("/api/user-service/spend-money", async (ClaimsPrincipal user, IUserService userService,
+        [FromBody] MoneyDto moneyDto) =>
     {
-        var idStr = user.FindFirst("id")?.Value;
+        var idStr = user.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
         if (!Guid.TryParse(idStr, out var id)) return Results.Unauthorized();
-        var userMoneyDto = new UserMoneyDto() { Id = id, Money = money };
+        var userMoneyDto = new UserMoneyDto() { Id = id, Money = moneyDto.Money };
         return Results.Ok(await userService.SpendMoney(userMoneyDto));
     })
     .WithDescription("Money spending")

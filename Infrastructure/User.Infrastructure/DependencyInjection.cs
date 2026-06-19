@@ -31,6 +31,7 @@ public static class DependencyInjection
                     ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Auth:Key"]!)),
                     ValidateIssuerSigningKey = true,
+                    //RoleClaimType = "role"
                 };
                 
                 // Debugging Hook

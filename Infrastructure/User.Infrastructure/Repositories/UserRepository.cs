@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using User.Application.Dto;
+using User.Application.Exceptions;
 using User.Application.Interfaces;
 using User.Infrastructure.Data;
 
@@ -32,7 +33,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public async Task<Models.User> WalletReplenishment(UserMoneyDto userMoneyDto)
     {
         var foundItem = await context.Users.FirstOrDefaultAsync(x => x.Id == userMoneyDto.Id);
-        if (foundItem == null) throw new Exception("User not found");
+        if (foundItem == null) throw new NotFoundException("User not found");
         foundItem.AddMoney(userMoneyDto.Money);
         await context.SaveChangesAsync();
         return foundItem;
@@ -41,7 +42,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public async Task<Models.User> SpendMoney(UserMoneyDto userMoneyDto)
     {
         var foundItem = await context.Users.FirstOrDefaultAsync(x => x.Id == userMoneyDto.Id);
-        if (foundItem == null) throw new Exception("User not found");
+        if (foundItem == null) throw new NotFoundException("User not found");
         foundItem.SpendMoney(userMoneyDto.Money);
         await context.SaveChangesAsync();
         return foundItem;
