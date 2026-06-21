@@ -5,7 +5,7 @@ using Cart.Application.Mappings;
 
 namespace Cart.Application.Services;
 
-public class OrderService(IUnitOfWork unitOfWork) : IOrderService
+public class OrderService(IUnitOfWork unitOfWork, ProductService productService) : IOrderService
 {
     public async Task<IEnumerable<OrderDto>> GetAllOrdersAsync(Guid cartId)
     {
@@ -15,21 +15,21 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task<OrderDto> AddOrderAsync(CreateOrderDto orderDto)
     {
-        // todo productService getProduct
-        var productCost = 5;
-        var order = Model.Order.CreateOrder(
-            orderDto.CartId,
-            orderDto.OrderedProductId,
-            orderDto.Quantity);
-        var createdOrder = await unitOfWork.OrderRepository.AddOrderAsync(order);
-        await unitOfWork.CartRepository.UpdateAmountToPayAsync(createdOrder.CartId, productCost);
+        var createdOrder = await unitOfWork.OrderRepository.AddOrderAsync(orderDto);
+        var cartOrders = await unitOfWork.OrderRepository.GetAllOrdersAsync(createdOrder.CartId);
+        var costCollection = new List<(int productCost, int productQuantity)>();
+        foreach (var cartOrder in cartOrders)
+        {
+            var productDto = await productService.GetProductByIdAsync(cartOrder.OrderedProductId);
+            costCollection.Add((productDto.Cost, orderDto.Quantity));
+        }
+        await unitOfWork.CartRepository.UpdateAmountToPayAsync(createdOrder.CartId, costCollection);
         await unitOfWork.CompleteAsync();
         return createdOrder.ToDto();
     }
-
-    public async Task DeleteOrderAsync(Guid cartId, Guid orderId)
+    public async Task DeleteOrderAsync(DeleteOrderDto deleteOrderDto)
     {
-        await unitOfWork.OrderRepository.DeleteOrderAsync(cartId, orderId);
+        await unitOfWork.OrderRepository.DeleteOrderAsync(deleteOrderDto);
         await unitOfWork.CompleteAsync();
     }
 }

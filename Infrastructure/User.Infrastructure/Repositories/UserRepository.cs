@@ -19,7 +19,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     public async Task DeleteAsync(Guid id)
     {
         var foundItem = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
-        if (foundItem == null) return;
+        if (foundItem == null) throw new NotFoundException("User not found");
         context.Users.Remove(foundItem);
         await context.SaveChangesAsync();
     }

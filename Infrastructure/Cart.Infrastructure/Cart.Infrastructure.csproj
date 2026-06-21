@@ -7,6 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Google.Protobuf" Version="3.35.1" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.80.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.81.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.24" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.11">
             <PrivateAssets>all</PrivateAssets>
@@ -22,6 +28,22 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Application\Cart.Application\Cart.Application.csproj" />
       <ProjectReference Include="..\..\Domain\Model\Model.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="Protos\products.proto">
+        <GrpcServices>Both</GrpcServices>
+        <Access>Public</Access>
+        <ProtoCompile>True</ProtoCompile>
+        <CompileOutputs>True</CompileOutputs>
+        <OutputDir>obj\Debug\net8.0\</OutputDir>
+        <Generator>MSBuild:Compile</Generator>
+        <GrpcService>Server</GrpcService>
+      </Protobuf>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="Protos/products.proto" GrpcService="Client"/>
     </ItemGroup>
 
 </Project>

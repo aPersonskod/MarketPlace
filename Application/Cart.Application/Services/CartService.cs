@@ -12,7 +12,6 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         var carts = await unitOfWork.CartRepository.GetBoughtCartsAsync(userId);
         return carts.Select(x => x.ToDto());
     }
-
     public async Task<CartDto> GetCartByUserIdAsync(Guid userId)
     {
         var cart = await unitOfWork.CartRepository.GetCartByUserIdAsync(userId);
@@ -23,33 +22,28 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         }
         return cart.ToDto();
     }
-
     public async Task DeleteCartAsync(Guid cartId)
     {
         await unitOfWork.CartRepository.DeleteCartAsync(cartId);
         await unitOfWork.CompleteAsync();
     }
-
     public async Task<CartDto> ConfirmCartAsync(Guid userId)
     {
         var cart = await unitOfWork.CartRepository.ConfirmCartAsync(userId);
         await unitOfWork.CompleteAsync();
         return cart.ToDto();
     }
-
     public async Task<CartDto> UnConfirmCartAsync(Guid userId)
     {
         var cart = await unitOfWork.CartRepository.UnConfirmCartAsync(userId);
         await unitOfWork.CompleteAsync();
         return cart.ToDto();
     }
-
     public async Task MarkCartAsBoughtAsync(Guid cartId)
     {
         await unitOfWork.CartRepository.BuyCartAsync(cartId);
         await unitOfWork.CompleteAsync();
     }
-
     public async Task MarkCartAsNotBoughtAsync(Guid cartId)
     {
         await unitOfWork.CartRepository.BuyBackCartAsync(cartId);

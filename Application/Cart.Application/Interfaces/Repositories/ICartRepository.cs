@@ -9,6 +9,6 @@ public interface ICartRepository
     Task<Model.Cart> UnConfirmCartAsync(Guid cartId);
     Task<Model.Cart> BuyCartAsync(Guid cartId);
     Task<Model.Cart> BuyBackCartAsync(Guid cartId);
-    Task UpdateAmountToPayAsync(Guid cartId, int productCost);
+    Task UpdateAmountToPayAsync(Guid cartId, IEnumerable<(int productCost, int productQuantity)> costCollection);
     Task DeleteCartAsync(Guid cartId);
 }

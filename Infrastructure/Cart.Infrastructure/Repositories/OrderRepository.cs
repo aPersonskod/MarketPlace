@@ -1,23 +1,30 @@
+using Cart.Application.Dtos;
 using Cart.Application.Interfaces.Repositories;
 using Cart.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Model.SharedExceptions;
 using Model;
 
 namespace Cart.Infrastructure.Repositories;
 
 public class OrderRepository(AppDbContext context) : IOrderRepository
 {
-    public Task<IEnumerable<Order>> GetAllOrdersAsync(Guid cartId)
+    public async Task<IEnumerable<Order>> GetAllOrdersAsync(Guid cartId) 
+        => await context.Orders.Where(x => x.CartId == cartId).ToListAsync();
+    public async Task<Order> AddOrderAsync(CreateOrderDto createOrderDto)
     {
-        throw new NotImplementedException();
+        var order = Order.CreateOrder(
+            createOrderDto.CartId,
+            createOrderDto.OrderedProductId,
+            createOrderDto.Quantity);
+        await context.Orders.AddAsync(order);
+        return order;
     }
-
-    public Task<Order> AddOrderAsync(Order order)
+    public async Task DeleteOrderAsync(DeleteOrderDto deleteOrderDto)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteOrderAsync(Guid cartId, Guid orderId)
-    {
-        throw new NotImplementedException();
+        var order = await context.Orders.FirstOrDefaultAsync(x =>
+            x.CartId == deleteOrderDto.CartId && x.OrderedProductId == deleteOrderDto.OrderedProductId);
+        if (order == null) throw new NotFoundException("Order not found");
+        context.Orders.Remove(order);
     }
 }

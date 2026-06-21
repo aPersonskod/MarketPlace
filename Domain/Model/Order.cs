@@ -15,5 +15,6 @@ public class Order
         Quantity = quantity
     };
     
+    // condition when deleting
     public bool IsFound(Guid cartId, Guid productId) => CartId == cartId && OrderedProductId == productId;
 }

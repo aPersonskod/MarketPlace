@@ -12,7 +12,6 @@ public class PlaceService(IUnitOfWork unitOfWork) : IPlaceService
         var places = await unitOfWork.PlaceRepository.GetAllPlacesAsync();
         return places.Select(x => x.ToDto());
     }
-
     public async Task<PlaceDto> GetPlaceAsync(Guid placeId)
     {
         var place = await unitOfWork.PlaceRepository.GetPlaceByIdAsync(placeId);

@@ -48,15 +48,16 @@ public class CartRepository(AppDbContext context) : ICartRepository
         cart.IsBought = false;
         return cart;
     }
-    //todo everything is wrong
-    public async Task UpdateAmountToPayAsync(Guid cartId, int productCost)
+    public async Task UpdateAmountToPayAsync(Guid cartId, IEnumerable<(int productCost, int productQuantity)> costCollection)
     {
         var cart = await context.Carts.FirstOrDefaultAsync(x => x.Id == cartId);
         if (cart == null) throw new NotFoundException("Cart not found");
-        var orders = await context.Orders.Where(x => x.CartId == cartId).ToListAsync();
+        cart.UpdateAmountToPay(costCollection);
     }
-    public Task DeleteCartAsync(Guid cartId)
+    public async Task DeleteCartAsync(Guid cartId)
     {
-        throw new NotImplementedException();
+        var foundItem = await context.Carts.FirstOrDefaultAsync(x => x.Id == cartId);
+        if (foundItem == null) throw new NotFoundException("Cart not found");
+        context.Carts.Remove(foundItem);
     }
 }

@@ -26,3 +26,12 @@ public class CreateOrderDto
     [JsonPropertyName("quantity")]
     public int Quantity { get; set; }
 }
+
+public class DeleteOrderDto
+{
+    [JsonPropertyName("cartId")]
+    public Guid CartId { get; set; }
+    
+    [JsonPropertyName("orderedProductId")]
+    public Guid OrderedProductId { get; set; }
+}
