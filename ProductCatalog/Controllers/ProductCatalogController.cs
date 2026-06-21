@@ -12,6 +12,12 @@ public class ProductCatalogController(IProductCatalog productCatalog) : Controll
     [HttpGet]
     public async Task<IEnumerable<ProductDto>> Get() => await productCatalog.Get();
 
+    [HttpGet("/p")]
+    public async Task<IActionResult> Getp()
+    {
+        return Ok("p");
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {

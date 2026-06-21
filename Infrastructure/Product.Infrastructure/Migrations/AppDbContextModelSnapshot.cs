@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using User.Infrastructure.Data;
+using Product.Infrastructure.Data;
 
 #nullable disable
 
-namespace User.Infrastructure.Migrations
+namespace Product.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -22,44 +22,47 @@ namespace User.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Model.User", b =>
+            modelBuilder.Entity("Model.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Cost")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Wallet")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Products");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("49792511-261b-4edb-94a5-ecb8540e60ff"),
-                            Email = "patochin@gmail.com",
-                            Name = "Петя Пяточкин",
-                            Password = "12345",
-                            Role = "user",
-                            Wallet = 0
+                            Id = new Guid("ca173802-206e-4a88-a6cc-2ac93e590fba"),
+                            Cost = 100,
+                            Name = "Футболка"
+                        },
+                        new
+                        {
+                            Id = new Guid("304e34b1-5267-433a-8d7d-a0abd761da11"),
+                            Cost = 200,
+                            Name = "Шорты"
+                        },
+                        new
+                        {
+                            Id = new Guid("35e52d12-62f8-4451-ab81-b549fa3f066b"),
+                            Cost = 50,
+                            Name = "Носки"
+                        },
+                        new
+                        {
+                            Id = new Guid("388ea4e6-f760-4735-9aa5-e3df9906b49c"),
+                            Cost = 70,
+                            Name = "Трусы"
                         });
                 });
 #pragma warning restore 612, 618

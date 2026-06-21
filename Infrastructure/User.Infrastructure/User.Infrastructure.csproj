@@ -17,7 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Application\User.Application\User.Application.csproj" />
-      <ProjectReference Include="..\..\Models\Models.csproj" />
+      <ProjectReference Include="..\..\Domain\Model\Model.csproj" />
     </ItemGroup>
 
     <ItemGroup>

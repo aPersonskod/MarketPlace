@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Models;
+using Model;
 
 namespace User.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
     private readonly ILogger<AppDbContext> _logger;
-    public DbSet<Models.User> Users { get; set; }
+    public DbSet<Model.User> Users { get; set; }
     public AppDbContext(DbContextOptions<AppDbContext> options, ILogger<AppDbContext> logger) : base(options)
     {
         _logger = logger;
@@ -15,8 +15,8 @@ public class AppDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Models.User>().HasData(
-            new Models.User { 
+        modelBuilder.Entity<Model.User>().HasData(
+            new Model.User { 
                 Id = new Guid("49792511-261b-4edb-94a5-ecb8540e60ff"),
                 Name = "Петя Пяточкин",
                 Email = "patochin@gmail.com",

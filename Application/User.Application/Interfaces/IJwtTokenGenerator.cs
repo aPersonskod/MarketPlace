@@ -1,5 +1,3 @@
-using Models;
-
 namespace User.Application.Interfaces;
 
 public interface IJwtTokenGenerator

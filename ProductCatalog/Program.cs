@@ -19,7 +19,7 @@ builder.Services.AddTransient<IProductCatalog, ProductCatalogService>();
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<DataContext>(o 
-        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnectionDev")));
+        => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
     builder.Services.AddStackExchangeRedisCache(o =>
     {
         o.Configuration = builder.Configuration.GetValue<string>("Redis:ConfigurationDev");

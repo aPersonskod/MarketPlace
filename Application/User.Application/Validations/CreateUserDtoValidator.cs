@@ -17,6 +17,6 @@ public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
         RuleFor(x => x.Wallet).NotEmpty().WithMessage("Wallet is required")
             .GreaterThan(0).WithMessage("Wallet must be greater than 0");
         RuleFor(x => x.Role).NotEmpty().WithMessage("Role is required")
-            .Must(x => Enum.TryParse<Models.Role>(x, true, out _)).WithMessage("The specified role name does not exist");
+            .Must(x => Enum.TryParse<Model.Role>(x, true, out _)).WithMessage("The specified role name does not exist");
     }
 }
