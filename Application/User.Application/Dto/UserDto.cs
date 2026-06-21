@@ -1,12 +1,10 @@
 using System.Text.Json.Serialization;
+using Model.Dtos;
 
 namespace User.Application.Dto;
 
-public class UserDto
+public class UserDto : IdDto
 {
-    [JsonPropertyName("id")]
-    public Guid Id { get; set; }
-    
     [JsonPropertyName("name")]
     public string Name { get; set; }
     

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Product.Application.Exceptions;
+using Model.SharedExceptions;
 
 namespace Product.Api.Middleware.Error;
 

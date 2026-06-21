@@ -1,5 +1,5 @@
+using Model.SharedExceptions;
 using User.Application.Dto;
-using User.Application.Exceptions;
 
 namespace User.Application.Mappings;
 

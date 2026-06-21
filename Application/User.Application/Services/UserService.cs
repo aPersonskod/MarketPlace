@@ -2,7 +2,6 @@ using FluentValidation;
 using User.Application.Dto;
 using User.Application.Interfaces;
 using User.Application.Mappings;
-using UnauthorizedAccessException = User.Application.Exceptions.UnauthorizedAccessException;
 
 namespace User.Application.Services;
 

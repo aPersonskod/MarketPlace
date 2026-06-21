@@ -96,7 +96,7 @@ app.MapPatch("/api/user-service/top-up-money", async (ClaimsPrincipal user, IUse
     {
         var idStr = user.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
         if (!Guid.TryParse(idStr, out var id)) return Results.Unauthorized();
-        var userMoneyDto = new UserMoneyDto() { Id = id, Money = moneyDto.Money };
+        var userMoneyDto = new UserMoneyDto() { UserId = id, Money = moneyDto.Money };
         return Results.Ok(await userService.TopUpMoney(userMoneyDto));
     })
     .WithDescription("Money replenishment")
@@ -109,7 +109,7 @@ app.MapPatch("/api/user-service/spend-money", async (ClaimsPrincipal user, IUser
     {
         var idStr = user.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
         if (!Guid.TryParse(idStr, out var id)) return Results.Unauthorized();
-        var userMoneyDto = new UserMoneyDto() { Id = id, Money = moneyDto.Money };
+        var userMoneyDto = new UserMoneyDto() { UserId = id, Money = moneyDto.Money };
         return Results.Ok(await userService.SpendMoney(userMoneyDto));
     })
     .WithDescription("Money spending")

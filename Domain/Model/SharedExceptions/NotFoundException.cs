@@ -1,3 +1,3 @@
-namespace Product.Application.Exceptions;
+namespace Model.SharedExceptions;
 
 public class NotFoundException(string message) : Exception(message);

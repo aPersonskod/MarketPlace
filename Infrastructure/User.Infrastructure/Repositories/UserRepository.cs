@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Model.SharedExceptions;
 using User.Application.Dto;
-using User.Application.Exceptions;
 using User.Application.Interfaces;
 using User.Infrastructure.Data;
 
@@ -27,7 +27,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
         => await context.Users.FirstOrDefaultAsync(x => x.Email == credentials.Email && x.Password == credentials.Password);
     public async Task<Model.User> WalletReplenishment(UserMoneyDto userMoneyDto)
     {
-        var foundItem = await context.Users.FirstOrDefaultAsync(x => x.Id == userMoneyDto.Id);
+        var foundItem = await context.Users.FirstOrDefaultAsync(x => x.Id == userMoneyDto.UserId);
         if (foundItem == null) throw new NotFoundException("User not found");
         foundItem.AddMoney(userMoneyDto.Money);
         await context.SaveChangesAsync();
@@ -35,7 +35,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
     }
     public async Task<Model.User> SpendMoney(UserMoneyDto userMoneyDto)
     {
-        var foundItem = await context.Users.FirstOrDefaultAsync(x => x.Id == userMoneyDto.Id);
+        var foundItem = await context.Users.FirstOrDefaultAsync(x => x.Id == userMoneyDto.UserId);
         if (foundItem == null) throw new NotFoundException("User not found");
         foundItem.SpendMoney(userMoneyDto.Money);
         await context.SaveChangesAsync();

@@ -10,5 +10,5 @@ public class MoneyDto
 public class UserMoneyDto : MoneyDto
 {
     [JsonPropertyName("id")]
-    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
 }
