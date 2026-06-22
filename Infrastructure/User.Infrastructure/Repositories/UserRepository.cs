@@ -10,11 +10,18 @@ public class UserRepository(AppDbContext context) : IUserRepository
 {
     public async Task<IEnumerable<Model.User>> GetAllAsync() => await context.Users.ToListAsync();
     public async Task<Model.User?> GetByIdAsync(Guid id) => await context.Users.FirstOrDefaultAsync(x => x.Id == id);
-    public async Task<Model.User> AddAsync(Model.User entity)
+    public async Task<Model.User> AddAsync(CreateUserDto userDto)
     {
-        await context.Users.AddAsync(entity);
+        if(!Enum.TryParse<Model.Role>(userDto.Role, out var role)) throw new ArgumentException("Invalid role");
+        var user = Model.User.CreateUser(
+            userDto.Name,
+            userDto.Email,
+            userDto.Password,
+            userDto.Wallet,
+            role);
+        await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
-        return entity;
+        return user;
     }
     public async Task DeleteAsync(Guid id)
     {

@@ -23,14 +23,7 @@ public class UserService(IUserRepository repository, IJwtTokenGenerator jwtToken
     public async Task<UserDto> Add(CreateUserDto userDto)
     {
         await createUserValidator.ValidateAndThrowAsync(userDto);
-        if(!Enum.TryParse<Model.Role>(userDto.Role, out var role)) throw new ArgumentException("Invalid role");
-        var user = Model.User.CreateUser(
-            userDto.Name,
-            userDto.Email,
-            userDto.Password,
-            userDto.Wallet,
-            role);
-        var createdUser = await repository.AddAsync(user);
+        var createdUser = await repository.AddAsync(userDto);
         return createdUser.ToDto();
     }
 
