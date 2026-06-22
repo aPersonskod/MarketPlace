@@ -2,8 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Infrastructure.Settings;
 using User.Application.Interfaces;
-using User.Infrastructure.Settings;
 
 namespace User.Infrastructure.Authorization;
 

@@ -4,9 +4,9 @@ namespace Product.Api.Apis;
 
 public static class ProductApi
 {
-    public static IEndpointRouteBuilder MapCartEndpoints(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder MapProductEndpoints(this IEndpointRouteBuilder app)
     {
-        var api = app.MapGroup("api/product-service");
+        var api = app.MapGroup("api/product-service").WithTags("Product");
         
         api.MapGet("/get-all", async (IProductService productService) 
                 => Results.Ok(await productService.Get()))

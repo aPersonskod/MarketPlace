@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Cart.Application.Interfaces.Services;
-using Shared.Infrastructure.Settings;
+using Shared.Infrastructure.Extensions;
 
 namespace Cart.Api.Apis;
 
