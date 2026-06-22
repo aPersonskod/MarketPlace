@@ -18,9 +18,10 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         if (environment.IsDevelopment())
         {
-            services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnectionDev")));
+            // todo ОБЯЗАТЕЛЬНО ПРОВЕРЬ ПРИ ЗАПУСКЕ ДОККЕРА !!!
+            //services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnectionDev")));
             // need that because in docker-compose env is development
-            //services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
+            services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
         }
         else
         {
