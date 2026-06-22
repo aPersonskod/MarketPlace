@@ -2,6 +2,7 @@ using Product.Api.Middleware.Error;
 using Product.Application;
 using Product.Application.Interfaces;
 using Product.Infrastructure;
+using Product.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
 app.UseExceptionHandler();
+app.MapGrpcService<ProductMessengerService>();
 
 app.MapGet("/api/product-service/get-all", async (IProductService productService) 
     => Results.Ok(await productService.Get()))

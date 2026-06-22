@@ -10,10 +10,10 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options, ILogger<AppDbContext> logger) : base(options)
     {
         _logger = logger;
-        //Database.EnsureCreated(); // need to be comment when create/apply migration
+        Database.EnsureCreated(); // need to be comment when create/apply migration
     }
 
-    public DbSet<Model.Cart> Carts { get; set; }
+    public DbSet<Model.Cart> ShoppingCarts { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Place> Places { get; set; }
     

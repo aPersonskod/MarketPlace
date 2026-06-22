@@ -11,7 +11,19 @@ public class OrderRepository(AppDbContext context) : IOrderRepository
 {
     public async Task<IEnumerable<Order>> GetAllOrdersAsync(Guid cartId) 
         => await context.Orders.Where(x => x.CartId == cartId).ToListAsync();
-    public async Task<Order> AddOrderAsync(CreateOrderDto createOrderDto)
+    public async Task<Order?> Get(CreateOrderDto orderDto) 
+        => await context.Orders.FirstOrDefaultAsync(x => 
+            x.CartId == orderDto.CartId && x.OrderedProductId == orderDto.OrderedProductId);
+
+    public async Task<Order?> AddOrderAsync(CreateOrderDto orderDto)
+    {
+        var foundOrder = await Get(orderDto);
+        if (foundOrder == null) return foundOrder;
+        foundOrder.Quantity += orderDto.Quantity;
+        return foundOrder;
+    }
+
+    public async Task<Order> CreateOrderAsync(CreateOrderDto createOrderDto)
     {
         var order = Order.CreateOrder(
             createOrderDto.CartId,

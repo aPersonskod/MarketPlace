@@ -30,9 +30,10 @@ public class Cart
         IsBought = true;
     }
 
-    public void UpdateAmountToPay(IEnumerable<(int productCost, int productQuantity)> costCollection)
+    public int UpdateAmountToPay(IEnumerable<(int productCost, int productQuantity)> costCollection)
     {
         AmountToPay = 0;
         foreach (var valueTuple in costCollection) AmountToPay += valueTuple.productCost * valueTuple.productQuantity;
+        return AmountToPay;
     }
 }

@@ -5,7 +5,7 @@ using Cart.Application.Mappings;
 
 namespace Cart.Application.Services;
 
-public class OrderService(IUnitOfWork unitOfWork, ProductService productService) : IOrderService
+public class OrderService(IUnitOfWork unitOfWork, IProductService productService) : IOrderService
 {
     public async Task<IEnumerable<OrderDto>> GetAllOrdersAsync(Guid cartId)
     {
@@ -15,17 +15,21 @@ public class OrderService(IUnitOfWork unitOfWork, ProductService productService)
 
     public async Task<OrderDto> AddOrderAsync(CreateOrderDto orderDto)
     {
-        var createdOrder = await unitOfWork.OrderRepository.AddOrderAsync(orderDto);
-        var cartOrders = await unitOfWork.OrderRepository.GetAllOrdersAsync(createdOrder.CartId);
+        // check if product exist
+        await productService.GetProductByIdAsync(orderDto.OrderedProductId);
+        // add or create order
+        var order = await unitOfWork.OrderRepository.AddOrderAsync(orderDto) 
+                    ?? await unitOfWork.OrderRepository.CreateOrderAsync(orderDto);
+        var cartOrders = await unitOfWork.OrderRepository.GetAllOrdersAsync(order.CartId);
         var costCollection = new List<(int productCost, int productQuantity)>();
         foreach (var cartOrder in cartOrders)
         {
             var productDto = await productService.GetProductByIdAsync(cartOrder.OrderedProductId);
-            costCollection.Add((productDto.Cost, orderDto.Quantity));
+            costCollection.Add((productDto.Cost, cartOrder.Quantity));
         }
-        await unitOfWork.CartRepository.UpdateAmountToPayAsync(createdOrder.CartId, costCollection);
+        await unitOfWork.CartRepository.UpdateAmountToPayAsync(order.CartId, costCollection);
         await unitOfWork.CompleteAsync();
-        return createdOrder.ToDto();
+        return order.ToDto();
     }
     public async Task DeleteOrderAsync(DeleteOrderDto deleteOrderDto)
     {
