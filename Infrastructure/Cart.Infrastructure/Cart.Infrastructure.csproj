@@ -13,7 +13,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.24" />
+        <!--<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.24" />-->
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.11">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,18 +28,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Application\Cart.Application\Cart.Application.csproj" />
       <ProjectReference Include="..\..\Domain\Model\Model.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Protobuf Include="Protos\products.proto">
-        <GrpcServices>Both</GrpcServices>
-        <Access>Public</Access>
-        <ProtoCompile>True</ProtoCompile>
-        <CompileOutputs>True</CompileOutputs>
-        <OutputDir>obj\Debug\net8.0\</OutputDir>
-        <Generator>MSBuild:Compile</Generator>
-        <GrpcService>Server</GrpcService>
-      </Protobuf>
+      <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

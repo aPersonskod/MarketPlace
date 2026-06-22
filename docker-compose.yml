@@ -153,6 +153,33 @@ services:
     volumes:
       - postgres-product-data:/var/lib/postgresql/18/data
 
+  mp_cart_app:
+    container_name: cart-app
+    build:
+      context: .
+      dockerfile: /Api/Cart.Api/Dockerfile
+#    image: mrandreyprogrammer/shopping-cart:latest
+    ports:
+      - "5002:8080"
+    networks:
+      - market-place-dev
+    depends_on:
+      - mp_postgres_cart_db
+  mp_postgres_cart_db:
+    container_name: postgres-cart
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: marketplace-shopping-cart-db
+    ports:
+      - "5434:5432"
+    networks:
+      - market-place-dev
+    volumes:
+      - postgres-cart-data:/var/lib/postgresql/18/data
+
+
 
 ##  zookeeper:
 ##    image: confluentinc/cp-zookeeper:7.3.2
@@ -220,6 +247,5 @@ services:
 volumes:
   postgres-user-data:
   postgres-product-data:
-#  postgres-product-catalog-data:
-#  postgres-shopping-cart-data:
+  postgres-cart-data:
 #  postgres-buy-actions-data:
