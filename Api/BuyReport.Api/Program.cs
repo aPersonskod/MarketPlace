@@ -1,12 +1,13 @@
-using Cart.Api.Apis;
-using Cart.Api.Extensions;
-using Cart.Application;
-using Cart.Infrastructure;
+using BuyReport.Api.Apis;
+using BuyReport.Api.Extensions;
+using BuyReport.Application;
+using BuyReport.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddDefaultServices();
-builder.Services.AddCartInfrastructure(builder.Configuration, builder.Environment);
-builder.Services.AddCartApplication();
+builder.Services.AddBuyReportInfrastructure(builder.Configuration, builder.Environment);
+builder.Services.AddBuyReportApplication();
 
 var app = builder.Build();
 
@@ -18,8 +19,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseDefaultApi();
-app.MapCartEndpoints();
-app.MapOrderEndpoints();
-app.MapPlaceEndpoints();
 app.MapBuyReportEndpoints();
 app.Run();

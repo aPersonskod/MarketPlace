@@ -1,16 +1,12 @@
 using System.Text.Json.Serialization;
-using Model.Dtos;
 
 namespace Cart.Application.Dtos;
 
-public class OrderDto : IdDto
+public class DeleteOrderDto
 {
     [JsonPropertyName("cartId")]
     public Guid CartId { get; set; }
     
     [JsonPropertyName("orderedProductId")]
     public Guid OrderedProductId { get; set; }
-    
-    [JsonPropertyName("quantity")]
-    public int Quantity { get; set; }
 }

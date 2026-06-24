@@ -22,6 +22,11 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         }
         return cart.ToDto();
     }
+    public async Task<bool> GetCartByIdAsync(Guid cartId)
+    {
+        var cart = await unitOfWork.CartRepository.GetCartByIdAsync(cartId);
+        return cart != null;
+    }
     public async Task DeleteCartAsync(Guid cartId)
     {
         await unitOfWork.CartRepository.DeleteCartAsync(cartId);

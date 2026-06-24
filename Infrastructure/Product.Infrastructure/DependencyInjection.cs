@@ -19,9 +19,9 @@ public static class DependencyInjection
         if (environment.IsDevelopment())
         {
             // todo ОБЯЗАТЕЛЬНО ПРОВЕРЬ ПРИ ЗАПУСКЕ ДОККЕРА !!!
-            //services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnectionDev")));
+            services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnectionDev")));
             // need that because in docker-compose env is development
-            services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
+            //services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
         }
         else
         {

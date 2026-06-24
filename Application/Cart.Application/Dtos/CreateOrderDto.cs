@@ -1,9 +1,8 @@
 using System.Text.Json.Serialization;
-using Model.Dtos;
 
 namespace Cart.Application.Dtos;
 
-public class OrderDto : IdDto
+public class CreateOrderDto
 {
     [JsonPropertyName("cartId")]
     public Guid CartId { get; set; }

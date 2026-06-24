@@ -33,6 +33,13 @@ public static class CartApi
             .WithName("GetCart")
             .RequireAuthorization()
             .WithOpenApi();
+        
+        api.MapGet("/is-cart-exist/{cartId:guid}", async (ICartService cartService, Guid cartId) 
+                => Results.Ok(await cartService.GetCartByIdAsync(cartId)))
+            .WithDescription("Get cart by id")
+            .WithName("GetCartById")
+            .RequireAuthorization()
+            .WithOpenApi();
 
         api.MapDelete("/delete-cart/{cartId:guid}", async (ICartService cartService, Guid cartId) =>
             {

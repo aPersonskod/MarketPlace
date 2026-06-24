@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPlaceRepository, PlaceRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IBuyReportRepository, BuyReportRepository>();
         if (environment.IsDevelopment())
         {
             services.Configure<GrpcProductSettings>(configuration.GetSection("Grpc:ProductsDev"));

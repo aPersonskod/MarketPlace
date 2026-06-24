@@ -14,6 +14,8 @@ public class CartRepository(AppDbContext context) : ICartRepository
         var carts = await context.ShoppingCarts.Where(x => x.UserId == userId).ToListAsync();
         return carts.FirstOrDefault(x => x.IsUnverified(x.UserId));
     }
+    public async Task<Model.Cart?> GetCartByIdAsync(Guid cartId) 
+        => await context.ShoppingCarts.FirstOrDefaultAsync(x => x.Id == cartId);
     public async Task<Model.Cart> AddCartAsync(Guid userId)
     {
         var cart = Model.Cart.CreateCart(userId);

@@ -1,9 +1,8 @@
-using Grpc.Core;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Model.SharedExceptions;
 
-namespace Cart.Api.Middleware.Error;
+namespace BuyReport.Api.Middleware.Error;
 
 public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
@@ -15,7 +14,6 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         {
             NotFoundException => new ExceptionDetails(StatusCodes.Status404NotFound, "Not Found", exception.Message),
             ArgumentException => new ExceptionDetails(StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
-            RpcException rpc => new ExceptionDetails(StatusCodes.Status400BadRequest, "Bad Request", rpc.Status.Detail),
             NoContentException => new ExceptionDetails(StatusCodes.Status204NoContent, "No Content", exception.Message),
             FluentValidation.ValidationException => new ExceptionDetails(StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
             _ => new ExceptionDetails(StatusCodes.Status500InternalServerError, "Internal Server Error", exception.Message)

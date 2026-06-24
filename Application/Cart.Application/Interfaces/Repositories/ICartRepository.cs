@@ -4,6 +4,7 @@ public interface ICartRepository
 {
     Task<IEnumerable<Model.Cart>> GetBoughtCartsAsync(Guid userId);
     Task<Model.Cart?> GetCartByUserIdAsync(Guid userId);
+    Task<Model.Cart?> GetCartByIdAsync(Guid cartId);
     Task<Model.Cart> AddCartAsync(Guid userId);
     Task<Model.Cart> ConfirmCartAsync(Guid cartId);
     Task<Model.Cart> UnConfirmCartAsync(Guid cartId);
