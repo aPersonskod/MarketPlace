@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Model.SharedExceptions;
+using Model.SharedExceptions.ProblemDetails;
 
 namespace BuyReport.Api.Middleware.Error;
 
@@ -12,11 +12,8 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         
         var exceptionDetails = exception switch
         {
-            NotFoundException => new ExceptionDetails(StatusCodes.Status404NotFound, "Not Found", exception.Message),
-            ArgumentException => new ExceptionDetails(StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
-            NoContentException => new ExceptionDetails(StatusCodes.Status204NoContent, "No Content", exception.Message),
             FluentValidation.ValidationException => new ExceptionDetails(StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
-            _ => new ExceptionDetails(StatusCodes.Status500InternalServerError, "Internal Server Error", exception.Message)
+            _ => exception.GetExceptionDetails()
         };
 
         var problemDetails = new ProblemDetails()
@@ -43,5 +40,3 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         return true;
     }
 }
-
-public record ExceptionDetails(int StatusCode, string Title, string Detail);

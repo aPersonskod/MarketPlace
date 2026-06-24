@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Model.SharedExceptions;
+using Model.SharedExceptions.ProblemDetails;
 
 namespace Product.Api.Middleware.Error;
 
@@ -9,19 +10,14 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         logger?.LogError(exception, $"Error: {exception.Message}, time: {DateTime.UtcNow}");
-        
-        var (statusCode, title) = exception switch
-        {
-            NotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
-            ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request"),
-            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
-        };
+
+        var exceptionDetails = exception.GetExceptionDetails();
 
         var problemDetails = new ProblemDetails()
         {
-            Status = statusCode,
-            Title = title, //exception.GetType().Name,
-            Detail = exception.Message,
+            Status = exceptionDetails.StatusCode,
+            Title = exceptionDetails.Title, //exception.GetType().Name,
+            Detail = exceptionDetails.Detail,
             Instance = httpContext.Request.Path,
         };
         
