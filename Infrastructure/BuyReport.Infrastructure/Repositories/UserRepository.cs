@@ -8,9 +8,9 @@ namespace BuyReport.Infrastructure.Repositories;
 
 public class UserRepository(IOptions<UserSettings> userOptions) : IUserRepository
 {
+    private readonly string _baseUrl = userOptions.Value.Address + "/api/user-service";
     public async Task<UserDto?> GetUserAsync(string? authToken)
     {
-        var query = $"{userOptions.Value.Address}";
-        return await query.GetQuery<UserDto>(authToken);
+        return await _baseUrl.GetQuery<UserDto>(authToken);
     }
 }

@@ -1,3 +1,6 @@
 namespace BuyReport.Infrastructure.Settings;
 
-public record UserSettings(string Address);
+public class UserSettings
+{
+    public string Address{ get; set; }
+}

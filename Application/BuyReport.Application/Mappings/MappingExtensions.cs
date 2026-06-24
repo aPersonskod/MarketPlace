@@ -23,6 +23,7 @@ public static class MappingExtensions
         return new DetailedCartForReportDto()
         {
             User = userDto,
+            CartId = cartForReportDto.CartId,
             Address = cartForReportDto.Address,
             Products = cartForReportDto.Products,
             Quantity = cartForReportDto.Quantity,
