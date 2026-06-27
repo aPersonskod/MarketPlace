@@ -19,14 +19,14 @@ public class Cart
     public bool IsUnverified(Guid userId) => UserId == userId && !IsConfirmed && !IsBought;
     public void ConfirmCart()
     {
-        if (PlaceId == null) return;
-        if (AmountToPay <= 0) return;
+        if (PlaceId == null) throw new ArgumentException("Place is required");
+        if (AmountToPay <= 0) throw new ArgumentException("Cart can not be empty");
         IsConfirmed = true;
     }
 
     public void BuyCart()
     {
-        if (!IsConfirmed) return;
+        if (!IsConfirmed) throw new ArgumentException("Cart is not confirmed");
         IsBought = true;
     }
 

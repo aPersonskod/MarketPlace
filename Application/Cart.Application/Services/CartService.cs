@@ -2,6 +2,7 @@ using Cart.Application.Dtos;
 using Cart.Application.Interfaces;
 using Cart.Application.Interfaces.Services;
 using Cart.Application.Mappings;
+using Model.SharedExceptions;
 
 namespace Cart.Application.Services;
 
@@ -14,7 +15,7 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
     }
     public async Task<CartDto> GetCartByUserIdAsync(Guid userId)
     {
-        var cart = await unitOfWork.CartRepository.GetCartByUserIdAsync(userId);
+        var cart = await unitOfWork.CartRepository.GetUnverifiedCartByUserIdAsync(userId);
         if (cart == null)
         {
             cart = await unitOfWork.CartRepository.AddCartAsync(userId);
@@ -32,8 +33,11 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         await unitOfWork.CartRepository.DeleteCartAsync(cartId);
         await unitOfWork.CompleteAsync();
     }
-    public async Task<CartDto> ConfirmCartAsync(Guid userId)
+    public async Task<CartDto> ConfirmCartAsync(Guid userId, Guid placeId)
     {
+        var place = await unitOfWork.PlaceRepository.GetPlaceByIdAsync(placeId);
+        if (place == null) throw new NotFoundException("Place not found");
+        await unitOfWork.CartRepository.AddPlaceToCart(userId, placeId);
         var cart = await unitOfWork.CartRepository.ConfirmCartAsync(userId);
         await unitOfWork.CompleteAsync();
         return cart.ToDto();

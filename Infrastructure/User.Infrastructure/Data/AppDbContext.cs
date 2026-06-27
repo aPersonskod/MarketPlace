@@ -22,6 +22,14 @@ public class AppDbContext : DbContext
                 Email = "patochin@gmail.com",
                 Password = "12345",
                 Role = Role.user.ToString()
+            },
+            new Model.User()
+            {
+                Id = new Guid("51228188-871a-43a8-91d3-a2595fb42bed"),
+                Name = "Test test",
+                Email = "test@gmail.com",
+                Password = "test_test",
+                Role = Role.user.ToString()
             }
         );
         //modelBuilder.Entity<User>().Property(u => u.Role).HasConversion<string>().HasDefaultValue(Role.user);

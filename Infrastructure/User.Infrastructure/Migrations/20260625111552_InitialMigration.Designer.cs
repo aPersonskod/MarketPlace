@@ -12,7 +12,7 @@ using User.Infrastructure.Data;
 namespace User.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260621015306_InitialMigration")]
+    [Migration("20260625111552_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -61,6 +61,15 @@ namespace User.Infrastructure.Migrations
                             Email = "patochin@gmail.com",
                             Name = "Петя Пяточкин",
                             Password = "12345",
+                            Role = "user",
+                            Wallet = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("51228188-871a-43a8-91d3-a2595fb42bed"),
+                            Email = "test@gmail.com",
+                            Name = "Test test",
+                            Password = "test_test",
                             Role = "user",
                             Wallet = 0
                         });

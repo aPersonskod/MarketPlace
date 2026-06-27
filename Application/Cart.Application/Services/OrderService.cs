@@ -20,6 +20,7 @@ public class OrderService(IUnitOfWork unitOfWork, IProductService productService
         // add or create order
         var order = await unitOfWork.OrderRepository.AddOrderAsync(orderDto) 
                     ?? await unitOfWork.OrderRepository.CreateOrderAsync(orderDto);
+        await unitOfWork.CompleteAsync();
         var cartOrders = await unitOfWork.OrderRepository.GetAllOrdersAsync(order.CartId);
         var costCollection = new List<(int productCost, int productQuantity)>();
         foreach (var cartOrder in cartOrders)

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Cart.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Infrastructure.Extensions;
 
 namespace Cart.Api.Apis;
@@ -51,12 +52,12 @@ public static class CartApi
             .RequireAuthorization()
             .WithOpenApi();
 
-        api.MapPatch("/confirm-cart", async (ClaimsPrincipal user, ICartService cartService) =>
+        api.MapPatch("/confirm-cart", async (ClaimsPrincipal user, ICartService cartService, [FromQuery] Guid placeId) =>
             {
                 var credentials = user.GetAuthCredentials();
                 return credentials == null
                     ? Results.Unauthorized()
-                    : Results.Ok(await cartService.ConfirmCartAsync(credentials.Value.UserId));
+                    : Results.Ok(await cartService.ConfirmCartAsync(credentials.Value.UserId, placeId));
             })
             .WithDescription("Confirm cart")
             .WithName("ConfirmCart")

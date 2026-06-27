@@ -60,6 +60,15 @@ namespace User.Infrastructure.Migrations
                             Password = "12345",
                             Role = "user",
                             Wallet = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("51228188-871a-43a8-91d3-a2595fb42bed"),
+                            Email = "test@gmail.com",
+                            Name = "Test test",
+                            Password = "test_test",
+                            Role = "user",
+                            Wallet = 0
                         });
                 });
 #pragma warning restore 612, 618
