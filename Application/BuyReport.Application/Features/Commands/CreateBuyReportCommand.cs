@@ -15,7 +15,7 @@ public class CreateBuyReportCommandHandler(IBuyReportRepository buyReportReposit
         cancellationToken.ThrowIfCancellationRequested();
         var response = await cartRepository.IsCartExistsAsync(request.CartId, request.AuthToken);
         if (!response) throw new ArgumentException("Invalid cartId");
-        var buyReport = await buyReportRepository.CreateBuyReportByIdAsync(request.CartId);
+        var buyReport = await buyReportRepository.CreateBuyReportByCartIdAsync(request.CartId);
         return buyReport.ToDto();
     }
 }

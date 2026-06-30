@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Application\Cart.Application\Cart.Application.csproj" />
+      <ProjectReference Include="..\Application\Orchestrator.Application\Orchestrator.Application.csproj" />
       <ProjectReference Include="..\Application\User.Application\User.Application.csproj" />
     </ItemGroup>
 

@@ -1,5 +1,11 @@
-﻿namespace Orchestrator.Application;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public class DependencyInjection
+namespace Orchestrator.Application;
+
+public static class DependencyInjection
 {
+    public static IServiceCollection AddOrchestratorApplication(this IServiceCollection services)
+    {
+        return services;
+    }
 }
