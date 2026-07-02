@@ -1,20 +1,20 @@
-using MediatR;
+using MassTransit;
 using Orchestrator.Application.Dtos;
+using Orchestrator.Application.Features.Events;
 using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record WalletReplenishmentCommand(int AmountToPay, string AuthToken) : IRequest<bool>;
-public class WalletReplenishmentCommandHandler(IUserRepository userRepository) 
-    : IRequestHandler<WalletReplenishmentCommand, bool>
+public record WalletReplenishmentCommand(Guid CartId, decimal AmountToPay, string AuthToken);
+public class WalletReplenishmentCommandConsumer(IUserRepository userRepository) : IConsumer<WalletReplenishmentCommand>
 {
-    public async Task<bool> Handle(WalletReplenishmentCommand request, CancellationToken cancellationToken)
+    public async Task Consume(ConsumeContext<WalletReplenishmentCommand> context)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        var user = await userRepository.SpendMoney(new UserMoneyDto()
+        await userRepository.SpendMoney(new UserMoneyDto()
         {
-            AuthToken = request.AuthToken, Money = request.AmountToPay
+            AuthToken = context.Message.AuthToken,
+            Money = (int)context.Message.AmountToPay
         });
-        return user != null;
+        await context.Publish(new CartPaidFailedEvent(context.Message.CartId));
     }
 }

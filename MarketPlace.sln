@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchestrator.Application", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTestProject", "XUnitTestProject\XUnitTestProject.csproj", "{4D636BD2-E324-4C11-BE39-A3CAB88121A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchestrator.Infrastructure", "Infrastructure\Orchestrator.Infrastructure\Orchestrator.Infrastructure.csproj", "{DC3FC091-B3A5-4EA4-924B-1721BF19B3CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,10 @@ Global
 		{4D636BD2-E324-4C11-BE39-A3CAB88121A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D636BD2-E324-4C11-BE39-A3CAB88121A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D636BD2-E324-4C11-BE39-A3CAB88121A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC3FC091-B3A5-4EA4-924B-1721BF19B3CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC3FC091-B3A5-4EA4-924B-1721BF19B3CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC3FC091-B3A5-4EA4-924B-1721BF19B3CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC3FC091-B3A5-4EA4-924B-1721BF19B3CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{16AFBC04-BE7B-415D-ABA5-49ED4ECCB6BE} = {4C59C76A-33EA-4FF8-85C9-606831016825}
@@ -179,5 +185,6 @@ Global
 		{975B80B3-03CB-4436-9C41-D55D8B35B80B} = {F2B69E18-D53F-4451-9FE8-AD7079E4A0CE}
 		{ABD33D49-59BD-4AC0-A02C-01B45DEEB7CB} = {A6434A1C-5DB4-45F3-A6E1-5F17C1F2F05B}
 		{7DBDA195-4814-459E-9015-B4257BBD61E8} = {8955F28E-C25E-4BCD-B599-3D9593D56D62}
+		{DC3FC091-B3A5-4EA4-924B-1721BF19B3CF} = {F2B69E18-D53F-4451-9FE8-AD7079E4A0CE}
 	EndGlobalSection
 EndGlobal

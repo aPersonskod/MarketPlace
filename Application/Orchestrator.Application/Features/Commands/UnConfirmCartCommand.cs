@@ -1,15 +1,15 @@
-using MediatR;
+using MassTransit;
+using Orchestrator.Application.Features.Events;
 using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record UnConfirmCartCommand(string AuthToken) : IRequest<bool>;
-public class UnConfirmCartCommandHandler(ICartRepository cartRepository) : IRequestHandler<UnConfirmCartCommand, bool>
+public record UnConfirmCartCommand(string AuthToken);
+public class UnConfirmCartCommandConsumer(ICartRepository cartRepository) : IConsumer<UnConfirmCartCommand>
 {
-    public async Task<bool> Handle(UnConfirmCartCommand request, CancellationToken cancellationToken)
+    public async Task Consume(ConsumeContext<UnConfirmCartCommand> context)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        var cart = await cartRepository.UnConfirmCartAsync(request.AuthToken);
-        return cart != null;
+        var cart = await cartRepository.UnConfirmCartAsync(context.Message.AuthToken);
+        await context.Publish(new CartConfirmingFailedEvent(cart.Id));
     }
 }

@@ -1,16 +1,13 @@
-﻿using System.Text;
-using Cart.Application.Interfaces;
+﻿using Cart.Application.Interfaces;
 using Cart.Application.Interfaces.Repositories;
 using Cart.Infrastructure.Data;
 using Cart.Infrastructure.Repositories;
 using Cart.Infrastructure.Settings;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Shared.Infrastructure;
 
 namespace Cart.Infrastructure;

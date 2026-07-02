@@ -1,28 +1,32 @@
-using MediatR;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 using Orchestrator.Application.Dtos;
+using Orchestrator.Application.Features.Events;
 using Orchestrator.Application.Interfaces;
-using Orchestrator.Application.Mapping;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record WalletSpendCommand(int AmountToPay, string AuthToken) : IRequest<UserDto>;
-public class WalletSpendCommandHandler(IUserRepository userRepository, 
-    ISender sender, UnConfirmCartCommand unConfirmCartCommand) : IRequestHandler<WalletSpendCommand, UserDto>
+public record WalletSpendCommand(Guid CartId, decimal AmountToPay, string AuthToken);
+public class WalletSpendCommandConsumer(IUserRepository userRepository, ILogger<WalletSpendCommandConsumer> logger) 
+    : IConsumer<WalletSpendCommand>
 {
-    public async Task<UserDto> Handle(WalletSpendCommand request, CancellationToken cancellationToken)
+    public async Task Consume(ConsumeContext<WalletSpendCommand> context)
     {
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            return await userRepository.SpendMoney(new UserMoneyDto()
+            await userRepository.SpendMoney(new UserMoneyDto()
             {
-                AuthToken = request.AuthToken, Money = request.AmountToPay
+                AuthToken = context.Message.AuthToken, Money = (int)context.Message.AmountToPay
             });
+            await context.Publish(new CartPaidEvent(context.Message.CartId));
         }
         catch (Exception e)
         {
-            await sender.Send(unConfirmCartCommand, cancellationToken);
-            throw;
+            logger.LogError(
+                e,
+                "Failed to process payment for cart {CartId}",
+                context.Message.CartId);
+            await context.Publish(new CartConfirmingFailedEvent(context.Message.CartId));
         }
     }
 }
