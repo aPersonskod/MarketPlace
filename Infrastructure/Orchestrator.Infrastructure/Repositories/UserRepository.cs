@@ -3,7 +3,7 @@ using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Infrastructure.Repositories;
 
-public class UserReportRepository : IUserRepository
+public class UserRepository : IUserRepository
 {
     public Task<UserDto> WalletReplenishment(UserMoneyDto userMoneyDto)
     {

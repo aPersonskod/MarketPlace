@@ -23,7 +23,8 @@ public class ConfirmCartCommandConsumer(ICartRepository cartRepository, ILogger<
             await context.Publish(
                 new CartConfirmedEvent(
                     cart.Id,
-                    cart.AmountToPay)
+                    cart.AmountToPay,
+                    context.Message.ConfirmCartDto.AuthToken)
             );
         }
         catch (Exception e)
@@ -32,7 +33,8 @@ public class ConfirmCartCommandConsumer(ICartRepository cartRepository, ILogger<
                 e,
                 "Failed to confirm cart {CartId}",
                 context.Message.ConfirmCartDto.CartId);
-            await context.Publish(new CartSubmitFailedEvent(context.Message.ConfirmCartDto.CartId));
+            await context.Publish(new CartSubmitFailedEvent(context.Message.ConfirmCartDto.CartId,
+                context.Message.ConfirmCartDto.AuthToken));
         }
     }
 }

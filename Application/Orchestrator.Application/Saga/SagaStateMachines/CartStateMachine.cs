@@ -27,7 +27,6 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                 {
                     c.Saga.CartId = c.Message.CartId;
                     c.Saga.PlaceId = c.Message.PlaceId;
-                    c.Saga.AuthToken = c.Message.AuthToken;
                 })
                 .TransitionTo(CartConfirmingState)
                 .Publish(c => new ConfirmCartCommand(new ConfirmCartDto()
@@ -45,7 +44,7 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                     c.Saga.AmountToPay = c.Message.AmountToPay;
                 })
                 .TransitionTo(UserPayingState)
-                .Publish(c => new WalletSpendCommand(c.Message.CartId, c.Saga.AmountToPay, c.Saga.AuthToken)),
+                .Publish(c => new WalletSpendCommand(c.Message.CartId, c.Saga.AmountToPay, c.Message.AuthToken)),
             When(CartSubmitFailed)
                 .TransitionTo(Failed)
                 .Finalize()
@@ -56,7 +55,7 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                 .TransitionTo(CartBuyingState)
                 .Publish(c => new BuyCartCommand(c.Message.CartId, c.Message.AuthToken)),
             When(CartConfirmingFailed)
-                .Publish(c => new UnConfirmCartCommand(c.Saga.AuthToken))
+                .Publish(c => new UnConfirmCartCommand(c.Message.AuthToken))
                 .TransitionTo(Failed)
                 .Finalize()
         );
@@ -66,7 +65,7 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                 .TransitionTo(ReportCreatingState)
                 .Publish(c => new CreateBuyReportCommand(c.Message.CartId, c.Message.AmountToPay, c.Message.AuthToken)),
             When(CartPaidFailed)
-                .Publish(c => new WalletRefundCommand(c.Message.CartId, c.Saga.AmountToPay, c.Saga.AuthToken))
+                .Publish(c => new WalletRefundCommand(c.Message.CartId, c.Saga.AmountToPay, c.Message.AuthToken))
                 .TransitionTo(Failed)
                 .Finalize()
         );
@@ -76,7 +75,7 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                 .TransitionTo(CompletedState)
                 .Finalize(),
             When(CartBoughtFailed)
-                .Publish(c => new BuyBackCartCommand(c.Message.CartId, c.Saga.AuthToken))
+                .Publish(c => new BuyBackCartCommand(c.Message.CartId, c.Message.AuthToken))
                 .TransitionTo(Failed)
                 .Finalize()
         );

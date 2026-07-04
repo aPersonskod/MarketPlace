@@ -26,7 +26,7 @@ public class WalletSpendCommandConsumer(IUserRepository userRepository, ILogger<
                 e,
                 "Failed to process payment for cart {CartId}",
                 context.Message.CartId);
-            await context.Publish(new CartConfirmingFailedEvent(context.Message.CartId));
+            await context.Publish(new CartConfirmingFailedEvent(context.Message.CartId, context.Message.AuthToken));
         }
     }
 }

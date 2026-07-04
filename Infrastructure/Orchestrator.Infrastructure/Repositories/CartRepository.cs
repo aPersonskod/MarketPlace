@@ -3,7 +3,7 @@ using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Infrastructure.Repositories;
 
-public class CartReportRepository : ICartRepository
+public class CartRepository : ICartRepository
 {
     public Task<CartDto> ConfirmCartAsync(string authToken, Guid placeId)
     {
