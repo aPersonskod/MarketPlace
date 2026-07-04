@@ -13,10 +13,6 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.11" />
         <PackageReference Include="MediatR" Version="13.1.0" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Features\Queries\" />
-    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\Domain\Model\Model.csproj" />

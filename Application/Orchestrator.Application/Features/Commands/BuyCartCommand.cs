@@ -1,16 +1,28 @@
-using MediatR;
-using Orchestrator.Application.Dtos;
+using MassTransit;
+using Microsoft.Extensions.Logging;
+using Orchestrator.Application.Features.Events;
 using Orchestrator.Application.Interfaces;
-using Orchestrator.Application.Mapping;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record BuyCartCommand(Guid CartId, string AuthToken) : IRequest<CartDto>;
-public class BuyCartCommandHandler(ICartRepository cartRepository) : IRequestHandler<BuyCartCommand, CartDto>
+public record BuyCartCommand(Guid CartId, string AuthToken);
+public class BuyCartCommandConsumer(ICartRepository cartRepository, ILogger<BuyCartCommandConsumer> logger) 
+    : IConsumer<BuyCartCommand>
 {
-    public async Task<CartDto> Handle(BuyCartCommand request, CancellationToken cancellationToken)
+    public async Task Consume(ConsumeContext<BuyCartCommand> context)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        return await cartRepository.BuyCartAsync(request.AuthToken, request.CartId);
+        try
+        {
+            var cart = await cartRepository.BuyCartAsync(context.Message.AuthToken, context.Message.CartId);
+            await context.Publish(new CartBoughtEvent(cart.Id, cart.AmountToPay, context.Message.AuthToken));
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                e,
+                "Failed to buy cart {CartId}",
+                context.Message.CartId);
+            await context.Publish(new CartPaidFailedEvent(context.Message.CartId, context.Message.AuthToken));
+        }
     }
 }

@@ -18,7 +18,7 @@ public class WalletSpendCommandConsumer(IUserRepository userRepository, ILogger<
             {
                 AuthToken = context.Message.AuthToken, Money = (int)context.Message.AmountToPay
             });
-            await context.Publish(new CartPaidEvent(context.Message.CartId));
+            await context.Publish(new CartPaidEvent(context.Message.CartId, context.Message.AuthToken));
         }
         catch (Exception e)
         {

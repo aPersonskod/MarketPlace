@@ -1,15 +1,21 @@
-using MediatR;
+using MassTransit;
+using Orchestrator.Application.Dtos;
 using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record BuyBackCartCommand(Guid CartId, string AuthToken) : IRequest<bool>;
-public class BuyBackCartCommandHandler(ICartRepository cartRepository) : IRequestHandler<BuyBackCartCommand, bool>
+public record BuyBackCartCommand(Guid CartId, string AuthToken);
+public class BuyBackCartCommandConsumer(ICartRepository cartRepository, IUserRepository userRepository) 
+    : IConsumer<BuyBackCartCommand>
 {
-    public async Task<bool> Handle(BuyBackCartCommand request, CancellationToken cancellationToken)
+    public async Task Consume(ConsumeContext<BuyBackCartCommand> context)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        var cart = await cartRepository.BuyBackCartAsync(request.AuthToken, request.CartId);
-        return cart != null;
+        var cart = await cartRepository.BuyBackCartAsync(context.Message.AuthToken, context.Message.CartId);
+        await userRepository.WalletReplenishment(new UserMoneyDto()
+        {
+            Money = cart.AmountToPay,
+            AuthToken = context.Message.AuthToken
+        });
+        await cartRepository.UnConfirmCartAsync(context.Message.AuthToken);
     }
 }

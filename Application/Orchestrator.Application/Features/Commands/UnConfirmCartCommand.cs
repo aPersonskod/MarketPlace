@@ -9,7 +9,6 @@ public class UnConfirmCartCommandConsumer(ICartRepository cartRepository) : ICon
 {
     public async Task Consume(ConsumeContext<UnConfirmCartCommand> context)
     {
-        var cart = await cartRepository.UnConfirmCartAsync(context.Message.AuthToken);
-        await context.Publish(new CartConfirmingFailedEvent(cart.Id));
+        await cartRepository.UnConfirmCartAsync(context.Message.AuthToken);
     }
 }

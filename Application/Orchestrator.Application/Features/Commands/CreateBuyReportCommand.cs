@@ -1,18 +1,34 @@
-using MediatR;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 using Orchestrator.Application.Dtos;
+using Orchestrator.Application.Features.Events;
 using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record CreateBuyReportCommand(CartDto CartDto, string AuthToken) : IRequest<bool>;
-public class CreateBuyReportCommandHandler(IBuyReportRepository buyReportRepository) 
-    : IRequestHandler<CreateBuyReportCommand, bool>
+public record CreateBuyReportCommand(Guid CartId, decimal AmountToPay, string AuthToken);
+
+public class CreateBuyReportCommandConsumer(
+    IBuyReportRepository buyReportRepository,
+    ILogger<CreateBuyReportCommandConsumer> logger)
+    : IConsumer<CreateBuyReportCommand>
 {
-    public async Task<bool> Handle(CreateBuyReportCommand request, CancellationToken cancellationToken)
+    public async Task Consume(ConsumeContext<CreateBuyReportCommand> context)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        var report = await buyReportRepository.CreateBuyReportByCartIdAsync(
-            new CreateBuyReportDto(request.CartDto.Id, request.AuthToken));
-        return report != null;
+        try
+        {
+            var report = await buyReportRepository.CreateBuyReportByCartIdAsync(
+                new CreateBuyReportDto(context.Message.CartId, context.Message.AuthToken));
+            await context.Publish(new CartBuyReportCreatedEvent(report!.CartId, context.Message.AuthToken));
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                e,
+                "Failed to create buy-report for cart {CartId}",
+                context.Message.CartId);
+            await context.Publish(new CartBoughtFailedEvent(context.Message.CartId, context.Message.AmountToPay,
+                context.Message.AuthToken));
+        }
     }
 }
