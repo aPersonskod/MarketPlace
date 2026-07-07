@@ -1,21 +1,16 @@
 import {useEffect, useState} from "react";
 import Form from "react-bootstrap/Form";
-import {ApiHelper} from "./ApiHelper.jsx";
+import {fetchPlaces} from "./ApiHelper/placeService.jsx"
 
 const Places = ({selectedPlace, setSelectedPlace, onSelectChangeEvent}) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const apiHelper = new ApiHelper();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetPlaces`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const result = await response.json();
+                const result = await fetchPlaces();
                 setData(result);
                 setSelectedPlace(result[0].id);
             } catch (err) {

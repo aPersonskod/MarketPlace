@@ -11,9 +11,10 @@ function ProductCart({cart}) {
     const fetchOrdersData = async () => {
         try {
             if(cart === null) return;
-            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCartOrders?cartId=${cart.id}`);
+            const response = await fetch(`${apiHelper.cartServiceBaseAddress}/get-cart-orders/${cart.id}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                let myLocalError = await response.json();
+                throw new Error(`${myLocalError.error}`);
             }
             const result = await response.json();
             setOrders(result);
@@ -37,7 +38,7 @@ function ProductCart({cart}) {
                 <div style={{margin: '5px', overflowY: 'auto'}}>
                     <div className='d-flex flex-wrap'>
                         {!error && orders.map((item, index) => (
-                            <OrderedProduct key={index} productId={item.orderedProductId} quantity={item.quantity}/>
+                            <OrderedProduct key={index} productId={item.orderedProductId} cartId={item.cartId} quantity={item.quantity}/>
                         ))}
                     </div>
                 </div>

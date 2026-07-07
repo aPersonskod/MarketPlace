@@ -28,7 +28,7 @@ public static class OrderApi
                 async (IOrderService orderService, [FromBody] DeleteOrderDto deleteOrderDto) =>
                 {
                     await orderService.DeleteOrderAsync(deleteOrderDto);
-                    return Results.Ok();
+                    return Results.NoContent();
                 })
             .WithDescription("Delete order")
             .WithName("DeleteOrder")

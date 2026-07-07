@@ -7,97 +7,28 @@ import Products from "../Products.jsx";
 import ProductCart from "../ProductCart.jsx";
 import Places from "../Places.jsx";
 import SumToPay from "../SumToPay.jsx";
-import {ApiHelper} from "../ApiHelper.jsx";
+import {fetchCartData} from "../ApiHelper/cartService.jsx"
+import {buyCartRequest} from "../ApiHelper/orchestratorService.jsx"
 const ConfirmationPage = () => {
     const navigate = useNavigate();
     const [selectedPlaceId, setSelectedPlaceId] = useState('');
     const [cart, setCart] = useState(null);
-    const [isCartConfirmed, setIsCartConfirmed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const apiHelper = new ApiHelper();
 
-    const fetchCartData = async () => {
+    const getCart = async () => {
         try {
-            let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart`;
-            let options = {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-            const response = await fetch(query, options);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result = await response.json();
-            setCart(result);
+            let response = await fetchCartData();
+            setCart(response);
         } catch (err) {
             setError(err);
         } finally {
             setLoading(false);
         }
     };
-    
-    const confirmCart = async () => {
-        try {
-            let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.shoppingCartBaseAddress}/ConfirmCart?placeId=${selectedPlaceId}`;
-            let options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-            const response = await fetch(query, options);
-
-            if (!response.ok) {
-                let myLocalError = await response.json();
-                throw new Error(`${myLocalError.message}`);
-                //alert(`HTTP error! status: ${response.status}`);
-            }
-            let result = await response.json();
-            setCart(result);
-            console.log('Заказ подтвержден !!!');
-            return {
-                isConfirmed: true,
-                cart: result
-            };
-        } catch (err) {
-            console.error('Error confirm cart!', err);
-            alert(err);
-        }
-    }
-    
-    const buyCart = async (cartParam) => {
-        try {
-            let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.buyActionsBaseAddress}/BuyCart`;
-            const response = await fetch(query, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(cartParam),
-            });
-
-            if (!response.ok) {
-                let myLocalError = await response.json();
-                throw new Error(myLocalError.message);
-                //alert(`HTTP error! status: ${response.status}`);
-            }
-            alert("Заказ куплен !!!")
-        } catch (err) {
-            console.error('Error buy cart!', err);
-            alert(err);
-        }
-    }
 
     useEffect(() => {
-        fetchCartData();
+        getCart();
     }, []);
 
     const handlePlaceChange = (event) => {
@@ -107,17 +38,19 @@ const ConfirmationPage = () => {
         navigate('/');
     }
     const handleBuy = async () => {
-        let res = await confirmCart();
-        if (res?.isConfirmed) {
-            console.log('Покупка осуществлена !!!');
-            alert('Покупка осуществлена !!!');
-            //await buyCart(res.cart);
+        try {
+            await buyCartRequest(cart.Id, selectedPlaceId);
+            console.log('Заказ отправлен !!!');
+            alert('Заказ отправлен !!!');
             navigate('/');
+        } catch (err) {
+            console.error('Error confirm cart!', err);
+            alert(err);
         }
     }
 
     if (loading) return <div>Loading data...</div>;
-    if (error) return <div>Error: {error.message}</div>;
+    if (error) return <div>{error.message}</div>;
     
     return (
       <>

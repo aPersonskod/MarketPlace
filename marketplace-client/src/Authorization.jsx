@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import { useNavigate } from 'react-router';
+import {getUser, authRequest} from "./ApiHelper/userService.jsx"
 import './Authorization.css';
-import {ApiHelper} from "./ApiHelper.jsx";
 
 const Authorization = ({
                            onLoginSuccess,
@@ -18,14 +18,13 @@ const Authorization = ({
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const apiHelper = new ApiHelper();
     //const { login } = useAuth();
     
     useEffect(() => {
         navigateNext();
     }, [])
     const navigateNext = async () => {
-        let userDto = await apiHelper.getUser();
+        let userDto = await getUser();
         if (userDto !== null) {
             navigate('/');
         }
@@ -70,26 +69,7 @@ const Authorization = ({
 
     const handleAuth = async () => {
         try {
-            let userCredentials = {
-                email: formData.email,
-                password: formData.password
-            };
-            const response = await fetch(`${apiHelper.userManipulationBaseAddress}/Authorize`, {
-                method: 'POST',
-                headers: {
-                    'accept': '*/*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userCredentials),
-            });
-            if (!response.ok) {
-                let localError = await response.json();
-                alert(localError.message);
-                return;
-            }
-            const result = await response.json();
-            let token = result.accessToken;
-            localStorage.setItem('uToken', token);
+            await authRequest(formData.email, formData.password);
             navigateNext();
         } catch (err) {
             setError(err);

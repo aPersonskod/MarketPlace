@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import {ApiHelper} from "./ApiHelper.jsx";
 import { useNavigate } from 'react-router';
 
-const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cart, minQuantity = 0, maxQuantity = 99}) => {
+const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cart, refreshCartFunc, minQuantity = 0, maxQuantity = 99}) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -68,13 +68,12 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     const fetchOrders = async () => {
         try {
             if(cart === null) return;
-            const response = await fetch(`${apiHelper.shoppingCartBaseAddress}/GetCartOrders?cartId=${cart.id}`);
+            const response = await fetch(`${apiHelper.cartServiceBaseAddress}/get-cart-orders/${cart.id}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const orders = await response.json();
             let currentQuantity = getInitialQuantity(productId, orders);
-            console.log(currentQuantity);
             setCounter(currentQuantity);
         } catch (err) {
             setError(err);
@@ -121,7 +120,8 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     const updateCart = async (amount, user) => {
         setCounter(amount);
         await addProductToCart(amount, user);
-        await refreshAnotherComponents();
+        refreshCartFunc();
+        //await refreshAnotherComponents();
     }
 
     const addProductToCart = async (amount, user) => {
@@ -130,19 +130,26 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
         setSuccess(false);
         try {
             let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.shoppingCartBaseAddress}/AddOrder?productId=${productId}&quantity=${amount}`;
+            let order = {
+                cartId: cart.id,
+                orderedProductId: productId,
+                quantity: amount
+            };
+            let query = `${apiHelper.cartServiceBaseAddress}/add-order`;
             const response = await fetch(query, {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization' : `Bearer ${token}`
-                }//,
-                //body: JSON.stringify(requestBody),
+                },
+                body: JSON.stringify(order)
             });
 
             if (!response.ok) {
                 //throw new Error(`HTTP error! status: ${response.status}`);
-                alert(`ADD HTTP error! status: ${response.status}`);
+                let myLocalError = await response.json();
+                throw new Error(`${myLocalError.error}`);
+                alert(`ADD HTTP error: ${myLocalError.error}`);
             }
 
             const data = await response.json();
@@ -152,30 +159,6 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
         } catch (error) {
             setError(error.message);
             console.error('Error updating user:', error);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const refreshAnotherComponents = async () => {
-        // must go after setting count to db !!!
-        try {
-            let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.shoppingCartBaseAddress}/GetCart`;
-            const response = await fetch(query, {
-                method: 'GET',
-                headers: {
-                    'Authorization' : `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result = await response.json();
-            // update ProductCartComponent
-            setAmmountToPay(result.amountToPay);
-        } catch (err) {
-            setError(err);
         } finally {
             setLoading(false);
         }

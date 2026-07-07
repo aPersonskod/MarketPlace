@@ -5,20 +5,21 @@ export class ApiHelper {
     base = (serviceName) => {
         return `http://${serviceName}:8080`;
     };
-    productCatalogBaseAddress =   `${this.dev(true)}1/ProductCatalog`;
-    shoppingCartBaseAddress =     `${this.dev(true)}2/ShoppingCart`;
-    buyActionsBaseAddress =       `${this.dev(true)}3/BuyActions`;
-    userManipulationBaseAddress = `${this.dev(true)}4/UserManipulations`;
+    orchestratorServiceBaseAddress =       `${this.dev(false)}5/api/buy-actions`;
+    buyServiceBaseAddress =                `${this.dev(false)}4/api/buy-service`;
+    cartServiceBaseAddress =               `${this.dev(false)}3/api/cart-service`;
+    productServiceBaseAddress =            `${this.dev(false)}2/api/product-service`;
+    userServiceBaseAddress =               `${this.dev(false)}1/api/user-service`;
 
     getUser = async () => {
         let token = this.getAccessToken();
         if (token === null) return null;
-        let url = `${this.userManipulationBaseAddress}`;
+        let url = `${this.userServiceBaseAddress}/`;
         let options = {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
         };
 

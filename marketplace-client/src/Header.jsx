@@ -10,6 +10,8 @@ import NotLoggedLogo from './assets/NotLoggedLogo.jsx';
 import {Dropdown} from "react-bootstrap";
 import {useState, useEffect} from "react";
 import { useNavigate } from 'react-router';
+
+import {getUser, walletReplenishmentRequest} from "./ApiHelper/userService.jsx"
 import {ApiHelper} from "./ApiHelper.jsx";
 
 function Header() {
@@ -45,37 +47,17 @@ function Header() {
     };
     const walletReplenishment = async () => {
         try {
-            let userDto = await apiHelper.getUser();
+            let userDto = await getUser();
             if(userDto === null) navigate('/auth');
-            let money = 300;
-            let query = `${apiHelper.userManipulationBaseAddress}/WalletReplenishment?userId=${user.id}&money=${money}`;
-            const response = await fetch(query, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiHelper.getAccessToken()}`
-                }//,
-                //body: JSON.stringify(requestBody),
-            });
-    
-            if (!response.ok) {
-                //throw new Error(`HTTP error! status: ${response.status}`);
-                if(response.status === 401) {
-                    navigate('/auth');
-                    return;
-                }
-                alert(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            setUser(data);
+            const response = await walletReplenishmentRequest();
+            setUser(response);
         } catch (error) {
             console.error('Error updating user:', error);
         }
     };
     const getUserData = async () => {
         try {
-            let userDto = await apiHelper.getUser();
+            let userDto = await getUser();
             if (userDto !== null){
                 setIsLoggedIn(true);
                 setUser(userDto);

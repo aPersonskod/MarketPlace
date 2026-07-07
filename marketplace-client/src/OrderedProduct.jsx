@@ -1,7 +1,10 @@
 import {useEffect, useState} from "react";
+import {deleteOrderRequest} from "./ApiHelper/orderService.jsx"
+
+import {fetchProductData} from "./ApiHelper/productService.jsx"
 import {ApiHelper} from "./ApiHelper.jsx";
 
-const OrderedProduct = ({ productId, quantity}) => {
+const OrderedProduct = ({ productId, cartId, quantity}) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -61,26 +64,8 @@ const OrderedProduct = ({ productId, quantity}) => {
         setLoading(true);
         setError(null);
         try {
-            let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.shoppingCartBaseAddress}/DeleteOrder?productId=${productId}`;
-            const response = await fetch(query, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization' : `Bearer ${token}`
-                }//,
-                //body: JSON.stringify(requestBody),
-            });
-
-            if (!response.ok) {
-                //throw new Error(`HTTP error! status: ${response.status}`);
-                alert(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('Update successful:', data);
-            if(data) window.location.reload();
-            // Optionally, update local state or re-fetch data after successful update
+            await deleteOrderRequest(cartId, productId);
+            window.location.reload();
         } catch (error) {
             setError(error.message);
             console.error('Error updating user:', error);
@@ -88,13 +73,9 @@ const OrderedProduct = ({ productId, quantity}) => {
             setLoading(false);
         }
     }
-    const fetchProductData = async () => {
+    const fetchProduct = async () => {
         try {
-            const response = await fetch(`${apiHelper.productCatalogBaseAddress}/${productId}`);
-            if (!response.ok) {
-                alert(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
+            const data = await fetchProductData(productId);
             setProduct(data);
         } catch (e) {
             setError(e);
@@ -104,7 +85,7 @@ const OrderedProduct = ({ productId, quantity}) => {
     }
 
     useEffect(() => {
-        fetchProductData();
+        fetchProduct();
     }, [productId]);
 
     if (loading) return <div>Loading data...</div>;

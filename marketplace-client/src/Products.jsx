@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import ProductQuantitySelector from "./ProductQuantitySelector.jsx";
 import {ApiHelper} from "./ApiHelper.jsx";
 
-function Products({cart, setAmmountToPay}) {
+function Products({cart, setAmmountToPay, refreshCartFunc}) {
     const [products, setProducts] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -10,9 +10,10 @@ function Products({cart, setAmmountToPay}) {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch(apiHelper.productCatalogBaseAddress);
+            const response = await fetch(`${apiHelper.productServiceBaseAddress}/get-all`);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                let myLocalError = await response.json();
+                throw new Error(`${myLocalError.error}`);
             }
             const result = await response.json();
             setProducts(result);
@@ -41,7 +42,7 @@ function Products({cart, setAmmountToPay}) {
                     <div className='d-flex flex-wrap'>
                         {products.map((product, index) => (
                             <ProductQuantitySelector key={index} productId={product.id} productName={product.name} 
-                            productCost={product.cost} setAmmountToPay={setAmmountToPay} cart={cart}/>
+                            productCost={product.cost} setAmmountToPay={setAmmountToPay} cart={cart} refreshCartFunc={refreshCartFunc}/>
                         ))}
                     </div>
                 </div>

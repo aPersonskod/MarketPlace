@@ -1,31 +1,16 @@
 import Table from 'react-bootstrap/Table';
 import {useEffect, useState} from "react";
-import {ApiHelper} from "../ApiHelper.jsx";
+import {fetchBuyReports} from "../ApiHelper/buyService.jsx";
 
 const PurchasesPage = () => {
     const [buyActions, setBuyActions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const apiHelper = new ApiHelper();
 
     const fetchBuyActions = async () => {
         try {
-            let user = await apiHelper.getUser();
-            if (user === null) setBuyActions([]);
-            let token = apiHelper.getAccessToken();
-            let query = `${apiHelper.buyActionsBaseAddress}/GetByUserId`;
-            let options = {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-            const response = await fetch(query, options);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result = await response.json();
-            setBuyActions(result);
+            let response = await fetchBuyReports();
+            setBuyActions(response);
         } catch (err) {
             setError(err);
         } finally {
@@ -67,7 +52,7 @@ const PurchasesPage = () => {
     return(
         <>
             <p className='fs24'>История покупок</p>
-            <Table responsive="sm">
+            <Table responsive>
                 <thead>
                 <tr>
                     <th>#</th>

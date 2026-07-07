@@ -17,7 +17,7 @@ public static class CartOrchestratorApi
                 var token = context.GetAccessToken();
                 if (token == null) return Results.Unauthorized();
                 await publishEndpoint.Publish(new CartSubmittedEvent(cartSubmittedDto.CartId, cartSubmittedDto.PlaceId, token));
-                return Results.Ok();
+                return Results.Ok("Cart submitted successfully");
             })
             .WithDescription("Buy cart saga")
             .WithName("BuyCart")
