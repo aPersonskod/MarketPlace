@@ -1,9 +1,11 @@
-﻿using MassTransit;
+﻿using System.Reflection;
+using MassTransit;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Orchestrator.Application.Features.Commands;
 using Orchestrator.Application.Interfaces;
 using Orchestrator.Application.Saga.SagaDatas;
 using Orchestrator.Application.Saga.SagaStateMachines;
@@ -49,13 +51,8 @@ public static class DependencyInjection
         //services.AddDbContext<CartSagaDbContext>(o => o.UseNpgsql(dbConnectionString));
         services.AddMassTransit(x =>
         {
-            /*x.AddSagaStateMachine<CartStateMachine, CartStateSagaData>()
-                .EntityFrameworkRepository(r =>
-                {
-                    r.ConcurrencyMode = ConcurrencyMode.Pessimistic;
-                    r.AddDbContext<DbContext, CartSagaDbContext>();
-                    r.UsePostgres();
-                });*/
+            x.AddConsumers(typeof(ConfirmCartCommandConsumer).Assembly);
+            x.AddSagaStateMachine<CartStateMachine, CartStateSagaData>().InMemoryRepository();
             x.UsingInMemory((context, config) => config.ConfigureEndpoints(context));
         });
         return services;

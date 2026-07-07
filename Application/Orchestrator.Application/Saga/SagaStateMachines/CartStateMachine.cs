@@ -79,6 +79,7 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                 .TransitionTo(Failed)
                 .Finalize()
         );
+        SetCompletedWhenFinalized();
     }
 
     public State CartConfirmingState { get; private set; }
