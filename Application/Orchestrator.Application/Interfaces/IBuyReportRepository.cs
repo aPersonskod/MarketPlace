@@ -4,5 +4,5 @@ namespace Orchestrator.Application.Interfaces;
 
 public interface IBuyReportRepository
 {
-    Task<BuyReportDto?> CreateBuyReportByCartIdAsync(CreateBuyReportDto createBuyReportDto);
+    Task<BuyReportDto?> CreateBuyReportAsync(CreateBuyReportDto createBuyReportDto);
 }

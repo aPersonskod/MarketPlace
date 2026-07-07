@@ -1,12 +1,18 @@
+using Microsoft.Extensions.Options;
+using Model.Extensions;
 using Orchestrator.Application.Dtos;
 using Orchestrator.Application.Interfaces;
+using Orchestrator.Infrastructure.Settings;
 
 namespace Orchestrator.Infrastructure.Repositories;
 
-public class BuyReportRepository : IBuyReportRepository
+public class BuyReportRepository(IOptions<BuyReportSettings> buyOptions) : IBuyReportRepository
 {
-    public Task<BuyReportDto?> CreateBuyReportByCartIdAsync(CreateBuyReportDto createBuyReportDto)
+    private readonly string _baseUrl = buyOptions.Value.Address + "/api/buy-service";
+    public async Task<BuyReportDto?> CreateBuyReportAsync(CreateBuyReportDto createBuyReportDto)
     {
-        throw new NotImplementedException();
+        var url = $"{_baseUrl}/create-report";
+        var body = new CreateBuyReportBodyDto(createBuyReportDto.CartId);
+        return await url.PostQuery<BuyReportDto, CreateBuyReportBodyDto>(body, createBuyReportDto.AuthToken);
     }
 }

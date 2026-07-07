@@ -17,7 +17,7 @@ public class CreateBuyReportCommandConsumer(
     {
         try
         {
-            var report = await buyReportRepository.CreateBuyReportByCartIdAsync(
+            var report = await buyReportRepository.CreateBuyReportAsync(
                 new CreateBuyReportDto(context.Message.CartId, context.Message.AuthToken));
             await context.Publish(new CartBuyReportCreatedEvent(report!.CartId, context.Message.AuthToken));
         }
