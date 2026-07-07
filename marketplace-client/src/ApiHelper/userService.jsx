@@ -3,7 +3,7 @@ const userPort = import.meta.env.VITE_USER_APP_PORT;
 
 export const userServiceBaseAddress = `${userHost}:${userPort}/api/user-service`;
 
-export const walletReplenishmentRequest = () => {
+export const walletReplenishmentRequest = async () => {
     try{
         let moneyDto = {
             money: 300
@@ -34,8 +34,8 @@ export const walletReplenishmentRequest = () => {
 export const authRequest = async (email, password) => {
     try{
         let userCredentials = {
-            email: formData.email,
-            password: formData.password
+            email: email,
+            password: password
         };
         const response = await fetch(`${userServiceBaseAddress}/login`, {
             method: 'POST',
@@ -50,7 +50,7 @@ export const authRequest = async (email, password) => {
             throw new Error(`${myLocalError.error}`);
         }
         const result = await response.json();
-        let token = result.token;
+        let token = result;
         localStorage.setItem('uToken', token);
     } catch(e){
         console.error("Failed to delete cart:", e);

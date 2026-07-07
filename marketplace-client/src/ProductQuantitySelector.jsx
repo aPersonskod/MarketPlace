@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react";
 import Button from "react-bootstrap/Button";
-import {ApiHelper} from "./ApiHelper.jsx";
 import { useNavigate } from 'react-router';
+import {getCartOrders, createOrderRequest} from "./ApiHelper/orderService.jsx"
 
 const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cart, refreshCartFunc, minQuantity = 0, maxQuantity = 99}) => {
     // Basic inline styles for quick demonstration
@@ -58,7 +58,6 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
-    const apiHelper = new ApiHelper();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -68,11 +67,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     const fetchOrders = async () => {
         try {
             if(cart === null) return;
-            const response = await fetch(`${apiHelper.cartServiceBaseAddress}/get-cart-orders/${cart.id}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const orders = await response.json();
+            const orders = await getCartOrders(cart.id);
             let currentQuantity = getInitialQuantity(productId, orders);
             setCounter(currentQuantity);
         } catch (err) {
@@ -129,30 +124,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
         setError(null);
         setSuccess(false);
         try {
-            let token = apiHelper.getAccessToken();
-            let order = {
-                cartId: cart.id,
-                orderedProductId: productId,
-                quantity: amount
-            };
-            let query = `${apiHelper.cartServiceBaseAddress}/add-order`;
-            const response = await fetch(query, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization' : `Bearer ${token}`
-                },
-                body: JSON.stringify(order)
-            });
-
-            if (!response.ok) {
-                //throw new Error(`HTTP error! status: ${response.status}`);
-                let myLocalError = await response.json();
-                throw new Error(`${myLocalError.error}`);
-                alert(`ADD HTTP error: ${myLocalError.error}`);
-            }
-
-            const data = await response.json();
+            const data = await createOrderRequest(cart.id, productId, amount);
             console.log('Update successful:', data);
             setSuccess(true);
             // Optionally, update local state or re-fetch data after successful update

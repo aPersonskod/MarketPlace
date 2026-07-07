@@ -1,23 +1,17 @@
 import OrderedProduct from "./OrderedProduct.jsx";
 import {useEffect, useState} from "react";
-import {ApiHelper} from "./ApiHelper.jsx";
+import {getCartOrders} from "./ApiHelper/orderService.jsx"
 
 function ProductCart({cart}) {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const apiHelper = new ApiHelper();
     
     const fetchOrdersData = async () => {
         try {
             if(cart === null) return;
-            const response = await fetch(`${apiHelper.cartServiceBaseAddress}/get-cart-orders/${cart.id}`);
-            if (!response.ok) {
-                let myLocalError = await response.json();
-                throw new Error(`${myLocalError.error}`);
-            }
-            const result = await response.json();
-            setOrders(result);
+            const response = await getCartOrders(cart.id);
+            setOrders(response);
         } catch (err) {
             setError(err);
         } finally {

@@ -1,21 +1,15 @@
 import { useState, useEffect } from 'react';
 import ProductQuantitySelector from "./ProductQuantitySelector.jsx";
-import {ApiHelper} from "./ApiHelper.jsx";
+import {fetchProductsRequest} from "./ApiHelper/productService.jsx"
 
 function Products({cart, setAmmountToPay, refreshCartFunc}) {
     const [products, setProducts] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const apiHelper = new ApiHelper();
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch(`${apiHelper.productServiceBaseAddress}/get-all`);
-            if (!response.ok) {
-                let myLocalError = await response.json();
-                throw new Error(`${myLocalError.error}`);
-            }
-            const result = await response.json();
+            const result = await fetchProductsRequest();
             setProducts(result);
         } catch (err) {
             setError(err);

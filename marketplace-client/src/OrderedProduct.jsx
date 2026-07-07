@@ -1,8 +1,6 @@
 import {useEffect, useState} from "react";
 import {deleteOrderRequest} from "./ApiHelper/orderService.jsx"
-
 import {fetchProductData} from "./ApiHelper/productService.jsx"
-import {ApiHelper} from "./ApiHelper.jsx";
 
 const OrderedProduct = ({ productId, cartId, quantity}) => {
     // Basic inline styles for quick demonstration
@@ -58,7 +56,6 @@ const OrderedProduct = ({ productId, cartId, quantity}) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [product, setProduct] = useState({});
-    const apiHelper = new ApiHelper();
 
     const removeFromCart = async () => {
         setLoading(true);
