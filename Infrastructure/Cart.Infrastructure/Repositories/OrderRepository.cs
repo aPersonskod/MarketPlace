@@ -19,7 +19,7 @@ public class OrderRepository(AppDbContext context) : IOrderRepository
     {
         var foundOrder = await Get(orderDto);
         if (foundOrder == null) return foundOrder;
-        foundOrder.Quantity += orderDto.Quantity;
+        foundOrder.Quantity = orderDto.Quantity;
         return foundOrder;
     }
 

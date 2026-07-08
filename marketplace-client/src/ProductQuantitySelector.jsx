@@ -2,7 +2,7 @@ import {useState, useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from 'react-router';
 import {fetchUserData} from "./ApiHelper/userService.jsx"
-import {getCartOrders, createOrderRequest} from "./ApiHelper/orderService.jsx"
+import {getCartOrders, createOrderRequest, deleteOrderRequest} from "./ApiHelper/orderService.jsx"
 
 const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cart, refreshCartFunc, minQuantity = 0, maxQuantity = 99}) => {
     // Basic inline styles for quick demonstration
@@ -125,8 +125,13 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
         setError(null);
         setSuccess(false);
         try {
-            const data = await createOrderRequest(cart.id, productId, amount);
-            console.log('Update successful:', data);
+            if(amount === 0){
+                await deleteOrderRequest(cart.id, productId);
+            } 
+            else{
+                const data = await createOrderRequest(cart.id, productId, amount);
+                console.log('Order updated:', data);
+            }
             setSuccess(true);
             // Optionally, update local state or re-fetch data after successful update
         } catch (error) {

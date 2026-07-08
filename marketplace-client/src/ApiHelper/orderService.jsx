@@ -1,4 +1,5 @@
 import {getAccessToken} from './userService';
+import {throwHandledException} from './errorHandler.jsx';
 
 const orderHost = import.meta.env.VITE_CART_APP_HOST;
 const orderPort = import.meta.env.VITE_CART_APP_PORT;
@@ -17,11 +18,8 @@ export const getCartOrders = async (cartId) => {
             },
         };
         const response = await fetch(url, options);
-        if (!response.ok) {
-            let myLocalError = await response.json();
-            throw new Error(`${myLocalError.error}`);
-        }
-        return await response.json();
+        if (response.ok) return await response.json();
+        await throwHandledException(response);
     } catch(e){
         console.error("Failed to get orders:", e);
         throw e; 
@@ -37,20 +35,17 @@ export const createOrderRequest = async (cartId, productId, quantity) => {
         };
         let token = getAccessToken();
         let query = `${cartServiceBaseAddress}/add-order`;
-        const response = await fetch(query, {
+        let options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization' : `Bearer ${token}`
             },
             body: JSON.stringify(createOrderDto)
-        });
-        if (!response.ok) {
-            //throw new Error(`HTTP error! status: ${response.status}`);
-            let myLocalError = await response.json();
-            throw new Error(`${myLocalError.error}`);
-        }
-        return await response.json();
+        };
+        const response = await fetch(query, options);
+        if (response.ok) return await response.json();
+        await throwHandledException(response);
     } catch(e){
         console.error("Failed to add order:", e);
         throw e; 
@@ -73,11 +68,8 @@ export const deleteOrderRequest = async (cartId, productId) => {
             },
             body: JSON.stringify(deleteOrderDto),
         });
-        if (!response.status === 204) {
-            let myLocalError = await response.json();
-            throw new Error(`${myLocalError.error}`);
-        }
-        console.log("Order was deleted");
+        if (response.ok) console.log("Order was deleted");
+        await throwHandledException(response);
     } catch(e) {
         console.error("Failed to delete order:", e);
         throw e; 

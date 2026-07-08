@@ -27,7 +27,7 @@ const ProductCatalogPage = () => {
 
     const handleDeleteCart = async () => {
         try {
-            await deleteCartRequest();
+            await deleteCartRequest(cart.id);
             await fetchCart();
         } catch (err) {
             setError(err);
@@ -47,9 +47,6 @@ const ProductCatalogPage = () => {
             navigate('confirmation');
         }
     }
-
-    if (loading) return <div>Loading data...</div>;
-    if (error) return <div>Error: {error.message}</div>;
     
     return (
         <>
@@ -57,7 +54,7 @@ const ProductCatalogPage = () => {
                 <div className='col col-xs-12 col-sm-12 col-lg-6'>
                     <p className='fs24'>Продукты:</p>
                     <div className='divStyle xsDivStyle mdDivStyle'>
-                        <Products cart={cart} setAmmountToPay={setAmmountToPay} refreshCartFunc={fetchCartData}/>
+                        <Products cart={cart} setAmmountToPay={setAmmountToPay} refreshCartFunc={fetchCart}/>
                     </div>
                 </div>
                 <div className='col col-xs-12 col-sm-12 col-lg-6'>
@@ -76,6 +73,8 @@ const ProductCatalogPage = () => {
                         }   
                     </div>
                     <div className='divStyle xsDivStyle mdDivStyle'>
+                        {loading && <div>Loading data...</div>}
+                        {error && <div>Error: {error.message}</div>}
                         <ProductCart key={ammountToPay} cart={cart}/>
                     </div>
                 </div>

@@ -11,7 +11,8 @@ public class BuyReportRepository(AppDbContext context) : IBuyReportRepository
     public async Task<IEnumerable<CartForReportDto>?> GetCartForReportAsync(Guid userId)
     {
         await using var connection = context.Database.GetDbConnection();
-        var sql = $"SELECT cart.\"Id\", cart.\"UserId\", place.\"Address\", ord.\"OrderedProductId\", ord.\"Quantity\", cart.\"AmountToPay\" " +
+        var sql = $"SELECT cart.\"Id\", cart.\"UserId\", place.\"Address\", ord.\"Id\" as OrderId, "+
+                  $"ord.\"OrderedProductId\" , ord.\"Quantity\", cart.\"AmountToPay\" " +
                   $"FROM public.\"ShoppingCarts\" as cart " +
                   $"INNER JOIN public.\"Places\" as place ON cart.\"PlaceId\" = place.\"Id\" " +
                   $"RIGHT JOIN public.\"Orders\" as ord ON cart.\"Id\" = ord.\"CartId\" " +

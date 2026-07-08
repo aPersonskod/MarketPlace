@@ -1,6 +1,6 @@
+using Cart.Application.Dtos;
 using Cart.Application.Interfaces.Repositories;
 using Cart.Application.Interfaces.Services;
-using Product.Application.Dtos;
 
 namespace Cart.Application.Services;
 

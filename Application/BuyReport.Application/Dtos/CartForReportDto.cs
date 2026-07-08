@@ -13,11 +13,8 @@ public class CartForReportDto
     [JsonPropertyName("address")]
     public string Address { get; set; }
     
-    [JsonPropertyName("products")]
-    public IEnumerable<ProductDto> Products { get; set; }
-    
-    [JsonPropertyName("quantity")]
-    public int Quantity { get; set; }
+    [JsonPropertyName("orders")]
+    public IEnumerable<OrderForReportDto> Orders { get; set; } = [];
     
     [JsonPropertyName("amountToPay")]
     public int AmountToPay { get; set; }

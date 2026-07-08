@@ -21,8 +21,8 @@ const PurchasesPage = () => {
     const getProducts = (orders) => {
         return (
             <ul>
-                {orders.map(order => (
-                    <li key={order.id}>{order.product.name}, цена:{order.product.cost}, {order.quantity}шт.</li>
+                {orders.map(o => (
+                    <li key={o.product.id}>{o.product.name}, цена:{o.product.cost}, {o.quantity}шт.</li>
                 ))}
             </ul>
         );
@@ -66,12 +66,12 @@ const PurchasesPage = () => {
                 <tbody>
                 {buyActions.map((buyAction, index) => (
                     <tr key={index+'tr'}>
-                        <td key={index+'td'}>{index+1}</td>
-                        <td key={index+buyAction.cart.id}>{buyAction.cart.user.name}</td>
-                        <td key={index+buyAction.cart.place.id}>{buyAction.cart.place.address}</td>
-                        <td key={index+index}>{getProducts(buyAction.cart.orders)}</td>
-                        <td key={index+buyAction.cart.amountToPay}>{buyAction.cart.amountToPay}</td>
-                        <td key={index+buyAction.saleDate}>{getFormatedDate(buyAction.saleDate)}</td>
+                        <td key={index+'01'}>{index+1}</td>
+                        <td key={index+'02'}>{buyAction.cart.user.name}</td>
+                        <td key={index+'03'}>{buyAction.cart.address}</td>
+                        <td key={index+'04'}>{getProducts(buyAction.cart.orders)}</td>
+                        <td key={index+'05'}>{buyAction.cart.amountToPay}</td>
+                        <td key={index+'06'}>{getFormatedDate(buyAction.saleDate)}</td>
                     </tr>
                 ))}
                 </tbody>

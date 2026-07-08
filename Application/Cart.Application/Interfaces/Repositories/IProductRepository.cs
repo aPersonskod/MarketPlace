@@ -1,4 +1,4 @@
-using Product.Application.Dtos;
+using Cart.Application.Dtos;
 
 namespace Cart.Application.Interfaces.Repositories;
 

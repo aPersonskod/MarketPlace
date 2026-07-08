@@ -25,8 +25,7 @@ public static class MappingExtensions
             User = userDto,
             CartId = cartForReportDto.CartId,
             Address = cartForReportDto.Address,
-            Products = cartForReportDto.Products,
-            Quantity = cartForReportDto.Quantity,
+            Orders = cartForReportDto.Orders,
             AmountToPay = cartForReportDto.AmountToPay
         };
     }

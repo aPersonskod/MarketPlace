@@ -1,3 +1,5 @@
+import {throwHandledException} from './errorHandler.jsx';
+
 const userHost = import.meta.env.VITE_USER_APP_HOST;
 const userPort = import.meta.env.VITE_USER_APP_PORT;
 
@@ -17,14 +19,8 @@ export const walletReplenishmentRequest = async () => {
             },
             body: JSON.stringify(moneyDto),
         });
-
-        if (!response.ok) {
-            let myLocalError = await response.json();
-            throw new Error(`${myLocalError.error}`);
-        }
-
-        const data = await response.json();
-        return data;
+        if (response.ok) return await response.json();
+        await throwHandledException(response);
     } catch(e){
         console.error("Failed to top-up money:", e);
         throw e; 
@@ -45,13 +41,11 @@ export const authRequest = async (email, password) => {
             },
             body: JSON.stringify(userCredentials),
         });
-        if (!response.ok) {
-            let localError = await response.json();
-            throw new Error(`${myLocalError.error}`);
+        if (response.ok){
+            const token = await response.json();
+            localStorage.setItem('uToken', token);
         }
-        const result = await response.json();
-        let token = result;
-        localStorage.setItem('uToken', token);
+        await throwHandledException(response);
     } catch(e){
         console.error("Failed to delete cart:", e);
         throw e; 
@@ -71,23 +65,8 @@ export const fetchUserData = async () => {
             }
         };
         const response = await fetch(query, options);
-        switch(response.status) {
-            case 200:
-                const userDto = await response.json();
-                return userDto;
-
-            case 401:
-                console.log("401 Unauthorized - Authentication failed");
-                //localStorage.removeItem('uToken');
-                return null;
-                
-            case 403:
-                console.log("403 Forbidden - Insufficient permissions");
-                return null;
-            default:
-                console.log(`Unhandled HTTP status: ${response.status}`);
-                return null;
-        }
+        if (response.ok) return await response.json();
+        await throwHandledException(response);
     }
     catch(e){
         console.error("Network or CORS error:", e);

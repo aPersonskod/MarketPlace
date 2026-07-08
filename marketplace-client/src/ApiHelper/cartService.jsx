@@ -1,4 +1,5 @@
 import {getAccessToken} from './userService';
+import {throwHandledException} from './errorHandler.jsx';
 
 const cartHost = import.meta.env.VITE_CART_APP_HOST;
 const cartPort = import.meta.env.VITE_CART_APP_PORT;
@@ -16,11 +17,8 @@ export const fetchCartData = async () => {
             }
         };
         const response = await fetch(query, options);
-        if (!response.ok) {
-            let myLocalError = await response.json();
-            throw new Error(`${myLocalError.error}`);
-        }
-        return await response.json();
+        if (response.ok) return await response.json();
+        await throwHandledException(response);
     } catch(e) {
         console.error("Failed to fetch cart data:", e);
         throw e; 
@@ -38,11 +36,8 @@ export const deleteCartRequest = async (cartId) => {
                 'Authorization' : `Bearer ${token}`
             }
         });
-        if (!response.status === 204) {
-            let myLocalError = await response.json();
-            throw new Error(`${myLocalError.error}`);
-        }
-        console.log("Cart was deleted")
+        if (response.ok) console.log("Cart was deleted")
+        await throwHandledException(response);
     } catch(e){
         console.error("Failed to delete cart:", e);
         throw e; 

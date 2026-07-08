@@ -1,12 +1,11 @@
+using Cart.Application.Dtos;
 using Cart.Application.Interfaces.Repositories;
 using Cart.Infrastructure.Settings;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Product.Application.Dtos;
 using productServiceClient;
-using ProductService = productServiceClient.ProductService;
 
 namespace Cart.Infrastructure.Repositories;
 

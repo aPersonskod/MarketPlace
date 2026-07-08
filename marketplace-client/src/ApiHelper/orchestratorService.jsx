@@ -1,4 +1,5 @@
 import {getAccessToken} from './userService';
+import {throwHandledException} from './errorHandler.jsx';
 
 const orchestratorHost = import.meta.env.VITE_ORCHESTRATOR_APP_HOST;
 const orchestratorPort = import.meta.env.VITE_ORCHESTRATOR_APP_PORT;
@@ -22,13 +23,8 @@ export const buyCartRequest = async (cartId, placeId) => {
             body: JSON.stringify(cartSubmittedDto)
         }
         const response = await fetch(query, options);
-    
-        if (!response.ok) {
-            let myLocalError = await response.json();
-            throw new Error(`${myLocalError.error}`);
-            //alert(`HTTP error! status: ${response.status}`);
-        }
-        console.log("Succesfully submit cart !!!");
+        if (response.ok) console.log("Succesfully submit cart !!!");
+        await throwHandledException(response);
     } catch(e) {
         console.error("Failed to buy cart:", e);
         throw e; 

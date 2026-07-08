@@ -2,7 +2,6 @@ using Cart.Application.Dtos;
 using Cart.Application.Interfaces;
 using Cart.Application.Interfaces.Services;
 using Model.SharedExceptions;
-using Product.Application.Dtos;
 
 namespace Cart.Application.Services;
 
@@ -26,13 +25,17 @@ public class BuyReportService(IUnitOfWork unitOfWork, IProductService productSer
                 var productDto = await productService.GetProductByIdAsync(cartForReportDto.OrderedProductId);
                 detailedCartForReport.UserId = cartForReportDto.UserId;
                 detailedCartForReport.Address = cartForReportDto.Address;
-                detailedCartForReport.Products.Add(new ProductDto()
+                detailedCartForReport.Orders.Add(new OrderForReportDto()
                 {
-                    Id = productDto.Id,
-                    Name = productDto.Name,
-                    Cost = productDto.Cost
+                    Id = cartForReportDto.OrderId,
+                    Product = new ProductDto()
+                    {
+                        Id = productDto.Id,
+                        Name = productDto.Name,
+                        Cost = productDto.Cost
+                    },
+                    Quantity = cartForReportDto.Quantity
                 });
-                detailedCartForReport.Quantity = cartForReportDto.Quantity;
                 detailedCartForReport.AmountToPay = cartForReportDto.AmountToPay;
             }
 
