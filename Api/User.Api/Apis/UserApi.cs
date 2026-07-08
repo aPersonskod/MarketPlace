@@ -47,7 +47,7 @@ public static class UserApi
             })
             .WithDescription("Get user by id")
             .WithName("GetUserById")
-            .RequireAuthorization(new AuthorizeAttribute { Roles = "admin, user" })
+            .RequireAuthorization()
             .WithOpenApi();
 
         api.MapDelete("", async (ClaimsPrincipal user, IUserService userService) =>

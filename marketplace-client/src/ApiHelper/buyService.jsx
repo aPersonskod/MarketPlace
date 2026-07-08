@@ -1,4 +1,4 @@
-import {getAccessToken, getUser} from './userService';
+import {getAccessToken, fetchUserData} from './userService';
 
 const buyHost = import.meta.env.VITE_BUY_APP_HOST;
 const buyPort = import.meta.env.VITE_BUY_APP_PORT;
@@ -7,7 +7,7 @@ export const buyServiceBaseAddress = `${buyHost}:${buyPort}/api/buy-service`;
 
 export const fetchBuyReports = async () => {
     try {
-        let user = await getUser();
+        let user = await fetchUserData();
         if (user === null) setBuyActions([]);
         let token = getAccessToken();
         let query = `${buyServiceBaseAddress}/get-reports-by-userid`;

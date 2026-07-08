@@ -25,6 +25,8 @@ public static class Extensions
     {
         app.UseHttpsRedirection();
         app.UseCors("CorsPolicy");
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseExceptionHandler();
         return app;
     }

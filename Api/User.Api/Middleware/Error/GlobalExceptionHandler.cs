@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Model.SharedExceptions;
+using Model.SharedExceptions.ProblemDetails;
 
 namespace User.Api.Middleware.Error;
 
@@ -10,20 +11,18 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
     {
         logger?.LogError(exception, $"Error: {exception.Message}, time: {DateTime.UtcNow}");
         
-        var (statusCode, title) = exception switch
+        var exceptionDetails = exception switch
         {
-            NotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
-            ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request"),
-            FluentValidation.ValidationException => (StatusCodes.Status400BadRequest, "Bad Request"),
-            Model.SharedExceptions.UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
-            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
+            NotFoundException => new ExceptionDetails(StatusCodes.Status404NotFound, "Not Found", exception.Message),
+            FluentValidation.ValidationException => new ExceptionDetails(StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
+            _ => exception.GetExceptionDetails()
         };
 
         var problemDetails = new ProblemDetails()
         {
-            Status = statusCode,
-            Title = title, //exception.GetType().Name,
-            Detail = exception.Message,
+            Status = exceptionDetails.StatusCode,
+            Title = exceptionDetails.Title, //exception.GetType().Name,
+            Detail = exceptionDetails.Detail,
             Instance = httpContext.Request.Path,
         };
         

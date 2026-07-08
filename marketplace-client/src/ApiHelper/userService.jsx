@@ -58,20 +58,19 @@ export const authRequest = async (email, password) => {
     }
 };
 
-export const getUser = async () => {
-    let token = getAccessToken();
-    if (token === null) return null;
-    let url = `${userServiceBaseAddress}/`;
-    let options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
-    };
-
+export const fetchUserData = async () => {
     try{
-        const response = await fetch(url, options);
+        let token = getAccessToken();
+        if (token === null) return null;
+        let query = `${userServiceBaseAddress}`;
+        let options = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+        const response = await fetch(query, options);
         switch(response.status) {
             case 200:
                 const userDto = await response.json();
@@ -91,7 +90,7 @@ export const getUser = async () => {
         }
     }
     catch(e){
-        console.log("Network or CORS error:", e);
+        console.error("Network or CORS error:", e);
         return null;
     }
 }

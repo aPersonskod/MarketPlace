@@ -11,7 +11,7 @@ import {Dropdown} from "react-bootstrap";
 import {useState, useEffect} from "react";
 import { useNavigate } from 'react-router';
 
-import {getUser, walletReplenishmentRequest} from "./ApiHelper/userService.jsx"
+import {fetchUserData, walletReplenishmentRequest} from "./ApiHelper/userService.jsx"
 import {ApiHelper} from "./ApiHelper.jsx";
 
 function Header() {
@@ -47,7 +47,7 @@ function Header() {
     };
     const walletReplenishment = async () => {
         try {
-            let userDto = await getUser();
+            let userDto = await fetchUserData();
             if(userDto === null) navigate('/auth');
             const response = await walletReplenishmentRequest();
             setUser(response);
@@ -57,7 +57,7 @@ function Header() {
     };
     const getUserData = async () => {
         try {
-            let userDto = await getUser();
+            let userDto = await fetchUserData();
             if (userDto !== null){
                 setIsLoggedIn(true);
                 setUser(userDto);

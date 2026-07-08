@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import { useNavigate } from 'react-router';
-import {getUser, authRequest} from "./ApiHelper/userService.jsx"
+import {fetchUserData, authRequest} from "./ApiHelper/userService.jsx"
 import './Authorization.css';
 
 const Authorization = ({
@@ -24,7 +24,7 @@ const Authorization = ({
         navigateNext();
     }, [])
     const navigateNext = async () => {
-        let userDto = await getUser();
+        let userDto = await fetchUserData();
         if (userDto !== null) {
             navigate('/');
         }

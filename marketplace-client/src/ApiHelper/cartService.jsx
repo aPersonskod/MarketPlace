@@ -14,7 +14,7 @@ export const fetchCartData = async () => {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        }
+        };
         const response = await fetch(query, options);
         if (!response.ok) {
             let myLocalError = await response.json();

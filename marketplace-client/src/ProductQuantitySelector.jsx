@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from 'react-router';
+import {fetchUserData} from "./ApiHelper/userService.jsx"
 import {getCartOrders, createOrderRequest} from "./ApiHelper/orderService.jsx"
 
 const ProductQuantitySelector = ({ productName, productCost, productId, setAmmountToPay, cart, refreshCartFunc, minQuantity = 0, maxQuantity = 99}) => {
@@ -100,7 +101,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
     };
 
     const addToShoppingCartBtnHandler = async () => {
-        let user = await apiHelper.getUser();
+        let user = await fetchUserData();
         if(user === null) {
             navigate('auth');
             return;
