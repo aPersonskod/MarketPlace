@@ -9,16 +9,16 @@ namespace Cart.Infrastructure.Repositories;
 
 public class OrderRepository(AppDbContext context) : IOrderRepository
 {
-    public async Task<IEnumerable<Order>> GetAllOrdersAsync(Guid cartId) 
+    public async Task<IEnumerable<Order>> GetCartOrdersAsync(Guid cartId) 
         => await context.Orders.Where(x => x.CartId == cartId).ToListAsync();
     public async Task<Order?> Get(CreateOrderDto orderDto) 
         => await context.Orders.FirstOrDefaultAsync(x => 
             x.CartId == orderDto.CartId && x.OrderedProductId == orderDto.OrderedProductId);
 
-    public async Task<Order?> AddOrderAsync(CreateOrderDto orderDto)
+    public async Task<Order> AddOrderAsync(CreateOrderDto orderDto)
     {
         var foundOrder = await Get(orderDto);
-        if (foundOrder == null) return foundOrder;
+        if (foundOrder == null) throw new NotFoundException("Order not found");
         foundOrder.Quantity = orderDto.Quantity;
         return foundOrder;
     }

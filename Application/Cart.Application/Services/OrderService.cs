@@ -9,7 +9,7 @@ public class OrderService(IUnitOfWork unitOfWork, IProductService productService
 {
     public async Task<IEnumerable<OrderDto>> GetAllOrdersAsync(Guid cartId)
     {
-        var orders = await unitOfWork.OrderRepository.GetAllOrdersAsync(cartId);
+        var orders = await unitOfWork.OrderRepository.GetCartOrdersAsync(cartId);
         return orders.Select(x => x.ToDto());
     }
 
@@ -18,23 +18,52 @@ public class OrderService(IUnitOfWork unitOfWork, IProductService productService
         // check if product exist
         await productService.GetProductByIdAsync(orderDto.OrderedProductId);
         // add or create order
-        var order = await unitOfWork.OrderRepository.AddOrderAsync(orderDto) 
-                    ?? await unitOfWork.OrderRepository.CreateOrderAsync(orderDto);
-        await unitOfWork.CompleteAsync();
-        var cartOrders = await unitOfWork.OrderRepository.GetAllOrdersAsync(order.CartId);
+        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            var order = await unitOfWork.OrderRepository.Get(orderDto);
+            var newOrder = order == null
+                ? await unitOfWork.OrderRepository.CreateOrderAsync(orderDto)
+                : await unitOfWork.OrderRepository.AddOrderAsync(orderDto);
+            await unitOfWork.CompleteAsync();
+            var costCollection = await GetCostCollection(newOrder.CartId);
+            await unitOfWork.CartRepository.UpdateAmountToPayAsync(orderDto.CartId, costCollection);
+            await unitOfWork.CommitTransactionAsync();
+            return newOrder.ToDto();
+        }
+        catch (Exception e)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+    }
+    public async Task DeleteOrderAsync(DeleteOrderDto deleteOrderDto)
+    {
+        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            await unitOfWork.OrderRepository.DeleteOrderAsync(deleteOrderDto);
+            await unitOfWork.CompleteAsync();
+            var costCollection = await GetCostCollection(deleteOrderDto.CartId);
+            await unitOfWork.CartRepository.UpdateAmountToPayAsync(deleteOrderDto.CartId, costCollection);
+            await unitOfWork.CommitTransactionAsync();
+        }
+        catch (Exception e)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
+    private async Task<IEnumerable<(int productCost, int productQuantity)>?> GetCostCollection(Guid cartId)
+    {
+        var cartOrders = await unitOfWork.OrderRepository.GetCartOrdersAsync(cartId);
         var costCollection = new List<(int productCost, int productQuantity)>();
         foreach (var cartOrder in cartOrders)
         {
             var productDto = await productService.GetProductByIdAsync(cartOrder.OrderedProductId);
             costCollection.Add((productDto.Cost, cartOrder.Quantity));
         }
-        await unitOfWork.CartRepository.UpdateAmountToPayAsync(order.CartId, costCollection);
-        await unitOfWork.CompleteAsync();
-        return order.ToDto();
-    }
-    public async Task DeleteOrderAsync(DeleteOrderDto deleteOrderDto)
-    {
-        await unitOfWork.OrderRepository.DeleteOrderAsync(deleteOrderDto);
-        await unitOfWork.CompleteAsync();
+        return costCollection;
     }
 }

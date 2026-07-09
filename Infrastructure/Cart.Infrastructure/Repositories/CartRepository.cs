@@ -58,10 +58,11 @@ public class CartRepository(AppDbContext context) : ICartRepository
         cart.IsBought = false;
         return cart;
     }
-    public async Task UpdateAmountToPayAsync(Guid cartId, IEnumerable<(int productCost, int productQuantity)> costCollection)
+    public async Task UpdateAmountToPayAsync(Guid cartId, IEnumerable<(int productCost, int productQuantity)>? costCollection)
     {
         var cart = await context.ShoppingCarts.FirstOrDefaultAsync(x => x.Id == cartId);
         if (cart == null) throw new NotFoundException("Cart not found");
+        if (costCollection == null) throw new NotFoundException("Cart has no orders");
         cart.AmountToPay = cart.UpdateAmountToPay(costCollection);
     }
     public async Task DeleteCartAsync(Guid cartId)

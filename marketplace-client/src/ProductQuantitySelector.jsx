@@ -63,7 +63,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [cart]);
 
     const fetchOrders = async () => {
         try {
@@ -130,7 +130,7 @@ const ProductQuantitySelector = ({ productName, productCost, productId, setAmmou
             } 
             else{
                 const data = await createOrderRequest(cart.id, productId, amount);
-                console.log('Order updated:', data);
+                console.log(`Order updated: quantity is ${data.quantity}`);
             }
             setSuccess(true);
             // Optionally, update local state or re-fetch data after successful update

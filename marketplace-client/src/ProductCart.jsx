@@ -2,7 +2,7 @@ import OrderedProduct from "./OrderedProduct.jsx";
 import {useEffect, useState} from "react";
 import {getCartOrders} from "./ApiHelper/orderService.jsx"
 
-function ProductCart({cart}) {
+function ProductCart({cart, refreshCartFunc}) {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -32,7 +32,7 @@ function ProductCart({cart}) {
                 <div style={{margin: '5px', overflowY: 'auto'}}>
                     <div className='d-flex flex-wrap'>
                         {!error && orders.map((item, index) => (
-                            <OrderedProduct key={index} productId={item.orderedProductId} cartId={item.cartId} quantity={item.quantity}/>
+                            <OrderedProduct key={index} productId={item.orderedProductId} cartId={item.cartId} quantity={item.quantity} refreshCartFunc={refreshCartFunc}/>
                         ))}
                     </div>
                 </div>

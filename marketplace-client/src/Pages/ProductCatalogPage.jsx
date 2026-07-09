@@ -75,7 +75,7 @@ const ProductCatalogPage = () => {
                     <div className='divStyle xsDivStyle mdDivStyle'>
                         {loading && <div>Loading data...</div>}
                         {error && <div>Error: {error.message}</div>}
-                        <ProductCart key={ammountToPay} cart={cart}/>
+                        <ProductCart key={ammountToPay} cart={cart} refreshCartFunc={fetchCart}/>
                     </div>
                 </div>
                 {((cart !== null) && (cart.ammountToPay !== 0)) &&

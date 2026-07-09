@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {deleteOrderRequest} from "./ApiHelper/orderService.jsx"
 import {fetchProductData} from "./ApiHelper/productService.jsx"
 
-const OrderedProduct = ({ productId, cartId, quantity}) => {
+const OrderedProduct = ({ productId, cartId, quantity, refreshCartFunc}) => {
     // Basic inline styles for quick demonstration
     const styles = {
         container: {
@@ -62,7 +62,8 @@ const OrderedProduct = ({ productId, cartId, quantity}) => {
         setError(null);
         try {
             await deleteOrderRequest(cartId, productId);
-            window.location.reload();
+            refreshCartFunc();
+            //window.location.reload();
         } catch (error) {
             setError(error.message);
             console.error('Error updating user:', error);

@@ -9,4 +9,7 @@ public interface IUnitOfWork : IDisposable
     IPlaceRepository PlaceRepository { get; }
     IBuyReportRepository BuyReportRepository { get; }
     Task<int> CompleteAsync(CancellationToken cancellationToken = default);
+    Task BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
 }
