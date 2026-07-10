@@ -52,6 +52,8 @@ public static class DependencyInjection
         services.AddMassTransit(x =>
         {
             x.AddConsumers(typeof(ConfirmCartCommandConsumer).Assembly);
+            /*x.AddConsumer<ConfirmCartCommandConsumer>();
+            x.AddConsumer<WalletSpendCommandConsumer>();*/
             x.AddSagaStateMachine<CartStateMachine, CartStateSagaData>().InMemoryRepository();
             x.UsingInMemory((context, config) => config.ConfigureEndpoints(context));
         });

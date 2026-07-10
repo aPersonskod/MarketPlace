@@ -17,9 +17,11 @@ public class CreateBuyReportCommandConsumer(
     {
         try
         {
-            var report = await buyReportRepository.CreateBuyReportAsync(
-                new CreateBuyReportDto(context.Message.CartId, context.Message.AuthToken));
-            await context.Publish(new CartBuyReportCreatedEvent(report!.CartId, context.Message.AuthToken));
+            /*var report = await buyReportRepository.CreateBuyReportAsync(
+                new CreateBuyReportDto(context.Message.CartId, context.Message.AuthToken));*/
+            await Task.Delay(1000);
+            //await context.Publish(new CartBuyReportCreatedEvent(report!.CartId, context.Message.AuthToken));
+            await context.Publish(new CartBuyReportCreatedEvent(context.Message.CartId, context.Message.AuthToken));
         }
         catch (Exception e)
         {

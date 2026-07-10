@@ -1,6 +1,7 @@
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Model.SharedExceptions;
 using Orchestrator.Application.Dtos;
 using Orchestrator.Application.Features.Events;
 using Orchestrator.Application.Interfaces;
@@ -16,14 +17,22 @@ public class ConfirmCartCommandConsumer(ICartRepository cartRepository, ILogger<
     {
         try
         {
-            var cart = await cartRepository.ConfirmCartAsync(
+            /*var cart = await cartRepository.ConfirmCartAsync(
                 context.Message.ConfirmCartDto.AuthToken,
                 context.Message.ConfirmCartDto.PlaceId
             );
-            await context.Publish(
+            if (cart == null) throw new NotFoundException("Failed to confirm cart");*/
+            await Task.Delay(1000);
+            /*await context.Publish(
                 new CartConfirmedEvent(
                     cart.Id,
                     cart.AmountToPay,
+                    context.Message.ConfirmCartDto.AuthToken)
+            );*/
+            await context.Publish(
+                new CartConfirmedEvent(
+                    new Guid(),
+                    10,
                     context.Message.ConfirmCartDto.AuthToken)
             );
         }

@@ -39,9 +39,8 @@ const ConfirmationPage = () => {
     }
     const handleBuy = async () => {
         try {
-            await buyCartRequest(cart.Id, selectedPlaceId);
-            console.log('Заказ отправлен !!!');
-            alert('Заказ отправлен !!!');
+            let response = await buyCartRequest(cart.Id, selectedPlaceId);
+            alert(response);
             navigate('/');
         } catch (err) {
             console.error('Error confirm cart!', err);

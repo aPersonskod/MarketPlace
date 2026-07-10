@@ -23,7 +23,7 @@ export const buyCartRequest = async (cartId, placeId) => {
             body: JSON.stringify(cartSubmittedDto)
         }
         const response = await fetch(query, options);
-        if (response.ok) console.log("Succesfully submit cart !!!");
+        if (response.ok) return "Succesfully submit cart !!!";
         await throwHandledException(response);
     } catch(e) {
         console.error("Failed to buy cart:", e);

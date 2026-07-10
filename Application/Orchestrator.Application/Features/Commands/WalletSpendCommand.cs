@@ -14,10 +14,11 @@ public class WalletSpendCommandConsumer(IUserRepository userRepository, ILogger<
     {
         try
         {
-            await userRepository.SpendMoney(new UserMoneyDto()
+            /*await userRepository.SpendMoney(new UserMoneyDto()
             {
                 AuthToken = context.Message.AuthToken, Money = (int)context.Message.AmountToPay
-            });
+            });*/
+            await Task.Delay(1000);
             await context.Publish(new CartPaidEvent(context.Message.CartId, context.Message.AuthToken));
         }
         catch (Exception e)

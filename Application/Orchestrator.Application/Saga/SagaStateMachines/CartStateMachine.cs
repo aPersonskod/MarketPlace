@@ -10,6 +10,8 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
 {
     public CartStateMachine()
     {
+        InstanceState(x => x.CurrentState);
+        
         Event(() => CartSubmitted, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartSubmitFailed, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartConfirmed, x => x.CorrelateById(c => c.Message.CartId));
@@ -20,7 +22,6 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
         Event(() => CartBoughtFailed, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartBuyReportCreated, x => x.CorrelateById(c => c.Message.CartId));
 
-        InstanceState(x => x.CurrentState);
         Initially(
             When(CartSubmitted)
                 .Then(c =>
@@ -28,13 +29,13 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                     c.Saga.CartId = c.Message.CartId;
                     c.Saga.PlaceId = c.Message.PlaceId;
                 })
-                .TransitionTo(CartConfirmingState)
                 .Publish(c => new ConfirmCartCommand(new ConfirmCartDto()
                 {
                     CartId = c.Message.CartId,
                     PlaceId = c.Message.PlaceId,
                     AuthToken = c.Message.AuthToken
                 }))
+                .TransitionTo(CartConfirmingState)
         );
         During(CartConfirmingState,
             When(CartConfirmed)
@@ -43,8 +44,8 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                     c.Saga.IsConfirmed = true;
                     c.Saga.AmountToPay = c.Message.AmountToPay;
                 })
-                .TransitionTo(UserPayingState)
-                .Publish(c => new WalletSpendCommand(c.Message.CartId, c.Saga.AmountToPay, c.Message.AuthToken)),
+                .Publish(c => new WalletSpendCommand(c.Message.CartId, c.Saga.AmountToPay, c.Message.AuthToken))
+                .TransitionTo(UserPayingState),
             When(CartSubmitFailed)
                 .TransitionTo(Failed)
                 .Finalize()

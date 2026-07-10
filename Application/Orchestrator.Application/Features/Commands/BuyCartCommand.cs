@@ -13,8 +13,10 @@ public class BuyCartCommandConsumer(ICartRepository cartRepository, ILogger<BuyC
     {
         try
         {
-            var cart = await cartRepository.BuyCartAsync(context.Message.AuthToken, context.Message.CartId);
-            await context.Publish(new CartBoughtEvent(cart.Id, cart.AmountToPay, context.Message.AuthToken));
+            //var cart = await cartRepository.BuyCartAsync(context.Message.AuthToken, context.Message.CartId);
+            await Task.Delay(1000);
+            //await context.Publish(new CartBoughtEvent(cart.Id, cart.AmountToPay, context.Message.AuthToken));
+            await context.Publish(new CartBoughtEvent(context.Message.CartId, 10, context.Message.AuthToken));
         }
         catch (Exception e)
         {
