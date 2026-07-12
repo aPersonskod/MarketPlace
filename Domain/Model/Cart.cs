@@ -17,6 +17,7 @@ public class Cart
     
     // Не подтвержденная тележка
     public bool IsUnverified(Guid userId) => UserId == userId && !IsConfirmed && !IsBought;
+    public bool IsNotBought(Guid userId) => UserId == userId && !IsBought;
     public void ConfirmCart()
     {
         if (PlaceId == null) throw new ArgumentException("Place is required");

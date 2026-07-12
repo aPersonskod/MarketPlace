@@ -15,7 +15,7 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
     }
     public async Task<CartDto> GetCartByUserIdAsync(Guid userId)
     {
-        var cart = await unitOfWork.CartRepository.GetUnverifiedCartByUserIdAsync(userId);
+        var cart = await unitOfWork.CartRepository.GetNotBoughtCartByUserIdAsync(userId);
         if (cart == null)
         {
             cart = await unitOfWork.CartRepository.AddCartAsync(userId);

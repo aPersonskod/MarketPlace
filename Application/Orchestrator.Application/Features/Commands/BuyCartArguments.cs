@@ -5,11 +5,22 @@ using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record BuyCartCommand(Guid CartId, string AuthToken);
-public class BuyCartCommandConsumer(ICartRepository cartRepository, ILogger<BuyCartCommandConsumer> logger) 
-    : IConsumer<BuyCartCommand>
+public class BuyCartArguments
 {
-    public async Task Consume(ConsumeContext<BuyCartCommand> context)
+    public Guid CartId { get; set; }
+    public string AuthToken { get; set; }
+}
+
+public class BuyCartLog
+{
+    public Guid CartId { get; set; }
+    public string AuthToken { get; set; }
+}
+
+public class BuyCartCommandConsumer(ICartRepository cartRepository, ILogger<BuyCartCommandConsumer> logger)
+    : IConsumer<BuyCartArguments>
+{
+    public async Task Consume(ConsumeContext<BuyCartArguments> context)
     {
         try
         {

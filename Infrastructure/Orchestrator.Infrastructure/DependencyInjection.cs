@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Orchestrator.Application.Features.Activities;
 using Orchestrator.Application.Features.Commands;
 using Orchestrator.Application.Interfaces;
 using Orchestrator.Application.Saga.SagaDatas;
@@ -39,22 +40,22 @@ public static class DependencyInjection
             userSettings = configuration.GetSection("Grpc:UserOptions");
             //dbConnectionString = Environment.GetEnvironmentVariable("PostgresConnection");
         }
-        services.AddAuthInfrastructure(configuration);
-        services.AddScoped<IBuyReportRepository, BuyReportRepository>();
-        services.AddScoped<ICartRepository, CartRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
         // settings
         services.Configure<BuyReportSettings>(buyReportSettings);
         services.Configure<CartSettings>(cartSettings);
         services.Configure<UserSettings>(userSettings);
+        services.AddAuthInfrastructure(configuration);
+        services.AddScoped<IBuyReportRepository, BuyReportRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         // db context
         //services.AddDbContext<CartSagaDbContext>(o => o.UseNpgsql(dbConnectionString));
         services.AddMassTransit(x =>
         {
-            x.AddConsumers(typeof(ConfirmCartCommandConsumer).Assembly);
+            //x.AddConsumers(typeof(ConfirmCartCommandConsumer).Assembly);
             /*x.AddConsumer<ConfirmCartCommandConsumer>();
             x.AddConsumer<WalletSpendCommandConsumer>();*/
-            x.AddSagaStateMachine<CartStateMachine, CartStateSagaData>().InMemoryRepository();
+            x.AddActivities(typeof(ConfirmCartActivity).Assembly);
             x.UsingInMemory((context, config) => config.ConfigureEndpoints(context));
         });
         return services;

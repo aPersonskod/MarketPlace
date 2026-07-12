@@ -1,26 +1,48 @@
 using MassTransit;
-using Orchestrator.Application.Dtos;
 using Orchestrator.Application.Features.Commands;
 using Orchestrator.Application.Features.Events;
-using Orchestrator.Application.Saga.SagaDatas;
 
 namespace Orchestrator.Application.Saga.SagaStateMachines;
 
-public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
+public class SagaExecutor(IBus bus)
+{
+    public async Task Execute(CartSubmittedEvent cartSubmitted)
+    {
+        var builder = new RoutingSlipBuilder(cartSubmitted.CartId);
+        builder.AddActivity("ConfirmCartActivity", new Uri("queue:confirm-cart-execute-queue"),
+            new ConfirmCartArguments()
+            {
+                CartId = cartSubmitted.CartId,
+                PlaceId = cartSubmitted.PlaceId,
+                AuthToken = cartSubmitted.AuthToken
+            });
+        builder.AddActivity("WalletSpendActivity", new Uri("queue:wallet-spend-execute-queue"));
+        builder.AddActivity("BuyCartActivity", new Uri("queue:buy-cart-execute-queue"));
+        builder.AddActivity("CreateBuyReportActivity", new Uri("queue:create-buy-report-execute-queue"));
+        var routingSlip = builder.Build();
+        await bus.Execute(routingSlip);
+    }
+}
+
+/*public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
 {
     public CartStateMachine()
     {
         InstanceState(x => x.CurrentState);
         
         Event(() => CartSubmitted, x => x.CorrelateById(c => c.Message.CartId));
-        Event(() => CartSubmitFailed, x => x.CorrelateById(c => c.Message.CartId));
+        Event(() => RoutingSlipCompleted, x => x.CorrelateById(c => c.Message.TrackingNumber));
+        Event(() => RoutingSlipFaulted, x => x.CorrelateById(c => c.Message.TrackingNumber));
+        
+        
+        /*Event(() => CartSubmitFailed, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartConfirmed, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartConfirmingFailed, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartPaid, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartPaidFailed, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartBought, x => x.CorrelateById(c => c.Message.CartId));
         Event(() => CartBoughtFailed, x => x.CorrelateById(c => c.Message.CartId));
-        Event(() => CartBuyReportCreated, x => x.CorrelateById(c => c.Message.CartId));
+        Event(() => CartBuyReportCreated, x => x.CorrelateById(c => c.Message.CartId));#1#
 
         Initially(
             When(CartSubmitted)
@@ -29,28 +51,36 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                     c.Saga.CartId = c.Message.CartId;
                     c.Saga.PlaceId = c.Message.PlaceId;
                 })
-                .Publish(c => new ConfirmCartCommand(new ConfirmCartDto()
+                .ThenAsync(async c =>
                 {
-                    CartId = c.Message.CartId,
-                    PlaceId = c.Message.PlaceId,
-                    AuthToken = c.Message.AuthToken
-                }))
+                    var builder = new RoutingSlipBuilder(c.Saga.CartId);
+                    
+                    builder.AddActivity("confirm-cart", new Uri("queue:confirm-cart_execute"), new
+                    {
+                        c.Saga.CartId,
+                        c.Saga.PlaceId,
+                        c.Message.AuthToken
+                    });
+                    var money = 10m;
+                    builder.AddActivity("create-buy-report", new Uri("queue:create-buy-report_execute"), new
+                    {
+                        c.Saga.CartId,
+                        money,
+                        c.Message.AuthToken
+                    });
+                    var routingSlip = builder.Build();
+                    await c.Execute(routingSlip);
+                })
                 .TransitionTo(CartConfirmingState)
         );
         During(CartConfirmingState,
-            When(CartConfirmed)
-                .Then(c =>
-                {
-                    c.Saga.IsConfirmed = true;
-                    c.Saga.AmountToPay = c.Message.AmountToPay;
-                })
-                .Publish(c => new WalletSpendCommand(c.Message.CartId, c.Saga.AmountToPay, c.Message.AuthToken))
-                .TransitionTo(UserPayingState),
-            When(CartSubmitFailed)
+            When(RoutingSlipCompleted)
+                .TransitionTo(CompletedState),
+            When(RoutingSlipFaulted)
                 .TransitionTo(Failed)
                 .Finalize()
         );
-        During(UserPayingState,
+        /*During(UserPayingState,
             When(CartPaid)
                 .Then(c => { c.Saga.IsMoneySpent = true; })
                 .TransitionTo(CartBuyingState)
@@ -80,23 +110,28 @@ public class CartStateMachine : MassTransitStateMachine<CartStateSagaData>
                 .TransitionTo(Failed)
                 .Finalize()
         );
-        SetCompletedWhenFinalized();
+        SetCompletedWhenFinalized();#1#
     }
 
     public State CartConfirmingState { get; private set; }
-    public State UserPayingState { get; private set; }
+    /*public State UserPayingState { get; private set; }
     public State CartBuyingState { get; private set; }
-    public State ReportCreatingState { get; private set; }
+    public State ReportCreatingState { get; private set; }#1#
     public State CompletedState { get; private set; }
     public State Failed { get; private set; }
 
     public Event<CartSubmittedEvent> CartSubmitted { get; private set; }
-    public Event<CartSubmitFailedEvent> CartSubmitFailed { get; private set; }
+    public Event<RoutingSlipCompletedEvent> RoutingSlipCompleted { get; private set; }
+    public Event<RoutingSlipFaultedEvent> RoutingSlipFaulted { get; private set; }
+    
+    
+    
+    /*public Event<CartSubmitFailedEvent> CartSubmitFailed { get; private set; }
     public Event<CartConfirmedEvent> CartConfirmed { get; private set; }
     public Event<CartConfirmingFailedEvent> CartConfirmingFailed { get; private set; }
     public Event<CartBoughtEvent> CartBought { get; private set; }
     public Event<CartBoughtFailedEvent> CartBoughtFailed { get; private set; }
     public Event<CartPaidEvent> CartPaid { get; private set; }
     public Event<CartPaidFailedEvent> CartPaidFailed { get; private set; }
-    public Event<CartBuyReportCreatedEvent> CartBuyReportCreated { get; private set; }
-}
+    public Event<CartBuyReportCreatedEvent> CartBuyReportCreated { get; private set; }#1#
+}*/

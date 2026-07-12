@@ -78,7 +78,7 @@ const ProductCatalogPage = () => {
                         <ProductCart key={ammountToPay} cart={cart} refreshCartFunc={fetchCart}/>
                     </div>
                 </div>
-                {((cart !== null) && (cart.ammountToPay !== 0)) &&
+                {((cart !== null) && (cart.amountToPay !== 0)) &&
                 <div className='col col-xs-12 col-sm-12'>
                     <Button onClick={handleConfirmation}>Подтвердить заказ</Button>
                 </div>

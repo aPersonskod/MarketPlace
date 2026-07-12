@@ -39,7 +39,7 @@ const ConfirmationPage = () => {
     }
     const handleBuy = async () => {
         try {
-            let response = await buyCartRequest(cart.Id, selectedPlaceId);
+            let response = await buyCartRequest(cart.id, selectedPlaceId);
             alert(response);
             navigate('/');
         } catch (err) {

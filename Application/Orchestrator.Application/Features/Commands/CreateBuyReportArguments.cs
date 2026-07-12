@@ -6,19 +6,24 @@ using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record CreateBuyReportCommand(Guid CartId, decimal AmountToPay, string AuthToken);
+public class CreateBuyReportArguments
+{
+    public Guid CartId { get; set; }
+    public decimal AmountToPay { get; set; }
+    public string AuthToken { get; set; }
+}
 
 public class CreateBuyReportCommandConsumer(
     IBuyReportRepository buyReportRepository,
     ILogger<CreateBuyReportCommandConsumer> logger)
-    : IConsumer<CreateBuyReportCommand>
+    : IConsumer<CreateBuyReportArguments>
 {
-    public async Task Consume(ConsumeContext<CreateBuyReportCommand> context)
+    public async Task Consume(ConsumeContext<CreateBuyReportArguments> context)
     {
         try
         {
             /*var report = await buyReportRepository.CreateBuyReportAsync(
-                new CreateBuyReportDto(context.Message.CartId, context.Message.AuthToken));*/
+                new CreateBuyReportDto(context.Message.CartId, context.Message.AuthToken));*/   
             await Task.Delay(1000);
             //await context.Publish(new CartBuyReportCreatedEvent(report!.CartId, context.Message.AuthToken));
             await context.Publish(new CartBuyReportCreatedEvent(context.Message.CartId, context.Message.AuthToken));

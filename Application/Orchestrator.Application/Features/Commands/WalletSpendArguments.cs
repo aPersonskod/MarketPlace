@@ -6,11 +6,24 @@ using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Commands;
 
-public record WalletSpendCommand(Guid CartId, decimal AmountToPay, string AuthToken);
-public class WalletSpendCommandConsumer(IUserRepository userRepository, ILogger<WalletSpendCommandConsumer> logger) 
-    : IConsumer<WalletSpendCommand>
+public class WalletSpendArguments
 {
-    public async Task Consume(ConsumeContext<WalletSpendCommand> context)
+    public Guid CartId { get; set; }
+    public decimal AmountToPay { get; set; }
+    public string AuthToken { get; set; }
+}
+
+public class WalletSpendLog
+{
+    public Guid CartId { get; set; }
+    public decimal AmountToPay { get; set; }
+    public string AuthToken { get; set; }
+}
+
+public class WalletSpendCommandConsumer(IUserRepository userRepository, ILogger<WalletSpendCommandConsumer> logger)
+    : IConsumer<WalletSpendArguments>
+{
+    public async Task Consume(ConsumeContext<WalletSpendArguments> context)
     {
         try
         {
