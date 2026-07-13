@@ -9,6 +9,7 @@ public class CartRepository(AppDbContext context) : ICartRepository
 {
     public async Task<IEnumerable<Model.Cart>> GetBoughtCartsAsync(Guid userId) 
         => await context.ShoppingCarts.Where(x => x.UserId == userId && x.IsBought).ToListAsync();
+    [Obsolete]
     public async Task<Model.Cart?> GetUnverifiedCartByUserIdAsync(Guid userId)
     {
         var carts = await context.ShoppingCarts.Where(x => x.UserId == userId).ToListAsync();
@@ -29,7 +30,7 @@ public class CartRepository(AppDbContext context) : ICartRepository
     }
     public async Task<Model.Cart> AddPlaceToCart(Guid userId, Guid placeId)
     {
-        var cart = await GetUnverifiedCartByUserIdAsync(userId);
+        var cart = await GetNotBoughtCartByUserIdAsync(userId);
         if (cart == null) throw new NotFoundException("Cart not found");
         var foundCart = await context.ShoppingCarts.FirstAsync(x => x.Id == cart.Id);
         foundCart.PlaceId = placeId;
@@ -37,14 +38,14 @@ public class CartRepository(AppDbContext context) : ICartRepository
     }
     public async Task<Model.Cart> ConfirmCartAsync(Guid userId)
     {
-        var cart = await GetUnverifiedCartByUserIdAsync(userId);
+        var cart = await GetNotBoughtCartByUserIdAsync(userId);
         if (cart == null) throw new NotFoundException("Cart not found");
         cart.ConfirmCart();
         return cart;
     }
     public async Task<Model.Cart> UnConfirmCartAsync(Guid userId)
     {
-        var cart = await GetUnverifiedCartByUserIdAsync(userId);
+        var cart = await GetNotBoughtCartByUserIdAsync(userId);
         if (cart == null) throw new NotFoundException("Cart not found");
         cart.IsConfirmed = false;
         return cart;

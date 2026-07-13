@@ -17,7 +17,7 @@ public class CartRepository(IOptions<CartSettings> cartOptions) : ICartRepositor
 
     public async Task<bool> IsCartExistsAsync(Guid cartId, string? authToken)
     {
-        var query = $"{_baseUrl}/get-carts-for-report";
+        var query = $"{_baseUrl}/is-cart-exist/{cartId}";
         return await query.GetQuery<bool>(authToken);
     }
 }

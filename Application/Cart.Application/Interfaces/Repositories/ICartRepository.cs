@@ -3,6 +3,7 @@ namespace Cart.Application.Interfaces.Repositories;
 public interface ICartRepository
 {
     Task<IEnumerable<Model.Cart>> GetBoughtCartsAsync(Guid userId);
+    [Obsolete]
     Task<Model.Cart?> GetUnverifiedCartByUserIdAsync(Guid userId);
     Task<Model.Cart?> GetNotBoughtCartByUserIdAsync(Guid userId);
     Task<Model.Cart?> GetCartByIdAsync(Guid cartId);

@@ -2,7 +2,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Orchestrator.Application.Dtos;
 using Orchestrator.Application.Features.Events;
-using Orchestrator.Application.Saga.SagaStateMachines;
+using Orchestrator.Application.Saga;
 
 namespace Orchestrator.Api.Apis;
 

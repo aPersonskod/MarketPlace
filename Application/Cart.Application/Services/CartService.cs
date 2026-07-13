@@ -48,14 +48,16 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         await unitOfWork.CompleteAsync();
         return cart.ToDto();
     }
-    public async Task MarkCartAsBoughtAsync(Guid cartId)
+    public async Task<CartDto> MarkCartAsBoughtAsync(Guid cartId)
     {
-        await unitOfWork.CartRepository.BuyCartAsync(cartId);
+        var cart = await unitOfWork.CartRepository.BuyCartAsync(cartId);
         await unitOfWork.CompleteAsync();
+        return cart.ToDto();
     }
-    public async Task MarkCartAsNotBoughtAsync(Guid cartId)
+    public async Task<CartDto> MarkCartAsNotBoughtAsync(Guid cartId)
     {
-        await unitOfWork.CartRepository.BuyBackCartAsync(cartId);
+        var cart = await unitOfWork.CartRepository.BuyBackCartAsync(cartId);
         await unitOfWork.CompleteAsync();
+        return cart.ToDto();
     }
 }

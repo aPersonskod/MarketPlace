@@ -10,9 +10,9 @@ export const walletReplenishmentRequest = async () => {
         let moneyDto = {
             money: 300
         };
-        let query = `${userServiceBaseAddress}/wallet-replenishment?money=${money}`;
+        let query = `${userServiceBaseAddress}/top-up-money`;
         const response = await fetch(query, {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${getAccessToken()}`

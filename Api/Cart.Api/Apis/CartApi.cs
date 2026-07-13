@@ -78,8 +78,8 @@ public static class CartApi
 
         api.MapPatch("/mark-cart-as-bought/{cartId:guid}", async (ICartService cartService, Guid cartId) =>
             {
-                await cartService.MarkCartAsBoughtAsync(cartId);
-                return Results.Ok();
+                var cartDto = await cartService.MarkCartAsBoughtAsync(cartId);
+                return Results.Ok(cartDto);
             })
             .WithDescription("Mark cart as bought")
             .WithName("MarkCartAsBought")
@@ -88,8 +88,8 @@ public static class CartApi
 
         api.MapPatch("/mark-cart-as-not-bought/{cartId:guid}", async (ICartService cartService, Guid cartId) =>
             {
-                await cartService.MarkCartAsNotBoughtAsync(cartId);
-                return Results.Ok();
+                var cartDto = await cartService.MarkCartAsNotBoughtAsync(cartId);
+                return Results.Ok(cartDto);
             })
             .WithDescription("Mark cart as not bought")
             .WithName("MarkCartAsNotBought")

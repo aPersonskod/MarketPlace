@@ -13,6 +13,6 @@ public interface ICartService
     Task<CartDto> ConfirmCartAsync(Guid userId, Guid placeId);
     Task<CartDto> UnConfirmCartAsync(Guid userId);
     
-    Task MarkCartAsBoughtAsync(Guid cartId);
-    Task MarkCartAsNotBoughtAsync(Guid cartId);
+    Task<CartDto> MarkCartAsBoughtAsync(Guid cartId);
+    Task<CartDto> MarkCartAsNotBoughtAsync(Guid cartId);
 }

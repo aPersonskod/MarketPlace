@@ -12,6 +12,7 @@ public class BuyReportRepository(AppDbContext context) : IBuyReportRepository
     {
         var buyReport = Model.BuyReport.Create(cartId, DateTime.Now);
         await context.BuyReports.AddAsync(buyReport);
+        await context.SaveChangesAsync();
         return buyReport;
     }
 }
