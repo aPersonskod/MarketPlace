@@ -1,5 +1,6 @@
-import {getAccessToken, fetchUserData} from './userService';
+import {fetchUserData} from './userService';
 import {throwHandledException} from './errorHandler.jsx';
+import {handleUnauthorizedApi, getAccessToken} from './authService.jsx';
 
 const buyHost = import.meta.env.VITE_BUY_APP_HOST;
 const buyPort = import.meta.env.VITE_BUY_APP_PORT;
@@ -16,7 +17,7 @@ export const fetchBuyReports = async () => {
                 'Authorization': `Bearer ${token}`
             }
         }
-        const response = await fetch(query, options);
+        const response = await handleUnauthorizedApi(query, options);
         if (response.ok){
             return await response.json();
         }

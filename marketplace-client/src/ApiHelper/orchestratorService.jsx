@@ -1,4 +1,4 @@
-import {getAccessToken} from './userService';
+import {handleUnauthorizedApi, getAccessToken, refreshRequest} from './authService.jsx';
 import {throwHandledException} from './errorHandler.jsx';
 
 const orchestratorHost = import.meta.env.VITE_ORCHESTRATOR_APP_HOST;
@@ -22,6 +22,7 @@ export const buyCartRequest = async (cartId, placeId) => {
             },
             body: JSON.stringify(cartSubmittedDto)
         }
+        await refreshRequest();
         const response = await fetch(query, options);
         if (response.ok) return "Succesfully submit cart !!!";
         await throwHandledException(response);

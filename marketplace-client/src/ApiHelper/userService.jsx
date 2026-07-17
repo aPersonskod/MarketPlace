@@ -1,4 +1,5 @@
 import {throwHandledException} from './errorHandler.jsx';
+import {handleUnauthorizedApi, getAccessToken} from './authService.jsx';
 
 const userHost = import.meta.env.VITE_USER_APP_HOST;
 const userPort = import.meta.env.VITE_USER_APP_PORT;
@@ -11,43 +12,19 @@ export const walletReplenishmentRequest = async () => {
             money: 300
         };
         let query = `${userServiceBaseAddress}/top-up-money`;
-        const response = await fetch(query, {
+        let options = {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${getAccessToken()}`
             },
             body: JSON.stringify(moneyDto),
-        });
+        };
+        const response = await handleUnauthorizedApi(query, options);
         if (response.ok) return await response.json();
         await throwHandledException(response);
     } catch(e){
         console.error("Failed to top-up money:", e);
-        throw e; 
-    }
-};
-
-export const authRequest = async (email, password) => {
-    try{
-        let userCredentials = {
-            email: email,
-            password: password
-        };
-        const response = await fetch(`${userServiceBaseAddress}/login`, {
-            method: 'POST',
-            headers: {
-                'accept': '*/*',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userCredentials),
-        });
-        if (response.ok){
-            const token = await response.json();
-            localStorage.setItem('uToken', token);
-        }
-        await throwHandledException(response);
-    } catch(e){
-        console.error("Failed to delete cart:", e);
         throw e; 
     }
 };
@@ -64,7 +41,7 @@ export const fetchUserData = async () => {
                 'Authorization': `Bearer ${token}`
             }
         };
-        const response = await fetch(query, options);
+        const response = await handleUnauthorizedApi(query, options);
         if (response.ok) return await response.json();
         await throwHandledException(response);
     }
@@ -72,9 +49,5 @@ export const fetchUserData = async () => {
         console.error("Network or CORS error:", e);
         return null;
     }
-}
-
-export const getAccessToken = () => {
-    return localStorage.getItem('uToken');
 }
 

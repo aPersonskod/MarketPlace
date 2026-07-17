@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
 {
     private readonly ILogger<AppDbContext> _logger;
     public DbSet<Model.User> Users { get; set; }
+    public DbSet<Model.Token> Tokens { get; set; }
     public AppDbContext(DbContextOptions<AppDbContext> options, ILogger<AppDbContext> logger) : base(options)
     {
         _logger = logger;

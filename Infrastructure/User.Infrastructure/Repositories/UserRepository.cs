@@ -30,7 +30,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
         context.Users.Remove(foundItem);
         await context.SaveChangesAsync();
     }
-    public async Task<Model.User?> Authorize(UserCredentialsDto credentials) 
+    public async Task<Model.User?> GetByCredentials(UserCredentialsDto credentials) 
         => await context.Users.FirstOrDefaultAsync(x => x.Email == credentials.Email && x.Password == credentials.Password);
     public async Task<Model.User> WalletReplenishment(UserMoneyDto userMoneyDto)
     {

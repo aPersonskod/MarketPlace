@@ -19,4 +19,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseDefaultApi();
 app.MapUserEndpoints();
+app.MapAuthEndpoints();
 app.Run();

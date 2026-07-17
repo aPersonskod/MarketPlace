@@ -12,15 +12,6 @@ public static class UserApi
     public static IEndpointRouteBuilder MapUserEndpoints(this IEndpointRouteBuilder app)
     {
         var api = app.MapGroup("api/user-service").WithTags("User");
-        
-        api.MapPost("/login", async (IUserService userService, [FromBody] UserCredentialsDto credentialsDto) =>
-            {
-                var token = await userService.Authorize(credentialsDto);
-                return Results.Ok(token);
-            })
-            .WithDescription("User authorization")
-            .WithName("UserAuthorization")
-            .WithOpenApi();
 
         api.MapPost("", async (IUserService userService, [FromBody] CreateUserDto createUserDto)
                 => Results.Ok(await userService.Add(createUserDto)))

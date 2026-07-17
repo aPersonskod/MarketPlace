@@ -1,4 +1,4 @@
-import {getAccessToken} from './userService';
+import {handleUnauthorizedApi as handleUnauthorizedApi, getAccessToken} from './authService.jsx';
 import {throwHandledException} from './errorHandler.jsx';
 
 const cartHost = import.meta.env.VITE_CART_APP_HOST;
@@ -29,13 +29,14 @@ export const deleteCartRequest = async (cartId) => {
     try{
         let token = getAccessToken();
         let query = `${cartServiceBaseAddress}/delete-cart/${cartId}`;
-        const response = await fetch(query, {
+        let options = {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization' : `Bearer ${token}`
             }
-        });
+        };
+        const response = await handleUnauthorizedApi(query, options);
         if (response.ok) console.log("Cart was deleted")
         await throwHandledException(response);
     } catch(e){

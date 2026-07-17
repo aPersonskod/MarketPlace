@@ -5,7 +5,7 @@ using User.Application.Mappings;
 
 namespace User.Application.Services;
 
-public class UserService(IUserRepository repository, IJwtTokenGenerator jwtTokenGenerator, 
+public class UserService(IUserRepository repository, 
     IValidator<CreateUserDto> createUserValidator, IValidator<UserMoneyDto> moneyDtoValidator) : IUserService
 {
     public async Task<IEnumerable<UserDto>> Get()
@@ -30,13 +30,6 @@ public class UserService(IUserRepository repository, IJwtTokenGenerator jwtToken
     public async Task Delete(Guid userId)
     {
         await repository.DeleteAsync(userId);
-    }
-
-    public async Task<string> Authorize(UserCredentialsDto credentials)
-    {
-        var user = await repository.Authorize(credentials);
-        if (user == null) throw new UnauthorizedAccessException("Invalid credentials");
-        return jwtTokenGenerator.GenerateJwtToken(user.Id, user.Role);
     }
 
     public async Task<UserDto> TopUpMoney(UserMoneyDto userMoneyDto)

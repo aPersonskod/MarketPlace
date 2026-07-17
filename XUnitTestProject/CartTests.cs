@@ -83,7 +83,7 @@ public class CartTests
             IsConfirmed = false,
             IsBought = false
         };
-        _moqCartRepo.Setup(x => x.GetUnverifiedCartByUserIdAsync(_userId)).ReturnsAsync(requestCart);
+        _moqCartRepo.Setup(x => x.GetNotBoughtCartByUserIdAsync(_userId)).ReturnsAsync(requestCart);
         _moqCartRepo.Setup(x => x.AddPlaceToCart(_userId, _placeId)).ReturnsAsync(() =>
         {
             requestCart.PlaceId = _placeId;

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Model.SharedExceptions;
 using Model.SharedExceptions.ProblemDetails;
+using UnauthorizedAccessException = Model.SharedExceptions.UnauthorizedAccessException;
 
 namespace User.Api.Middleware.Error;
 
@@ -14,6 +15,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         var exceptionDetails = exception switch
         {
             NotFoundException => new ExceptionDetails(StatusCodes.Status404NotFound, "Not Found", exception.Message),
+            UnauthorizedAccessException => new ExceptionDetails(StatusCodes.Status401Unauthorized, "Unauthorized", exception.Message),
             FluentValidation.ValidationException => new ExceptionDetails(StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
             _ => exception.GetExceptionDetails()
         };

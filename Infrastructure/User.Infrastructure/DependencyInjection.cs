@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddAuthInfrastructure(configuration);
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
         if (environment.IsDevelopment())
         {
             services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnectionDev")));

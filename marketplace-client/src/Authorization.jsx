@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import { useNavigate } from 'react-router';
-import {fetchUserData, authRequest} from "./ApiHelper/userService.jsx"
+import {fetchUserData} from "./ApiHelper/userService.jsx"
+import {authRequest} from "./ApiHelper/authService.jsx"
 import './Authorization.css';
 
 const Authorization = ({

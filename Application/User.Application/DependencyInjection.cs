@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
         services.AddValidatorsFromAssemblyContaining<MoneyDtoValidator>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthService, AuthService>();
         return services;
     }
 }

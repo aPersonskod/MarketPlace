@@ -10,7 +10,7 @@ export const throwHandledException = async (response) => {
                 break;
             default:
                 let myLocalError = await response.json();
-                throw new Error(`${status} ${myLocalError.error}`);
+                throw new Error(`${status} ${myLocalError.detail}`);
         }
     }
 };

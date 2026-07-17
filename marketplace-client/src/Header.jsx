@@ -12,7 +12,7 @@ import {useState, useEffect} from "react";
 import { useNavigate } from 'react-router';
 
 import {fetchUserData, walletReplenishmentRequest} from "./ApiHelper/userService.jsx"
-import {ApiHelper} from "./ApiHelper.jsx";
+import {removeToken} from "./ApiHelper/authService.jsx"
 
 function Header() {
     const expand = 'md';
@@ -23,7 +23,6 @@ function Header() {
         width: window.innerWidth,
         height: window.innerHeight,
     });
-    const apiHelper = new ApiHelper();
     
     useEffect(() => {
         const handleResize = () => {
@@ -42,7 +41,7 @@ function Header() {
         };
     },[]);
     const logOutHandler = () => {
-        localStorage.removeItem('uToken');
+        removeToken();
         navigate('/auth');
     };
     const walletReplenishment = async () => {
