@@ -11,15 +11,17 @@ public class AuthRepository(AppDbContext context, IJwtTokenGenerator jwtTokenGen
     public async Task<Token> CreateRefreshToken(Guid userId, string role)
     {
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
+        var token = Token.CreateToken(userId, refreshToken, DateTime.Now);
         var foundToken = await context.Tokens.FirstOrDefaultAsync(x => x.UserId == userId);
         if (foundToken == null)
         {
-            var token = Token.CreateToken(userId, refreshToken, DateTime.Now);
             await context.Tokens.AddAsync(token);
             await context.SaveChangesAsync();
             return token;
         }
-        foundToken.RefreshToken = refreshToken;
+        foundToken.RefreshToken = token.RefreshToken;
+        foundToken.Created = token.Created;
+        foundToken.Expired = token.Expired;
         await context.SaveChangesAsync();
         return foundToken;
     }
@@ -32,7 +34,7 @@ public class AuthRepository(AppDbContext context, IJwtTokenGenerator jwtTokenGen
         if (token == null) throw new UnauthorizedAccessException("Invalid refresh token");
         if (token.Expired < DateTime.UtcNow) throw new UnauthorizedAccessException("Refresh token is expired");
         var newToken = Token.CreateToken(token.UserId, jwtTokenGenerator.GenerateRefreshToken(), DateTime.Now);
-        token.RefreshToken = newToken.RefreshToken;
+        //token.RefreshToken = newToken.RefreshToken;
         token.Created = newToken.Created;
         token.Expired = newToken.Expired;
         await context.SaveChangesAsync();

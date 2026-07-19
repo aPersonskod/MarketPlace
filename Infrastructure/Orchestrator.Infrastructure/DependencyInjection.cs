@@ -16,7 +16,6 @@ public static class DependencyInjection
     public static IServiceCollection AddOrchestratorInfrastructure(this IServiceCollection services,
         IConfiguration configuration, IWebHostEnvironment environment)
     {
-        //string? dbConnectionString;
         IConfigurationSection buyReportSettings;
         IConfigurationSection cartSettings;
         IConfigurationSection userSettings;
@@ -25,14 +24,12 @@ public static class DependencyInjection
             buyReportSettings = configuration.GetSection("Grpc:BuyReportOptionsDev");
             cartSettings = configuration.GetSection("Grpc:CartOptionsDev");
             userSettings = configuration.GetSection("Grpc:UserOptionsDev");
-            //dbConnectionString = Environment.GetEnvironmentVariable("PostgresConnectionDev");
         }
         else
         {
             buyReportSettings = configuration.GetSection("Grpc:BuyReportOptions");
             cartSettings = configuration.GetSection("Grpc:CartOptions");
             userSettings = configuration.GetSection("Grpc:UserOptions");
-            //dbConnectionString = Environment.GetEnvironmentVariable("PostgresConnection");
         }
         // settings
         services.Configure<BuyReportSettings>(buyReportSettings);
@@ -42,12 +39,19 @@ public static class DependencyInjection
         services.AddScoped<IBuyReportRepository, BuyReportRepository>();
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        // db context
-        //services.AddDbContext<CartSagaDbContext>(o => o.UseNpgsql(dbConnectionString));
         services.AddMassTransit(x =>
         {
             x.AddActivities(typeof(ConfirmCartActivity).Assembly);
-            x.UsingInMemory((context, config) => config.ConfigureEndpoints(context));
+            //x.UsingInMemory((context, config) => config.ConfigureEndpoints(context));
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host("localhost", "/", h =>
+                {
+                    h.Username("admin");
+                    h.Password("securepassword123");
+                });
+                cfg.ConfigureEndpoints(context);
+            });
         });
         return services;
     }

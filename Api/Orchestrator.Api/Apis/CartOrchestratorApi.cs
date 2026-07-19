@@ -12,12 +12,12 @@ public static class CartOrchestratorApi
     {
         var api = app.MapGroup("api/buy-actions").WithTags("BuyActions");
 
-        api.MapPost("/buy-cart", async (HttpContext context, IBus bus, [FromBody] CartSubmittedDto cartSubmittedDto) =>
+        api.MapPost("/buy-cart", async (HttpContext context, IRoutingSlipExecutor executor, [FromBody] CartSubmittedDto cartSubmittedDto) =>
             {
                 var token = context.GetAccessToken();
                 if (token == null) return Results.Unauthorized();
                 var submittedEvent = new CartSubmittedEvent(cartSubmittedDto.CartId, cartSubmittedDto.PlaceId, token);
-                var saga = new SagaExecutor(bus);
+                var saga = new SagaExecutor(executor);
                 await saga.Execute(submittedEvent);
                 return Results.Ok("Cart submitted successfully");
             })
