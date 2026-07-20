@@ -16,8 +16,10 @@ export const fetchCartData = async () => {
                 'Authorization': `Bearer ${token}`
             }
         };
-        const response = await fetch(query, options);
-        if (response.ok) return await response.json();
+        const response = await handleUnauthorizedApi(query, options);
+        if (response.ok){
+            return await response.json();
+        }
         await throwHandledException(response);
     } catch(e) {
         console.error("Failed to fetch cart data:", e);

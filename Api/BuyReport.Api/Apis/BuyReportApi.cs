@@ -12,11 +12,16 @@ public static class BuyReportApi
     {
         var api = app.MapGroup("api/buy-service").WithTags("BuyService");
         
-        api.MapGet("/get-reports-by-userid", async (HttpContext context, ISender sender) =>
+        api.MapGet("/get-reports-by-userid", async (HttpContext context, ISender sender,
+                [FromQuery]int pageNumber = 1, [FromQuery]int pageSize = 6) =>
             {
                 var token = context.GetAccessToken();
                 if (token == null) return Results.Unauthorized();
-                var query = new GetReportsQuery(token);
+                
+                if (pageNumber < 1) pageNumber = 1;
+                if (pageSize < 1) pageSize = 6;
+                
+                var query = new GetReportsQuery(token, pageNumber, pageSize);
                 return Results.Ok(await sender.Send(query));
             })
             .WithDescription("Get reports by userid")

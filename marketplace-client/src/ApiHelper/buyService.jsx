@@ -7,10 +7,10 @@ const buyPort = import.meta.env.VITE_BUY_APP_PORT;
 
 export const buyServiceBaseAddress = `${buyHost}:${buyPort}/api/buy-service`;
 
-export const fetchBuyReports = async () => {
+export const fetchBuyReports = async (pageNumber, pageSize) => {
     try {
         let token = getAccessToken();
-        let query = `${buyServiceBaseAddress}/get-reports-by-userid`;
+        let query = `${buyServiceBaseAddress}/get-reports-by-userid?pageNumber=${pageNumber}&pageSize=${pageSize}`;
         let options = {
             method: 'GET',
             headers: {

@@ -17,8 +17,10 @@ export const getCartOrders = async (cartId) => {
                 'Authorization': `Bearer ${token}`,
             },
         };
-        const response = await fetch(url, options);
-        if (response.ok) return await response.json();
+        const response = await handleUnauthorizedApi(url, options);
+        if (response.ok){
+            return await response.json();
+        }
         await throwHandledException(response);
     } catch(e){
         console.error("Failed to get orders:", e);
