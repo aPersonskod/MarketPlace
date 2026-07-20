@@ -29,6 +29,27 @@ export const walletReplenishmentRequest = async () => {
     }
 };
 
+export const createUser = async (name, email, password) => {
+    let createUserDto = {
+        name: name,
+        email: email,
+        password: password,
+        wallet: 100,
+        role: 'user'
+    };
+    let query = `${userServiceBaseAddress}`;
+    let options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(createUserDto)
+    };
+    const response = await fetch(query, options);
+    if (response.ok) return await response.json();
+    await throwHandledException(response);
+};
+
 export const fetchUserData = async () => {
     try{
         let token = getAccessToken();

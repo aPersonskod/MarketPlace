@@ -1,17 +1,18 @@
-import {useEffect, useState} from "react";
+import {useState, useEffect} from "react";
 import { useNavigate } from 'react-router';
-import {fetchUserData} from "./ApiHelper/userService.jsx"
-import {authRequest} from "./ApiHelper/authService.jsx"
-import './Authorization.css';
+import {fetchUserData, createUser} from "../ApiHelper/userService.jsx"
+import {authRequest} from "../ApiHelper/authService.jsx"
+import '../Authorization.css'
 
-const Authorization = ({
-                           onLoginSuccess,
-                           title = "Привет!",
-                           subtitle = "Войдите в свой аккунт"
-                       }) => {
-    const [user, setUser] = useState({});
+const AuthPage = ({
+    onLoginSuccess,
+    showSignup = true,
+    title = "Welcome Back",
+    subtitle = "Sign in to your account"
+}) => {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
+        name: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -19,17 +20,35 @@ const Authorization = ({
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    //const { login } = useAuth();
-    
+
+    // #region API Functions
+
     useEffect(() => {
         navigateNext();
     }, [])
+
     const navigateNext = async () => {
         let userDto = await fetchUserData();
         if (userDto !== null) {
             navigate('/');
         }
     };
+
+    const handleAuth = async () => {
+        try {
+            await authRequest(formData.email, formData.password);
+            navigateNext();
+        } catch (err) {
+            setError(err);
+            throw err;
+        }
+    }
+    
+    const handleRegister = async () => {
+        await createUser(formData.name, formData.email, formData.password);
+    }
+
+    // #endregion
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -43,6 +62,11 @@ const Authorization = ({
 
     const validateForm = () => {
         if (!formData.email || !formData.password) {
+            setError('Please fill in all required fields');
+            return false;
+        }
+
+        if (!isLogin && !formData.name){
             setError('Please fill in all required fields');
             return false;
         }
@@ -68,14 +92,6 @@ const Authorization = ({
         return true;
     };
 
-    const handleAuth = async () => {
-        try {
-            await authRequest(formData.email, formData.password);
-            navigateNext();
-        } catch (err) {
-            setError(err);
-        }
-    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
@@ -90,8 +106,14 @@ const Authorization = ({
                 ...(isLogin ? {} : {name: formData.email.split('@')[0]})
             };
 
-            await handleAuth();
             //await login(credentials);
+            if (isLogin){
+                await handleAuth();
+            }
+            if (!isLogin){
+                await handleRegister();
+                await handleAuth();
+            }
         } catch (err) {
             setError(err.message || 'Authentication failed. Please try again.');
         } finally {
@@ -99,16 +121,15 @@ const Authorization = ({
         }
     };
 
-    if (isLoading) return <div>Loading data...</div>;
-    if (error) return <div>Error: {error.message}</div>;
-
     return (
         <>
             <div className="auth-container">
                 <div className="auth-card">
                     <div className="auth-header">
-                        <h1 className="auth-title">{title}</h1>
-                        <p className="auth-subtitle">{subtitle}</p>
+                        <h1 className="auth-title">{isLogin ? title : 'Create Account'}</h1>
+                        <p className="auth-subtitle">
+                            {isLogin ? subtitle : 'Join us today'}
+                        </p>
                     </div>
 
                     {error && (
@@ -118,8 +139,23 @@ const Authorization = ({
                     )}
 
                     <form onSubmit={handleSubmit} className="auth-form">
+                        {!isLogin && (
+                            <div className="form-group">
+                                <label htmlFor="name">Full Name</label>
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                    className="auth-input"
+                                />
+                            </div>
+                        )}
+
                         <div className="form-group">
-                            <label htmlFor="email">Email Address / Nick</label>
+                            <label htmlFor="email">Email Address</label>
                             <input
                                 id="email"
                                 name="email"
@@ -145,40 +181,58 @@ const Authorization = ({
                             />
                         </div>
 
+                        {!isLogin && (
+                            <div className="form-group">
+                                <label htmlFor="confirmPassword">Confirm Password</label>
+                                <input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type="password"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    className="auth-input"
+                                    required
+                                />
+                            </div>
+                        )}
+
                         <button
                             type="submit"
                             className="auth-button"
                             disabled={isLoading}
                             aria-busy={isLoading}
                         >
-                            {isLoading ? 'Processing...' : 'Войти'}
+                            {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
                         </button>
                     </form>
 
-                    <div className="auth-toggle">
-                        <p>
-                            Don't have an account?
-                        </p>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsLogin(!isLogin);
-                                setError('');
-                                setFormData({
-                                    email: '',
-                                    password: '',
-                                    confirmPassword: ''
-                                });
-                            }}
-                            className="auth-link"
-                        >
-                            Sign Up
-                        </button>
-                    </div>
+                    {showSignup && (
+                        <div className="auth-toggle">
+                            <p>
+                                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsLogin(!isLogin);
+                                    setError('');
+                                    setFormData({
+                                        name: '',
+                                        email: '',
+                                        password: '',
+                                        confirmPassword: ''
+                                    });
+                                }}
+                                className="auth-link"
+                            >
+                                {isLogin ? 'Sign Up' : 'Sign In'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </>
     );
 }
 
-export default Authorization;
+export default AuthPage;
