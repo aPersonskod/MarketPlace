@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Cart.Application.Interfaces.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 using Cart.Application.Interfaces.Services;
 using Cart.Application.Services;
 using Cart.Application.Validation;
@@ -12,11 +13,26 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssemblyContaining<CreateOrderDtoValidator>();
         services.AddValidatorsFromAssemblyContaining<DeleteOrderDtoValidator>();
-        services.AddScoped<ICartService, CartService>();
-        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<ICartService, CachedCartService>();
+        services.AddScoped<IOrderService, CachedOrderService>();
         services.AddScoped<IPlaceService, PlaceService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IBuyReportService, BuyReportService>();
         return services;
     }
+}
+
+public delegate ICartRepository? CartRepositoryResolver(CartRepositoryKeys key);
+public delegate IOrderRepository? OrderRepositoryResolver(OrderRepositoryKeys key);
+
+public enum CartRepositoryKeys
+{
+    Cart,
+    CachedCart
+}
+
+public enum OrderRepositoryKeys
+{
+    Order,
+    CachedOrder
 }

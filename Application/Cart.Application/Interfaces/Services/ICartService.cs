@@ -6,7 +6,7 @@ public interface ICartService
 {
     Task<IEnumerable<CartDto>> GetBoughtCartsAsync(Guid userId);
     Task<CartDto> GetCartByUserIdAsync(Guid userId);
-    Task<bool> GetCartByIdAsync(Guid cartId);
+    Task<CartDto?> GetCartByIdAsync(Guid cartId);
     Task DeleteCartAsync(Guid cartId);
     
     // saga
@@ -15,4 +15,5 @@ public interface ICartService
     
     Task<CartDto> MarkCartAsBoughtAsync(Guid cartId);
     Task<CartDto> MarkCartAsNotBoughtAsync(Guid cartId);
+    Task UpdateCartAsync(Guid cartId);
 }

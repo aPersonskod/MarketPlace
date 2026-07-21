@@ -16,12 +16,24 @@ public static class DependencyInjection
     {
         services.AddGrpc();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddStackExchangeRedisCache(o =>
+        {
+            o.Configuration = configuration.GetValue<string>("Redis:ConfigurationDev");
+            o.InstanceName = configuration.GetValue<string>("Redis:InstanceNameDev");
+        });
         if (environment.IsDevelopment())
         {
             // todo ОБЯЗАТЕЛЬНО ПРОВЕРЬ ПРИ ЗАПУСКЕ ДОККЕРА !!!
-            services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnectionDev")));
-            // need that because in docker-compose env is development
-            //services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
+            var isRunningFromContainer = false;
+            if (isRunningFromContainer)
+            {
+                // need that because in docker-compose env is development
+                services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
+            }
+            else
+            {
+                services.AddDbContext<AppDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("PostgresConnectionDev")));
+            }
         }
         else
         {

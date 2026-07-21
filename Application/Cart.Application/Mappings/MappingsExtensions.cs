@@ -32,6 +32,17 @@ public static class MappingsExtensions
         };
     }
 
+    public static Model.Order ToModel(this OrderDto? orderDto)
+    {
+        if (orderDto == null) throw new NotFoundException("Order not found");
+        return new Model.Order()
+        {
+            Id = orderDto.Id,
+            CartId = orderDto.CartId,
+            Quantity = orderDto.Quantity
+        };
+    }
+
     public static PlaceDto ToDto(this Model.Place? place)
     {
         if (place == null) throw new NotFoundException("Place not found");

@@ -5,9 +5,9 @@ namespace Product.Application.Mappings;
 
 public static class MappingsExtensions
 {
-    public static ProductDto ToDto(this Model.Product product)
+    public static ProductDto ToDto(this Model.Product? product)
     {
-        if (product == null) throw new NotFoundException("User not found");
+        if (product == null) throw new NotFoundException("Product not found");
         return new ProductDto()
         {
             Id = product.Id,

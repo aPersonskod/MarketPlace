@@ -1,4 +1,5 @@
-﻿using Cart.Application.Interfaces;
+﻿using Cart.Application;
+using Cart.Application.Interfaces;
 using Cart.Application.Interfaces.Repositories;
 using Cart.Infrastructure.Data;
 using Cart.Infrastructure.Repositories;
@@ -19,11 +20,31 @@ public static class DependencyInjection
     {
         services.AddAuthInfrastructure(configuration);
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<CartRepository>();
+        services.AddScoped<CachedCartRepository>();
+        services.AddScoped<CartRepositoryResolver>(s => key => key switch
+        {
+            CartRepositoryKeys.Cart => s.GetService<CartRepository>(),
+            CartRepositoryKeys.CachedCart => s.GetService<CachedCartRepository>(),
+            _ => throw new KeyNotFoundException("Unknown cart repository")
+        });
+        services.AddScoped<OrderRepository>();
+        services.AddScoped<CachedOrderRepository>();
+        services.AddScoped<OrderRepositoryResolver>(s => key => key switch
+        {
+            OrderRepositoryKeys.Order => s.GetService<OrderRepository>(),
+            OrderRepositoryKeys.CachedOrder => s.GetService<CachedOrderRepository>(),
+            _ => throw new KeyNotFoundException("Unknown order repository")
+        });
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPlaceRepository, PlaceRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IBuyReportRepository, BuyReportRepository>();
+        services.AddStackExchangeRedisCache(o =>
+        {
+            o.Configuration = configuration.GetValue<string>("Redis:ConfigurationDev");
+            o.InstanceName = configuration.GetValue<string>("Redis:InstanceNameDev");
+        });
         if (environment.IsDevelopment())
         {
             services.Configure<GrpcProductSettings>(configuration.GetSection("Grpc:ProductsDev"));
