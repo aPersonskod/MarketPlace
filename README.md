@@ -2,7 +2,7 @@
 Asp.net Core проект маркетплейса с микросервисной архитектурой.
 
 Стэк:
-ASP.NET Core 8, PostgreSQL, Apache Kafka, Redis, REST и gRPC, JWT Auth.
+ASP.NET Core 8, PostgreSQL, RabbitMQ, Redis, REST и gRPC, JWT Auth.
 Проект был разработан с DDD и Clean architecture, полностью упакован в docker-compose.
 - Для отказоустойчивости используется паттерн Outbox.
 - Оркестрация осуществляется паттреном SAGA.
@@ -15,20 +15,24 @@ ASP.NET Core 8, PostgreSQL, Apache Kafka, Redis, REST и gRPC, JWT Auth.
 Ниже приведены экраны приложения:
 
 Экран авторизации.
-![img_3.png](images/img_3.png)
+
+![img_auth.png](images/img_auth.png)
 
 Экран каталога товаров и корзины.
-![img.png](images/img.png)
 
-Экран оформления заказа.
 ![img_1.png](images/img_1.png)
 
-Экран осуществленных покупок.
+Экран оформления заказа.
+
 ![img_2.png](images/img_2.png)
+
+Экран осуществленных покупок.
+
+![img_3.png](images/img_3.png)
 
 
 This repo contains docker-compose file, so if you have installed docker in your computer:
 1) run "docker-compose up -d"
-2) go to "http://localhost:3000/"
+2) go to "http://localhost:5173/"
 3) login with user "patochin@gmail.com" and password "12345"
 4) enjoy it !!!
