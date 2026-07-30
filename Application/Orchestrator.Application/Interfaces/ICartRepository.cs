@@ -9,4 +9,5 @@ public interface ICartRepository
     
     Task<CartDto?> BuyCartAsync(string authToken, Guid cartId);
     Task<CartDto?> BuyBackCartAsync(string authToken, Guid cartId);
+    Task CachedCartDataToDbAsync(Guid cartId);
 }

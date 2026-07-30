@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Model.SharedExceptions;
 using Orchestrator.Application.Features.Arguments;
 using Orchestrator.Application.Features.SagaLogs;
@@ -6,25 +7,33 @@ using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Activities;
 
-public class BuyCartActivity(ICartRepository cartRepository) : IActivity<BuyCartArguments, BuyCartLog>
+public class BuyCartActivity(ICartRepository cartRepository, ILogger<BuyCartActivity> logger) : IActivity<BuyCartArguments, BuyCartLog>
 {
     public async Task<ExecutionResult> Execute(ExecuteContext<BuyCartArguments> context)
     {
-        var args = context.Arguments;
-        var cart = await cartRepository.BuyCartAsync(args.AuthToken, args.CartId);
-        if (cart == null) throw new NotFoundException("Cart not found");
-        var log = new BuyCartLog()
+        try
         {
-            CartId = args.CartId,
-            AuthToken = args.AuthToken
-        };
-        var buyReportArguments = new CreateBuyReportArguments()
+            var args = context.Arguments;
+            var cart = await cartRepository.BuyCartAsync(args.AuthToken, args.CartId);
+            if (cart == null) throw new NotFoundException("Cart not found");
+            var log = new BuyCartLog()
+            {
+                CartId = args.CartId,
+                AuthToken = args.AuthToken
+            };
+            var buyReportArguments = new CreateBuyReportArguments()
+            {
+                CartId = args.CartId,
+                AmountToPay = cart.AmountToPay,
+                AuthToken = args.AuthToken
+            };
+            return context.CompletedWithVariables(log, buyReportArguments);
+        }
+        catch (Exception e)
         {
-            CartId = args.CartId,
-            AmountToPay = cart.AmountToPay,
-            AuthToken = args.AuthToken
-        };
-        return context.CompletedWithVariables(log, buyReportArguments);
+            logger.LogError(e, "Error while buy cart");
+            throw;
+        }
     }
 
     public async Task<CompensationResult> Compensate(CompensateContext<BuyCartLog> context)

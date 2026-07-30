@@ -52,13 +52,14 @@ public static class CartApi
             .RequireAuthorization()
             .WithOpenApi();
 
-        api.MapPatch("/confirm-cart", async (ClaimsPrincipal user, ICartService cartService, [FromQuery] Guid placeId) =>
-            {
-                var credentials = user.GetAuthCredentials();
-                return credentials == null
-                    ? Results.Unauthorized()
-                    : Results.Ok(await cartService.ConfirmCartAsync(credentials.Value.UserId, placeId));
-            })
+        api.MapPatch("/confirm-cart",
+                async (ClaimsPrincipal user, ICartService cartService, [FromQuery] Guid placeId) =>
+                {
+                    var credentials = user.GetAuthCredentials();
+                    return credentials == null
+                        ? Results.Unauthorized()
+                        : Results.Ok(await cartService.ConfirmCartAsync(credentials.Value.UserId, placeId));
+                })
             .WithDescription("Confirm cart")
             .WithName("ConfirmCart")
             .RequireAuthorization()
@@ -96,11 +97,14 @@ public static class CartApi
             .RequireAuthorization()
             .WithOpenApi();
 
-        api.MapPost("/update-cart", async (ICartService cartService, [FromQuery] Guid cartId) =>
-        {
-            await cartService.UpdateCartAsync(cartId);
-            return Results.Ok();
-        });
+        api.MapPost("/cart/cache-to-db", async (ICartService cartService, [FromQuery] Guid cartId) =>
+            {
+                await cartService.CachedCartToDbAsync(cartId);
+                return Results.Ok();
+            })
+            .WithDescription("Save cart to database from cache")
+            .WithName("CacheToDbCart")
+            .WithOpenApi();
 
         return app;
     }

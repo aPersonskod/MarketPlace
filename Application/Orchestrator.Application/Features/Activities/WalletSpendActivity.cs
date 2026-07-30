@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Orchestrator.Application.Dtos;
 using Orchestrator.Application.Features.Arguments;
 using Orchestrator.Application.Features.SagaLogs;
@@ -6,28 +7,38 @@ using Orchestrator.Application.Interfaces;
 
 namespace Orchestrator.Application.Features.Activities;
 
-public class WalletSpendActivity(IUserRepository userRepository) : IActivity<WalletSpendArguments, WalletSpendLog>
+public class WalletSpendActivity(
+    IUserRepository userRepository,
+    ILogger<WalletSpendActivity> logger) : IActivity<WalletSpendArguments, WalletSpendLog>
 {
     public async Task<ExecutionResult> Execute(ExecuteContext<WalletSpendArguments> context)
     {
-        var args = context.Arguments;
-        var user = await userRepository.SpendMoney(new UserMoneyDto
+        try
         {
-            AuthToken = args.AuthToken,
-            Money = (int)args.AmountToPay
-        });
-        var log = new WalletSpendLog()
+            var args = context.Arguments;
+            var user = await userRepository.SpendMoney(new UserMoneyDto
+            {
+                AuthToken = args.AuthToken,
+                Money = (int)args.AmountToPay
+            });
+            var log = new WalletSpendLog()
+            {
+                CartId = args.CartId,
+                AmountToPay = args.AmountToPay,
+                AuthToken = args.AuthToken
+            };
+            var buyCartArguments = new BuyCartArguments()
+            {
+                CartId = args.CartId,
+                AuthToken = args.AuthToken
+            };
+            return context.CompletedWithVariables(log, buyCartArguments);
+        }
+        catch (Exception e)
         {
-            CartId = args.CartId,
-            AmountToPay = args.AmountToPay,
-            AuthToken = args.AuthToken
-        };
-        var buyCartArguments = new BuyCartArguments()
-        {
-            CartId = args.CartId,
-            AuthToken = args.AuthToken
-        };
-        return context.CompletedWithVariables(log, buyCartArguments);
+            logger.LogError(e, "Error while spend money cart");
+            throw;
+        }
     }
 
     public async Task<CompensationResult> Compensate(CompensateContext<WalletSpendLog> context)

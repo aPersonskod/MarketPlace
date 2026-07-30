@@ -7,5 +7,5 @@ public interface IOrderService
     Task<IEnumerable<OrderDto>> GetAllOrdersAsync(Guid cartId);
     Task<OrderDto> AddOrderAsync(CreateOrderDto orderDto);
     Task DeleteOrderAsync(DeleteOrderDto deleteOrderDto);
-    Task UpdateOrdersAsync(Guid cartId);
+    Task CachedOrdersToDbAsync(Guid cartId);
 }

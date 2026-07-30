@@ -15,5 +15,5 @@ public interface ICartService
     
     Task<CartDto> MarkCartAsBoughtAsync(Guid cartId);
     Task<CartDto> MarkCartAsNotBoughtAsync(Guid cartId);
-    Task UpdateCartAsync(Guid cartId);
+    Task CachedCartToDbAsync(Guid cartId);
 }

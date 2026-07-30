@@ -24,16 +24,6 @@ public static class OrderApi
             .RequireAuthorization()
             .WithOpenApi();
 
-        api.MapPost("/update-orders", async (IOrderService orderService, [FromQuery] Guid cartId) =>
-            {
-                await orderService.UpdateOrdersAsync(cartId);
-                return Results.Ok();
-            })
-            .WithDescription("Update order")
-            .WithName("UpdateOrder")
-            .RequireAuthorization()
-            .WithOpenApi();
-
         api.MapDelete("/delete-order",
                 async (IOrderService orderService, [FromBody] DeleteOrderDto deleteOrderDto) =>
                 {
@@ -43,6 +33,15 @@ public static class OrderApi
             .WithDescription("Delete order")
             .WithName("DeleteOrder")
             .RequireAuthorization()
+            .WithOpenApi();
+        
+        api.MapPost("/orders/cache-to-db", async (IOrderService orderService, [FromQuery] Guid cartId) =>
+            {
+                await orderService.CachedOrdersToDbAsync(cartId);
+                return Results.Ok();
+            })
+            .WithDescription("Save orders to database from cache")
+            .WithName("CacheToDbOrders")
             .WithOpenApi();
 
         return app;

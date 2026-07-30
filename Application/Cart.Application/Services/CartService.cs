@@ -71,7 +71,7 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
         return cart.ToDto();
     }
 
-    public Task UpdateCartAsync(Guid cartId) => Task.CompletedTask;
+    public Task CachedCartToDbAsync(Guid cartId) => Task.CompletedTask;
 }
 
 public class CachedCartService(
@@ -144,7 +144,7 @@ public class CachedCartService(
         await unitOfWork.CompleteAsync();
         return cart.ToDto();
     }
-    public async Task UpdateCartAsync(Guid cartId)
+    public async Task CachedCartToDbAsync(Guid cartId)
     {
         var cart = await cachedCartRepository.GetCartByIdAsync(cartId);
         if (cart == null) throw new NotFoundException("Cart not found when updating");

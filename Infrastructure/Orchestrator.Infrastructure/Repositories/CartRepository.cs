@@ -32,6 +32,14 @@ public class CartRepository(IOptions<CartSettings> cartOptions) : ICartRepositor
         var url = $"{_baseUrl}/mark-cart-as-not-bought/{cartId}";
         return await url.PatchQuery<CartDto>(authToken);
     }
+
+    public async Task CachedCartDataToDbAsync(Guid cartId)
+    {
+        var urlOrders = $"{_baseUrl}/orders/cache-to-db?cartId={cartId}";
+        var urlCart = $"{_baseUrl}/cart/cache-to-db?cartId={cartId}";
+        await urlOrders.PostQuery();
+        await urlCart.PostQuery();
+    }
 }
 
 public class TestCartRepository : ICartRepository
@@ -74,5 +82,10 @@ public class TestCartRepository : ICartRepository
     {
         _cartDto.IsBought = false;
         return Task.FromResult(_cartDto)!;
+    }
+
+    public Task CachedCartDataToDbAsync(Guid cartId)
+    {
+        throw new NotImplementedException();
     }
 }

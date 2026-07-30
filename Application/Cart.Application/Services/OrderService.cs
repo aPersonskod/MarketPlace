@@ -61,7 +61,7 @@ public class OrderService(IUnitOfWork unitOfWork, IProductService productService
         }
     }
 
-    public Task UpdateOrdersAsync(Guid cartId) => Task.CompletedTask;
+    public Task CachedOrdersToDbAsync(Guid cartId) => Task.CompletedTask;
 
     private async Task<IEnumerable<(int productCost, int productQuantity)>?> GetCostCollection(Guid cartId)
     {
@@ -116,7 +116,7 @@ public class CachedOrderService(
         await cachedCartRepository.UpdateAmountToPayAsync(deleteOrderDto.CartId, costCollection);
     }
 
-    public async Task UpdateOrdersAsync(Guid cartId)
+    public async Task CachedOrdersToDbAsync(Guid cartId)
     {
         var cachedOrders = await cachedOrderRepository.GetCartOrdersAsync(cartId);
         var orders = cachedOrders.ToList();

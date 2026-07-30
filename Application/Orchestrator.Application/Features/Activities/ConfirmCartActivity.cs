@@ -12,23 +12,32 @@ public class ConfirmCartActivity(ICartRepository cartRepository, ILogger<Confirm
 {
     public async Task<ExecutionResult> Execute(ExecuteContext<ConfirmCartArguments> context)
     {
-        var args = context.Arguments;
-        var cart = await cartRepository.ConfirmCartAsync(
-            args.AuthToken,
-            args.PlaceId
-        );
-        if (cart == null) throw new NotFoundException("Cart not found");
-        var confirmCartLog = new ConfirmCartLog()
+        try
         {
-            AuthToken = args.AuthToken
-        };
-        var walletSpentArgs = new WalletSpendArguments()
+            var args = context.Arguments;
+            await cartRepository.CachedCartDataToDbAsync(args.CartId);
+            var cart = await cartRepository.ConfirmCartAsync(
+                args.AuthToken,
+                args.PlaceId
+            );
+            if (cart == null) throw new NotFoundException("Cart not found");
+            var confirmCartLog = new ConfirmCartLog()
+            {
+                AuthToken = args.AuthToken
+            };
+            var walletSpentArgs = new WalletSpendArguments()
+            {
+                CartId = args.CartId,
+                AmountToPay = cart.AmountToPay,
+                AuthToken = args.AuthToken
+            };
+            return context.CompletedWithVariables(confirmCartLog, walletSpentArgs);
+        }
+        catch (Exception e)
         {
-            CartId = args.CartId,
-            AmountToPay = cart.AmountToPay,
-            AuthToken = args.AuthToken
-        };
-        return context.CompletedWithVariables(confirmCartLog, walletSpentArgs);
+            logger.LogError(e, "Error while confirm cart");
+            throw;
+        }
     }
 
     public async Task<CompensationResult> Compensate(CompensateContext<ConfirmCartLog> context)
