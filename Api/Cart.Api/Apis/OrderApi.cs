@@ -9,7 +9,7 @@ public static class OrderApi
     public static IEndpointRouteBuilder MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
         var api = app.MapGroup("api/cart-service").WithTags("Order");
-        
+
         api.MapGet("/get-cart-orders/{cartId:guid}", async (IOrderService orderService, Guid cartId)
                 => Results.Ok(await orderService.GetAllOrdersAsync(cartId)))
             .WithDescription("Get cart orders")
@@ -24,6 +24,16 @@ public static class OrderApi
             .RequireAuthorization()
             .WithOpenApi();
 
+        api.MapPost("/update-orders", async (IOrderService orderService, [FromQuery] Guid cartId) =>
+            {
+                await orderService.UpdateOrdersAsync(cartId);
+                return Results.Ok();
+            })
+            .WithDescription("Update order")
+            .WithName("UpdateOrder")
+            .RequireAuthorization()
+            .WithOpenApi();
+
         api.MapDelete("/delete-order",
                 async (IOrderService orderService, [FromBody] DeleteOrderDto deleteOrderDto) =>
                 {
@@ -34,7 +44,7 @@ public static class OrderApi
             .WithName("DeleteOrder")
             .RequireAuthorization()
             .WithOpenApi();
-        
+
         return app;
     }
 }

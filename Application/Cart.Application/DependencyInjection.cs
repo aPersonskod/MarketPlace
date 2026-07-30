@@ -1,5 +1,4 @@
-﻿using Cart.Application.Interfaces.Repositories;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Cart.Application.Interfaces.Services;
 using Cart.Application.Services;
 using Cart.Application.Validation;
@@ -20,19 +19,4 @@ public static class DependencyInjection
         services.AddScoped<IBuyReportService, BuyReportService>();
         return services;
     }
-}
-
-public delegate ICartRepository? CartRepositoryResolver(CartRepositoryKeys key);
-public delegate IOrderRepository? OrderRepositoryResolver(OrderRepositoryKeys key);
-
-public enum CartRepositoryKeys
-{
-    Cart,
-    CachedCart
-}
-
-public enum OrderRepositoryKeys
-{
-    Order,
-    CachedOrder
 }

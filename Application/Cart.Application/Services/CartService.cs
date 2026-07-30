@@ -1,12 +1,13 @@
 using Cart.Application.Dtos;
 using Cart.Application.Interfaces;
-using Cart.Application.Interfaces.Repositories;
+using Cart.Application.Interfaces.Repositories.Cached;
 using Cart.Application.Interfaces.Services;
 using Cart.Application.Mappings;
 using Model.SharedExceptions;
 
 namespace Cart.Application.Services;
 
+[Obsolete]
 public class CartService(IUnitOfWork unitOfWork) : ICartService
 {
     public async Task<IEnumerable<CartDto>> GetBoughtCartsAsync(Guid userId)
@@ -74,11 +75,10 @@ public class CartService(IUnitOfWork unitOfWork) : ICartService
 }
 
 public class CachedCartService(
-    IUnitOfWork unitOfWork,
-    CartRepositoryResolver cartAccessor
-) : ICartService
+    IUnitOfWork unitOfWork, 
+    ICachedCartRepository cachedCartRepository) : ICartService
 {
-    private readonly ICartRepository _cachedCartRepository = cartAccessor(CartRepositoryKeys.CachedCart)!;
+    // works only with DB
     public async Task<IEnumerable<CartDto>> GetBoughtCartsAsync(Guid userId)
     {
         var carts = await unitOfWork.CartRepository.GetBoughtCartsAsync(userId);
@@ -87,25 +87,30 @@ public class CachedCartService(
 
     public async Task<CartDto> GetCartByUserIdAsync(Guid userId)
     {
-        var cart = await _cachedCartRepository.GetNotBoughtCartByUserIdAsync(userId) 
-                   ?? await _cachedCartRepository.AddCartAsync(userId);
-
+        var cart = await cachedCartRepository.GetNotBoughtCartByUserIdAsync(userId);
+        if (cart == null)
+        {
+            await unitOfWork.CartRepository.AddCartAsync(userId);
+            await unitOfWork.CompleteAsync();
+            cart = await cachedCartRepository.AddCartAsync(userId);
+        }
         return cart.ToDto();
     }
 
     public async Task<CartDto?> GetCartByIdAsync(Guid cartId)
     {
-        var cart = await _cachedCartRepository.GetCartByIdAsync(cartId);
+        var cart = await cachedCartRepository.GetCartByIdAsync(cartId);
         return cart.ToDto();
     }
 
     public async Task DeleteCartAsync(Guid cartId)
     {
         await unitOfWork.CartRepository.DeleteCartAsync(cartId);
-        await _cachedCartRepository.DeleteCartAsync(cartId);
         await unitOfWork.CompleteAsync();
+        await cachedCartRepository.DeleteCartAsync(cartId);
     }
 
+    // works only with DB
     public async Task<CartDto> ConfirmCartAsync(Guid userId, Guid placeId)
     {
         var place = await unitOfWork.PlaceRepository.GetPlaceByIdAsync(placeId);
@@ -116,6 +121,7 @@ public class CachedCartService(
         return cart.ToDto();
     }
 
+    // works only with DB
     public async Task<CartDto> UnConfirmCartAsync(Guid userId)
     {
         var cart = await unitOfWork.CartRepository.UnConfirmCartAsync(userId);
@@ -123,6 +129,7 @@ public class CachedCartService(
         return cart.ToDto();
     }
 
+    // works only with DB
     public async Task<CartDto> MarkCartAsBoughtAsync(Guid cartId)
     {
         var cart = await unitOfWork.CartRepository.BuyCartAsync(cartId);
@@ -130,6 +137,7 @@ public class CachedCartService(
         return cart.ToDto();
     }
 
+    // works only with DB
     public async Task<CartDto> MarkCartAsNotBoughtAsync(Guid cartId)
     {
         var cart = await unitOfWork.CartRepository.BuyBackCartAsync(cartId);
@@ -138,10 +146,8 @@ public class CachedCartService(
     }
     public async Task UpdateCartAsync(Guid cartId)
     {
-        //var cart = await GetCartByIdAsync(cartId);
-        var cart = await _cachedCartRepository.GetCartByIdAsync(cartId);
+        var cart = await cachedCartRepository.GetCartByIdAsync(cartId);
         if (cart == null) throw new NotFoundException("Cart not found when updating");
         await unitOfWork.CartRepository.UpdateCartAsync(cart);
-        await _cachedCartRepository.UpdateCartAsync(cart);
     }
 }

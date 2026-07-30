@@ -96,6 +96,12 @@ public static class CartApi
             .RequireAuthorization()
             .WithOpenApi();
 
+        api.MapPost("/update-cart", async (ICartService cartService, [FromQuery] Guid cartId) =>
+        {
+            await cartService.UpdateCartAsync(cartId);
+            return Results.Ok();
+        });
+
         return app;
     }
 }

@@ -1,4 +1,4 @@
-namespace BuyReport.Infrastructure.Settings;
+namespace HostedService.Infrastructure.Settings;
 
 public class CartSettings
 {

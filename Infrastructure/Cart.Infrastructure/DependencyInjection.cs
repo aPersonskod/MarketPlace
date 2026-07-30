@@ -1,8 +1,10 @@
 ﻿using Cart.Application;
 using Cart.Application.Interfaces;
 using Cart.Application.Interfaces.Repositories;
+using Cart.Application.Interfaces.Repositories.Cached;
 using Cart.Infrastructure.Data;
 using Cart.Infrastructure.Repositories;
+using Cart.Infrastructure.Repositories.Cached;
 using Cart.Infrastructure.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -20,22 +22,10 @@ public static class DependencyInjection
     {
         services.AddAuthInfrastructure(configuration);
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<CartRepository>();
-        services.AddScoped<CachedCartRepository>();
-        services.AddScoped<CartRepositoryResolver>(s => key => key switch
-        {
-            CartRepositoryKeys.Cart => s.GetService<CartRepository>(),
-            CartRepositoryKeys.CachedCart => s.GetService<CachedCartRepository>(),
-            _ => throw new KeyNotFoundException("Unknown cart repository")
-        });
-        services.AddScoped<OrderRepository>();
-        services.AddScoped<CachedOrderRepository>();
-        services.AddScoped<OrderRepositoryResolver>(s => key => key switch
-        {
-            OrderRepositoryKeys.Order => s.GetService<OrderRepository>(),
-            OrderRepositoryKeys.CachedOrder => s.GetService<CachedOrderRepository>(),
-            _ => throw new KeyNotFoundException("Unknown order repository")
-        });
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<ICachedCartRepository, CachedCartRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<ICachedOrderRepository, CachedOrderRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPlaceRepository, PlaceRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();

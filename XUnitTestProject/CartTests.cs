@@ -1,10 +1,11 @@
 using Cart.Application.Dtos;
 using Cart.Application.Interfaces;
 using Cart.Application.Interfaces.Repositories;
+using Cart.Application.Interfaces.Repositories.Cached;
 using Cart.Application.Services;
 using Model.Extensions;
-using Moq;
 using User.Application.Dto;
+using Moq;
 
 namespace XUnitTestProject;
 
@@ -12,6 +13,7 @@ public class CartTests
 {
     private Mock<IUnitOfWork> _moqCartUow;
     private Mock<ICartRepository> _moqCartRepo;
+    private Mock<ICachedCartRepository> _moqCachedCartRepo;
     private Mock<IOrderRepository> _moqOrderRepo;
     private Mock<IPlaceRepository> _moqPlaceRepo;
     private Mock<IBuyReportRepository> _moqBuyRepo;
@@ -24,6 +26,7 @@ public class CartTests
     {
         _moqCartUow = new Mock<IUnitOfWork>();
         _moqCartRepo = new Mock<ICartRepository>();
+        _moqCachedCartRepo = new Mock<ICachedCartRepository>();
         _moqOrderRepo = new Mock<IOrderRepository>();
         _moqPlaceRepo = new Mock<IPlaceRepository>();
         _moqBuyRepo = new Mock<IBuyReportRepository>();
@@ -84,6 +87,7 @@ public class CartTests
             IsBought = false
         };
         _moqCartRepo.Setup(x => x.GetNotBoughtCartByUserIdAsync(_userId)).ReturnsAsync(requestCart);
+        _moqCachedCartRepo.Setup(x => x.GetNotBoughtCartByUserIdAsync(_userId)).ReturnsAsync(requestCart);
         _moqCartRepo.Setup(x => x.AddPlaceToCart(_userId, _placeId)).ReturnsAsync(() =>
         {
             requestCart.PlaceId = _placeId;
@@ -104,7 +108,7 @@ public class CartTests
         _moqCartUow.Setup(x => x.OrderRepository).Returns(_moqOrderRepo.Object);
         _moqCartUow.Setup(x => x.PlaceRepository).Returns(_moqPlaceRepo.Object);
         _moqCartUow.Setup(x => x.BuyReportRepository).Returns(_moqBuyRepo.Object);
-        var cartService = new CartService(_moqCartUow.Object);
+        var cartService = new CachedCartService(_moqCartUow.Object, _moqCachedCartRepo.Object);
 
         var cart = await cartService.ConfirmCartAsync(_userId, _placeId);
         Assert.Equal(_placeId, cart.PlaceId);
