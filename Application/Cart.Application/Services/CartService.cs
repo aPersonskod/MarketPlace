@@ -90,9 +90,9 @@ public class CachedCartService(
         var cart = await cachedCartRepository.GetNotBoughtCartByUserIdAsync(userId);
         if (cart == null)
         {
-            await unitOfWork.CartRepository.AddCartAsync(userId);
+            var createdCart = await unitOfWork.CartRepository.AddCartAsync(userId);
             await unitOfWork.CompleteAsync();
-            cart = await cachedCartRepository.AddCartAsync(userId);
+            cart = await cachedCartRepository.AddCartAsync(createdCart);
         }
         return cart.ToDto();
     }

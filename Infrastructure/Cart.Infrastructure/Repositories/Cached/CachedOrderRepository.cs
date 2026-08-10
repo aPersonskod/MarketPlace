@@ -1,6 +1,7 @@
 using Cart.Application.Dtos;
 using Cart.Application.Interfaces;
 using Cart.Application.Interfaces.Repositories.Cached;
+using Cart.Infrastructure.CacheModels;
 using Microsoft.Extensions.Caching.Distributed;
 using Model;
 using Model.Extensions;
@@ -10,38 +11,17 @@ namespace Cart.Infrastructure.Repositories.Cached;
 
 public class CachedOrderRepository(IUnitOfWork unitOfWork, IDistributedCache cache) : ICachedOrderRepository
 {
-    private const string NsCacheKey = "NSCartIds"; // not synced cartIds key
-    private static string CacheKey (Guid cartId) => $"orders:{cartId}";
-    private async Task AddNsCartIdAsync(Guid cartId)
-    {
-        var nsCartIds = await cache.GetRecordAsync<IEnumerable<Guid>>(NsCacheKey);
-        if (nsCartIds == null)
-        {
-            await cache.SetRecordAsync<IEnumerable<Guid>>(NsCacheKey, [cartId]);
-        }
-        else
-        {
-            var cartIds = nsCartIds.ToList();
-            cartIds.Add(cartId);
-            await cache.SetRecordAsync(NsCacheKey, cartIds.Distinct());
-        }
-    }
-
     public async Task<IEnumerable<Order>> GetCartOrdersAsync(Guid cartId)
     {
         // get cache data
-        var cachedCartOrders = await cache.GetRecordAsync<IEnumerable<Order>>(CacheKey(cartId));
+        var cachedCartOrders = await cache.GetCartOrdersByCartId(cartId);
         if (cachedCartOrders == null)
         {
             // get db data
             var cartOrders = await unitOfWork.OrderRepository.GetCartOrdersAsync(cartId);
-            var cartOrdersList = cartOrders.ToList();
-            if (cartOrdersList.Count != 0)
-            {
-                // set db data to cache
-                await cache.SetRecordAsync(CacheKey(cartId), cartOrdersList);
-                cachedCartOrders = await cache.GetRecordAsync<IEnumerable<Order>>(CacheKey(cartId));
-            }
+            // set db data to cache
+            await cache.SetCartOrdersByCartId(cartId, cartOrders);
+            cachedCartOrders = await cache.GetCartOrdersByCartId(cartId);
         }
         // get cache data
         if (cachedCartOrders == null) throw new NotFoundException("Cache does not save cart orders");
@@ -64,8 +44,8 @@ public class CachedOrderRepository(IUnitOfWork unitOfWork, IDistributedCache cac
         var allCartOrders = await GetCartOrdersAsync(orderDto.CartId);
         var cartOrders = allCartOrders.ToList();
         cartOrders.First(x => x.Id == foundOrder.Id).Quantity = orderDto.Quantity;
-        await cache.SetRecordAsync(CacheKey(orderDto.CartId), cartOrders);
-        await AddNsCartIdAsync(orderDto.CartId);
+        await cache.SetCartOrdersByCartId(orderDto.CartId, cartOrders);
+        await cache.AddChangedCartId(orderDto.CartId);
         return foundOrder;
     }
     // just cache
@@ -78,8 +58,8 @@ public class CachedOrderRepository(IUnitOfWork unitOfWork, IDistributedCache cac
         var cartOrdersResult = await GetCartOrdersAsync(createOrderDto.CartId);
         var cartOrders = cartOrdersResult.ToList();
         cartOrders.Add(order);
-        await cache.SetRecordAsync(CacheKey(createOrderDto.CartId), cartOrders);
-        await AddNsCartIdAsync(createOrderDto.CartId);
+        await cache.SetCartOrdersByCartId(createOrderDto.CartId, cartOrders);
+        await cache.AddChangedCartId(createOrderDto.CartId);
         return order;
     }
     // just cache
@@ -94,7 +74,7 @@ public class CachedOrderRepository(IUnitOfWork unitOfWork, IDistributedCache cac
         var cartOrdersResult = await GetCartOrdersAsync(deleteOrderDto.CartId);
         var cartOrders = cartOrdersResult.ToList();
         cartOrders.Remove(cartOrders.Single(x => x.Id == foundOrder.Id));
-        await cache.SetRecordAsync(CacheKey(deleteOrderDto.CartId), cartOrders);
-        await AddNsCartIdAsync(deleteOrderDto.CartId);
+        await cache.SetCartOrdersByCartId(deleteOrderDto.CartId, cartOrders);
+        await cache.AddChangedCartId(deleteOrderDto.CartId);
     }
 }
