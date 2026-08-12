@@ -9,10 +9,17 @@ namespace BuyReport.Infrastructure.Repositories;
 public class CartRepository(IOptions<CartSettings> cartOptions) : ICartRepository
 {
     private readonly string _baseUrl = cartOptions.Value.Address + "/api/cart-service";
+    [Obsolete]
     public async Task<IEnumerable<CartForReportDto>?> GetCartsForReportAsync(string? authToken)
     {
         var query = $"{_baseUrl}/get-carts-for-report";
         return await query.GetQuery<IEnumerable<CartForReportDto>>(authToken);
+    }
+
+    public async Task<CartForReportDto?> GetCartForReportAsync(Guid cartId, string? authToken)
+    {
+        var query = $"{_baseUrl}/get-cart-for-report?cartId={cartId}";
+        return await query.GetQuery<CartForReportDto>(authToken);
     }
 
     public async Task<bool> IsCartExistsAsync(Guid cartId, string? authToken)

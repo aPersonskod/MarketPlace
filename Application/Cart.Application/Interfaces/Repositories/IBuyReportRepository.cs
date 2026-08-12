@@ -4,5 +4,5 @@ namespace Cart.Application.Interfaces.Repositories;
 
 public interface IBuyReportRepository
 {
-    Task<IEnumerable<CartForReportDto>?> GetCartForReportAsync(Guid userId);
+    Task<IEnumerable<CartForReportDto>?> GetCartsForReportAsync(Guid userId);
 }

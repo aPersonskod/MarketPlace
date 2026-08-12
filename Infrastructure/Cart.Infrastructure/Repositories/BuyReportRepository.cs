@@ -8,7 +8,7 @@ namespace Cart.Infrastructure.Repositories;
 
 public class BuyReportRepository(AppDbContext context) : IBuyReportRepository
 {
-    public async Task<IEnumerable<CartForReportDto>?> GetCartForReportAsync(Guid userId)
+    public async Task<IEnumerable<CartForReportDto>?> GetCartsForReportAsync(Guid userId)
     {
         await using var connection = context.Database.GetDbConnection();
         var sql = $"SELECT cart.\"Id\", cart.\"UserId\", place.\"Address\", ord.\"Id\" as OrderId, "+

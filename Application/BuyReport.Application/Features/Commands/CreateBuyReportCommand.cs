@@ -5,7 +5,7 @@ using MediatR;
 
 namespace BuyReport.Application.Features.Commands;
 
-public record CreateBuyReportCommand(Guid CartId, string AuthToken) : IRequest<BuyReportDto>;
+public record CreateBuyReportCommand(Guid CartId, Guid UserId, string AuthToken) : IRequest<BuyReportDto>;
 
 public class CreateBuyReportCommandHandler(IBuyReportRepository buyReportRepository, ICartRepository cartRepository) 
     : IRequestHandler<CreateBuyReportCommand, BuyReportDto>
@@ -15,7 +15,7 @@ public class CreateBuyReportCommandHandler(IBuyReportRepository buyReportReposit
         cancellationToken.ThrowIfCancellationRequested();
         var response = await cartRepository.IsCartExistsAsync(request.CartId, request.AuthToken);
         if (!response) throw new ArgumentException("Invalid cartId");
-        var buyReport = await buyReportRepository.CreateBuyReportByCartIdAsync(request.CartId);
+        var buyReport = await buyReportRepository.CreateBuyReportByCartIdAsync(request.CartId, request.UserId);
         return buyReport.ToDto();
     }
 }
