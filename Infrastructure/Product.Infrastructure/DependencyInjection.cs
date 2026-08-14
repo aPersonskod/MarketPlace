@@ -24,7 +24,7 @@ public static class DependencyInjection
         if (environment.IsDevelopment())
         {
             // todo ОБЯЗАТЕЛЬНО ПРОВЕРЬ ПРИ ЗАПУСКЕ ДОККЕРА !!!
-            var isRunningFromContainer = false;
+            var isRunningFromContainer = true;
             if (isRunningFromContainer)
             {
                 // need that because in docker-compose env is development
